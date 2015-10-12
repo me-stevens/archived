@@ -1,0 +1,98 @@
+---
+layout:   post
+title:    "57: HAPPY YULE AND NEW GREGORIAN YEAR"
+date:     2016-01-01 20:00:00
+category: journal
+---
+
+<p>Although, the year started with <a href="https://en.wikipedia.org/wiki/Samhain">Samhain</a> for my dear ancestors; an epic party full of drugs, sex and rock &amp; roll<sup><a href="#note">[1]</a></sup> to celebrate going <a href="https://www.youtube.com/watch?v=pz-UA6rjQ8Q">from death and darkness to life and light</a>.</p>
+
+<p>Just like this octopus! Moving from Mordor to the light! <img src="{{ baseurl }}/img/lighter.gif" alt="Animated lighter" width="20" height="25"> And I started in October too! OMG EVERYTHING MAKES SENSE :-P</p>
+
+<p>My only New Year's resolution is again to learn Swedish, a resolution at which I totally failed last year.</p>
+
+<p id="note" class="footnote"><sup>[1]</sup> Ya know, dolmen-rock rolling or something : )</p>
+
+
+
+<h2>Today I learnt</h2>
+
+<p>I wanted to code the whole payroll thing by myself, so I asked on the Slack channel for on-line resources that anybody could recommend that had <strong>exercises on mocking a database</strong>. According to Felipe:</p>
+
+<ul>
+	<li>If it's SQL, use <a href="http://www.h2database.com/html/main.html">H2</a> (an in-memory implementation of SQL).</li>
+	<li>If it's not, just hide the database behind an object you can inject regularly.</li>
+</ul>
+
+<p>I don't have any database yet and I never did this before, so I was a bit lost. I asked if he had any database mocks in his GitHub repos, but he said he didn't<sup><a href="#code">[2]</a></sup>. I wanted to practice database mocking, as I practiced console mocking on my <a href="https://github.com/me-stevens/EchoServer">Echo Server</a>. The idea is that if you wanted to test what happens when you delete a record, for example, you wouldn't do it in the real database but in a mock. However, Felipe told me "<em>those are things I <strong>would</strong> test with the DB, because they are super-DB-specific</em>".</p>
+
+<p>My confusion gained +1000 extra points.</p>
+
+<p>He continued:</p>
+
+<blockquote>So, there are things that are specific to a database and database layer. For example, how the ORM is configured. Those are things I would test with some kind of in-memory database. For anything else, I would just roll a FakeDBObject. You have to ask yourself: who cares about the DB in your app?<br>
+
+The reason I'd use an in-memory DB is that I want raw speed. Spinning disks are slow compared to an SSD. For any test or specific DB thing, I'd use a real DB.</blockquote>
+
+<p>Regarding <a href="https://blog.8thlight.com/uncle-bob/2013/10/01/Dance-You-Imps.html">an article</a> plugged-in by Mateu when I asked opinions about Hibernate (basically, don't use disk but don't depend on DB specific details), Felipe added:</p>
+
+<blockquote>Sometimes you can use an in-memory DB, sometimes you can't. Not all DBs have a lightweight "version" of themselves that you can just spin up. You have to understand the values and what <strong>you like to see</strong>.</blockquote>
+
+<p>So, having an abstraction with only the details that the application cares about (like an interface in between the app and the DB), and avoiding the decision of the specific implementation would allow me to use a FakeDBObject. But I think that object is what I meant with "<em>database mock</em>". So, how to use it? Where do I start? A console and a database are very different. Still no idea : )</p>
+
+<p>My time is running out and I haven't written any code yet. I also never did anything with transactions before. I'm freaking out. So I'm going to follow the book.</p>
+
+<p id="code" class="footnote"><sup>[2]</sup> I remember asking Jim and Christoph long ago about good code samples, and they showed me the codebase of <a href="https://github.com/unclebob/fitnesse">Fintesse</a>. I asked again for code <a href="{% post_url 2015-11-18-day028 %}">some other day</a> and I was told to stick with my breakable toy. Sometimes I feel like there is not much good code I can take a look at that is not in a book!</p>
+
+
+
+
+
+
+
+<h3>LET'S DO THIS</h3>
+
+<p>The first thing that calls my attention is that, although having employee types proved to be the wrong approach, we still need those transactions. <strong>They are not using the affiliation collaborator yet. They are also not using the payment-method collaborator yet</strong>, but using defaults for it. I hadn't thought about any defaults yet!. And <strong>they are also introducing already the payroll database</strong>. BOOM. In the first test. OK! LET'S DO IT.</p>
+
+<p>The code in the book is in C++, and the test for the transaction that adds an employee with a salary is super long and does a lot of things. I feel like breaking it into separate tests. ISN'T THAT WHAT YOU TAUGHT ME, UNLCE BOB. I started with a smaller test in Java, just to allow me to create some of the many objects:</p>
+
+<pre><code class="language-java">public class AddMonthlyEmployeeTest {
+
+    @Test
+    public void addsMonthlyEmployeeToTheDB() {
+        PayrollDB payrollDB = new PayrollDB();
+        assertTrue(payrollDB.getEmployee(1) instanceof Employee);
+    }
+}</code></pre>
+
+<p>This allows me to create the classes <code class="language-java">PayrollDB</code> and <code class="language-java">Employee</code>.</p>
+
+<figure>
+	<a href="{{ baseurl }}/img/day057.png"><img src="{{ baseurl }}/img/day057.png" alt="I have no idea what I'm doing" width="400" height="254"></a>
+	<figcaption>What he said.</figcaption>
+</figure>
+
+<p>Now I need to add <strong>something that will allow me to implement the actual behavior of the PayrollDB using a transaction</strong>. They are using a "dictionary" to store the employees in the PayrollDB class. I think dictionaries exist also in Java, but I have only used Hash Maps. It's similar to my first design using a <code class="language-java">List</code> of employees in the Payroll class, just that now we need the id, and the employee class doesn't need to know about ids. The id has to be stored with the employee, but outside the employee.</p>
+
+<p>So, <strong>PayrollDB is going to be the mock of the database, or the FACADE pattern</strong>. I wonder what would be the difference between a fake and a FACADE? I'm gonna rename it to <code class="language-java">PayrollDBFacade</code>. These new lines will allow me to create the rest of the classes:</p>
+
+<pre><code class="language-java">@Test
+public void addsMonthlyEmployeeToTheDB() {
+    PayrollDBFacade payrollDB      = new PayrollDBFacade();
+    AddMonthlyEmployee addMonthlyE = new AddMonthlyEmployee(payrollDB);
+    addMonthlyE.execute(1, "Squiddo", "FishBowl", 1000.0);
+
+    Employee employee = payrollDB.getEmployee(1);
+    assertEquals("Squiddo", employee.getName());
+}</code></pre>
+
+<p>Since <code class="language-java">AddMonthlyEmployee</code> is a subclass of the <code class="language-java">AddEmployeeTransaction</code> interface, I should declare it like that, but... do I know that at this point? I'm gonna leave it like that by now. I wonder if in the future, the PayrollDBFacade will also be a subclass of an interface that would allow me to pass the real database to the <code class="language-java">AddEmployeeTransaction</code> in production?</p>
+
+<p>For the rest of the things, I <a href="https://github.com/me-stevens/payroll/commit/a3f35a9294d98adb7954985d9e2f53f12105590d">feel like I wrote a lot of production code just to make that test pass</a>. I guess it's because I have to set everything up to start rolling. But it's weird, because it seems like I'm testing three classes through only one test. Is this enough? This is how my app should behave, but shouldn't I need separate test classes for the classes I'm creating too? I'm going to continue following the book and add those tests later.</p>
+
+<p>Also, <strong>the transactions were said to have the same fields as the class we are adding</strong>, however, my code is leading me to pass the payrollDBFacade in the constructor of the transaction and the employee fields in the execute method... I wonder if I should change this? Should I leave the <code class="language-java">execute()</code> method with no arguments and provide another method to pass the payrollDB? Seems like I shouldn't pass it in the constructor because it's not an Employee field.</p>
+
+<p>Now I need to add the collaborators of the employee: the payment type, the payment schedule and the payment method. I'm going to start with the type of payment, which is monthly in this case. So I will need to create a new class. Again, I know it's going to be a subclass of an interface, but for now, <a href="https://github.com/me-stevens/payroll/commit/6abdbee7f496ea0b29d27da5ab45cc2988ba2a49">I'm declaring it as if it was the only type</a>. Same for the <a href="https://github.com/me-stevens/payroll/commit/d87c3bbff3773704490bd029699dc79011759af7">payment schedule</a> and the <a href="https://github.com/me-stevens/payroll/commit/90cf2fbe60bc86f0c2c84af348b5c4f624d97a36">payment method</a>.</p>
+
+<p>Adding another payment type allows me to abstract the payment type into an interface and work with it instead. I have to make the same for the transactions. Anyway, tomorrow more!</p>
+

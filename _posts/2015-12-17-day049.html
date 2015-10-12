@@ -1,0 +1,27 @@
+---
+layout:   post
+title:    "49: Drunken ants"
+date:     2015-12-17 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Micah had prepared something very cool for the master cohort today. He made a web-based ant game that we were playing with the whole day.</p>
+
+<p>It had an API that you could "log" into, and receive an ant id. With that ant you could do many things: move, collect food, create more ants, etc. If you moved to a cell that had food, you could collect it and if you brought it back to the nest, you would get one point. The food could be used to create more ants to send for more food. The objective was to get the highest score.</p>
+
+<p>We did a first round to check how the game worked, and how the information sent back from the server looked like. It was similar to JSON, but it was not JSON. From the second round on, we worked in pairs, so I worked with CJ. We used Ruby, which I'm still struggling to learn by my own (my brain is destroyed by a whole life of C-like languages). He mocked a server, <a href="{% post_url 2015-11-30-day036 %}">something I want to learn to do</a>, and then we started to TDD the thing. In each round the requirements were different, so at some point, we abandoned the TDD. We also created a lot of threads (each ant should move in its own thread).</p>
+
+
+<p>The pressure of the requirements, which of course got harder in each round, kept our code getting uglier and uglier, which amused us and scared us in equal amounts. At some point I was almost going to say something on the lines of:</p>
+
+<blockquote>Nah, don't worry. It's not AS IF UNCLE BOB WAS WATCHING US.</blockquote>
+
+<p>It took me two micro-seconds to swallow my words XD.</p>
+
+<p>We managed to make the ants move in random directions, because my algorithm idea was going to take ages to implement. Thanks god that I was with a craftsperson and THE OVER-COMPLICATOR could not take control. But our ants were slow and moving randomly, so they looked pretty much as drunken ants.</p>
+
+<h2>Nice things</h2>
+
+<p>This is very silly, but I was so happy that I finally have Internet at home, that I entered the office HUGGING EVERYBODY. AND IT FELT SO GOOD. We should do it instead of the handshake!</p>

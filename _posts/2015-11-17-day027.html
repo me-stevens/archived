@@ -1,0 +1,152 @@
+---
+layout:   post
+title:    "27: Refactoring and CIing like a boss"
+date:     2015-11-17 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Christoph talked about the <a href="https://en.wikipedia.org/wiki/Dependency_inversion_principle">Dependency Inversion Principle</a> or DIP. It's very related to what he talked about in <a href="{% post_url 2015-11-10-day022 %}">a previous <em>Zagaku</em> about how to split your Interfaces</a>. In this case, if you had a class that has a dependency on another class, for example, a button that depends on a light-bulb (what an appropriate example for us 8th-lighters :-P), you would have to add new button classes to switch doors, etc. However, if you pass it a "<em>Switchable</em>" object instead, defined as an interface, then you could use the same button implementation for any switchable-like object, and treat all those separately. The button doesn't have to know what the switchable objects are!.</p>
+
+<p>I was curious to know <strong>when would you use an interface and when would you use an abstract class</strong>, since, at the end of the day, the behaviour is very similar. The key difference is that an interface obliges you to implement every method, so it acts as a template, while the abstract class is there to say "<em>hey, this part here is common behaviour for all my kids, I exist just so that you don't repeat yourself</em>". Don't repeat yourself (DRY) as opposed to Writing Everything Twice (WET) or We Enjoy Typing. Sorry, I had to mention it XD.</p>
+
+<p>The thing is that I don't see many people enclosing common behaviour in an abstract class and extending it, <strong>I would rather extract that common behaviour into its own concept. Also, interfaces are useful when you don't know at compile time what the hell is gonna be passed to your method/constructor/thing</strong>. Felipe confirmed my suspicion by saying something along the lines of that.</p>
+
+<p>In other topics, I also read a bit more about <strong>continuous integration</strong>. Thoughtworks has <a href="https://www.thoughtworks.com/continuous-integration">a nice page on the subject</a>, that reads very easily. The idea is very similar to the git mantra: "<em>commit early, commit often</em>". That way, you have your back covered if life happens. This week was a bit of a mess, and I lost my usual organization and discipline, so I found out (on the IPM!!) that I had been writing code like crazy without committing. I almost liquefied over the floor out of shame. The CI practices are a lot of new stuff to me, I'll have to come back and read it several times.</p>
+
+<p>Regarding my code, Felipe helped me with the big refactoring that I have in one of my stories, where I have to extract an interface out of two of my classes. The book I am reading now about refactoring has a section about exactly that. At first I asked how to TDD that, and then I realized, either I was tired or I suddenly became a bit retarded. But no, I was just doing my favourite thing: thinking too far in advance and doing 40 things at once. It's called REFACTORING for a reason!. Wake up, brain.</p>
+
+<p>He spotted two important code smells that only the practice and experience I was talking about yesterday would allow to spot. First, I was creating the human and robot turn objects in <em>every</em> turn, and passing the board in the constructor:</p>
+
+<pre><code class="language-java">public int humanTurn() {
+	HumanTurn human = new HumanTurn(board, gameUI, currentPlayer);
+	return human.getCellIndex();
+}
+
+public int robotTurn() {
+	RobotTurn robot = new RobotTurn(board, gameUI, currentPlayer);
+	return robot.getCellIndex();
+}
+</code></pre>
+
+<p>The board only matters when I want to get an index to place the mark, so it makes much more sense to pass it to the method that gets the index:</p>
+
+<pre><code class="language-java">public int humanTurn() {
+	Player human = new HumanTurn(gameUI, currentPlayer);
+	return human.getCellIndex(board);
+}
+
+public int robotTurn() {
+	Player robot = new RobotTurn(gameUI, currentPlayer);
+	return robot.getCellIndex(board);
+}
+</code></pre>
+
+<p>As a final step, I moved the objects creation to the game menu. Then I removed the boolean variables I was using to differentiate the players, and used objects of the Player interface I just created instead. That made the robot and human turn methods unnecessary, so I could remove them and have my turn loop looking like this:</p>
+
+<pre><code class="language-java">public boolean nextTurn() {
+	gameUI.printBoard(board);
+
+	int index = (currentPlayer.equals("X")) ? player1.getCellIndex(board) : player2.getCellIndex(board);
+	board.setCell(index, currentPlayer);
+
+	return updateGameStatus();
+}
+</code></pre>
+
+<p>when it previously looked like this:</p>
+
+<pre><code class="language-java">public boolean nextTurn() {
+	gameUI.printBoard(board);
+
+	int index = (isHuman()) ? humanTurn() : robotTurn();
+	board.setCell(index, currentPlayer);
+
+	return updateGameStatus();
+}
+</code></pre>
+
+
+<p>This was relatively easy :) (I feared the next thing to do, not really this). The second thing Felipe helped me with was, a very simple test that was checking the behaviour of the game menu. I plan to extract it into its own class or enum or something, and it is one of my stories, but I don't want to do it yet. However, when I got rid of my boolean variables and was left with just Player objects, those tests where failing, and I had to fix them. I am just refactoring, so I should keep green with every change I do.</p>
+
+<p>This is what I had initially:</p>
+
+<pre><code class="language-java">@Test
+public void setsTwoHumanPlayers() {
+    game.setPlayers("1");
+    assertTrue(game.getHumanity1());
+    assertTrue(game.getHumanity2());
+}
+
+@Test
+public void setsOneRobotPlayer() {
+    game.setPlayers("2");
+    assertTrue( game.getHumanity1());
+    assertFalse(game.getHumanity2());
+}
+
+@Test
+public void setsTwoRobotPlayers() {
+    game.setPlayers("3");
+    assertFalse(game.getHumanity1());
+    assertFalse(game.getHumanity2());
+}
+</code></pre>
+
+<p>This is what I tried, but it felt weird because I was not asserting anything:</p>
+
+<pre><code class="language-java">@Test
+public void setsTwoHumanPlayers() {
+    spy.setInputs("1", "2");
+    game.setPlayers("1");
+    playTurns(2);
+}
+
+@Test
+public void setsOneRobotPlayer() {
+    spy.setInput("1");
+    game.setPlayers("2");
+    playTurns(2);
+}
+
+@Test
+public void setsTwoRobotPlayers() {
+    game.setPlayers("3");
+    playTurns(2);
+}
+</code></pre>
+
+<p>Then Felipe suggested that I used <code class="language-java">instanceof</code>. OF COURSE. How didn't I think of that!</p>
+
+<pre><code class="language-java">@Test
+public void setsTwoHumanPlayers() {
+    game.setPlayers("1");
+    assertTrue(game.getPlayer1() instanceof HumanPlayer);
+    assertTrue(game.getPlayer2() instanceof HumanPlayer);
+}
+
+@Test
+public void setsOneRobotPlayer() {
+    game.setPlayers("2");
+    assertTrue(game.getPlayer1() instanceof HumanPlayer);
+    assertTrue(game.getPlayer2() instanceof RobotPlayer);
+}
+
+@Test
+public void setsTwoRobotPlayers() {
+    game.setPlayers("3");
+    assertTrue(game.getPlayer1() instanceof RobotPlayer);
+    assertTrue(game.getPlayer2() instanceof RobotPlayer);
+}
+</code></pre>
+
+<p>I have to say, I'm really enjoying these refactoring sessions.</p>
+
+
+
+<h2>Nice things</h2>
+
+<p>Today I felt proud of myself. I was able to organize what I have to do for the week and worked very focused. Also, I followed Felipe's advice of making "<a href="{% post_url 2015-11-16-day026 %}">tiny branches</a>" </a>. I suspect it has to do with the fact that this week, my tasks are pretty broken down into little pieces. It won't be always possible to have my stories chunked this way, but I'm going to get the most out of it while I have it.</p>
+
+<p>Emily is becoming a very different person than what she was before starting as a student with us. <strong>I'm really proud of her and I think she is the one making the most out of what she's provided with</strong>. I wish I had her attitude and her maleable brain! I guess it's harder to unlearn your bad habits than to absorb new ones.</p>

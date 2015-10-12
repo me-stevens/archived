@@ -1,0 +1,128 @@
+---
+layout:   post
+title:    "79: Tmux"
+date:     2016-02-02 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Mateu finished his <em>Zagaku</em> from the other day, the one about dependencies and how to manage them properly. It's one of the <em>Zagaku</em>'s I've enjoyed the most so far. <strong>The code example was also very nice, an Android app</strong>! I miss doing Android apps, although I haven't really build anything usable or useful, lol.</p>
+
+<p>Also, I paired with Cedric, and he showed me a nice resource for Ruby documentation (as well as other languages): <a href="http://devdocs.io/">http://devdocs.io/</a>.</p>
+
+<p>Today, <strong>I had to decide the format my contacts were going to have</strong>. I have Jim's words resonating in my head:</p>
+
+<blockquote>I know you can write code. I want you to write CLEAN code.</blockquote>
+
+<p>And:</p>
+
+<blockquote>Simple doesn't mean the easiest thing. BE DISCIPLINED.</blockquote>
+
+<p>These words are pressing my chest and <strong>I've been super stressed out for fear of disappointing him</strong>. Many times I have wiped out everything I had done in ConMan&trade; and started over again from scratch. I am making small steps, thinking every commit, analyzing every line of code, searching the Ruby style of doing things before I do them, and all that. And still I feel my code is not good enough. And I still keep making the wrong decisions. And I can only imagine Jim looking at my code and facepalming until his forefront is red.</p>
+
+
+<figure>
+  <a href="{{ baseurl }}/img/day005.jpg"><img src="{{ baseurl }}/img/day005.jpg" alt="Double facepalm" width="500" height="400"></a>
+  <figcaption>I know of two who may probably look like these other two.</figcaption>
+</figure> 
+
+
+<p>Anyway, I thought the simplest and cleanest thing would be to just write one contact after another in the file, with every field in one line. Something like:</p>
+
+<pre><code class="language-">Contact 1 name
+Contact 1 address
+1234567890
+contact1@email.com
+Contact 1 notes
+Contact 2 name
+Contact 2 address
+1234567890
+contact2@email.com
+Contact 2 notes
+</code></pre>
+
+<p>But Christoph told me to not put that burden over my shoulders, specially when <strong>there is a JSON gem that takes care of that</strong>, parsing problems, and everything. So I spent some time on pry, figuring out what I should pass the JSON gem and what does it return, and how should I format it to send it to my application.</p>
+
+
+
+
+
+
+
+
+
+
+
+<h3>Tmux</h3>
+
+<p>After a <em>Zagaku</em> that Skim gave long ago about tmux, I was curious to try it again after all this years and see if my experience was different than with GNU screen, so I had installed it but hadn't used it yet. Today I started learning some commands.</p>
+
+<p>To enter tmux:</p>
+
+<pre><code class="language-bash">tmux</code></pre>
+
+<p>If you want to create a session:</p>
+
+<pre><code class="language-bash">$ tmux new -s session_name</code></pre>
+
+<p>In order to do stuff with tmux, I read somewhere that I had to press <kbd>Cmd</kbd> + <kbd>b</kbd>, and in particular, to detach from a session, you would do <kbd>Cmd</kbd> + <kbd>b</kbd> and then press <kbd>d</kbd>. It didn't work, but I discovered that in Chrome, that combination adds a bookmark, and in Finder, it hides or shows the desktop bar... LOL.</p>
+
+<p>Since these keyboard shortcuts didn't work, I had to type the actual commands:</p>
+
+<pre><code class="language-bash">$ tmux new -s session_name
+$ tmux split-window
+$ tmux select-pane -U
+$ tmux split-window -h 
+</code></pre>
+
+<p>Hopefully, Georgina gave me some tips, like which things to put in a tmux config file, <code class="language-bash">.tmux.conf</code>. I had the awful idea of sourcing it in the terminal, and some of my keys stopped working properly. So <strong>never source .tmux.conf</strong>! Instead, use:</p>
+
+<pre><code class="language-bash">$ tmux source-file ~/.tmux.conf</code></pre>
+
+<a href="https://github.com/christophgockel/dotfiles/blob/master/tmux/tmux.conf">Christoph</a>, <a href="https://gist.github.com/sl4m/ff152ce44f1921d9eedd">Skim</a> and <a href="https://github.com/gemcfadyen/dotfiles/blob/master/.tmux.conf
+">Georgina</a> tmux configurations are also worth studying.</p>
+
+<p>After this and mapping the <kbd>capslock</kbd> key to act as the <kbd>Ctrl</kbd> key, so that it is closer to the <kbd>a</kbd> key, I paired with Skim. He showed me more commands. First, he went to my system settings, and <strong>set the keyboard delay to zero</strong>. Now it reacts super fast to typing. Then, he showed me some keyboard shortcuts, like:</p>
+
+<ul>
+  <li><kbd>Ctrl</kbd> + <kbd>a</kbd> and then <kbd>d</kbd>: Exits tmux.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>a</kbd> and then <kbd>"</kbd>: divides tmux main window in two, vertically.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>a</kbd> and then <kbd>%</kbd>: same, but horizontally.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>a</kbd> and <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd>, <kbd>l</kbd> to move through Vim panes.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>a</kbd> and then <kbd>q</kbd>: Shows the panes' id's and panes' sizes.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>a</kbd> and then <kbd>t</kbd>: Shows the time in the current panel. Press <kbd>q</kbd> to exit clock and go back to that panel.</li>
+
+  <li><kbd>Ctrl</kbd> + <kbd>a</kbd> and then <kbd>[</kbd>: Enter Copy Mode.<br>
+    Inside this mode:
+    <ul>
+      <li><kbd>q</kbd>: Exit Copy Mode.</li>
+      <li><kbd>Shift</kbd> + <kbd>g</kbd>: Goes to bottom.</li>
+      <li><kbd>gg</kbd>: Goes to top.</li>
+      <li><kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd>, <kbd>l</kbd> to move the cursor.</li>
+      <li><kbd>spacebar</kbd> to mark the point to start copying.</li>
+      <li><kbd>e</kbd>, <kbd>b</kbd>, etc. to drag selection.</li>
+      <li>Use the arrow keys to select a line at a time.</li>
+      <li>Use <kbd>Enter</kbd> to copy.</li>
+      <li>Use <kbd>Ctrl</kbd> + <kbd>a</kbd> and then <kbd>]</kbd> to paste and exit Copy Mode.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Since you can't scroll on a tmux screen, the only way to scroll back is entering this "copy mode".</p>
+
+<p>I also found some good resources like <a href="https://robots.thoughtbot.com/a-tmux-crash-course">a tmux crash course</a>, <a href="https://gist.github.com/andreyvit/2921703">a tmux cheat sheet</a> and <a href="https://gist.github.com/MohamedAlaa/2961058">another tmux cheat sheet</a>.</p>
+
+<p>Regarding <strong>sessions in tmux</strong>: They can not really be saved, in the sense that when you turn off the computer they are lost. But you can use <a href="http://aokolish.me/blog/2013/02/12/using-tmux-and-tmuxinator/">tmuxinator</a>, which will save things like how many panels you have opened and the path each is in.</p>
+
+<p>Finally, because I was trying to code with Vim and tmux and finding out how to test File IO, I couldn't get anything done, so Christoph told me to switch back to Sublime so that I could finish my stories on time. I hope I don't forget all these commands I just learnt, but he's right, I also need to be productive.</p>
+
+
+
+
+
+
+
+
+
+

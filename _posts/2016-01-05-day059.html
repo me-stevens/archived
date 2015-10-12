@@ -1,0 +1,196 @@
+---
+layout:   post
+title:    "59: Exceptions"
+date:     2016-01-05 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>I talked with Christoph about the different approaches to coding a client app. He and I, we are used to going from inside out, starting with the first line of code and testing the little details first. Like in the roman numerals kata, where you start with number one, then number two, then number three, and there you stop and refactor because you detect a pattern. In other words, <strong>you go from details to generalization</strong>.</p>
+
+<p>The payroll app uses the opposite approach. And as I have been working on it, there was something feeling weird about the way they do things in the book and I didn't know why. Yesterday I fell off the tree: <strong>they are going from generalization to details</strong>! I had never work this way before.</p>
+
+<p>In the book, they start with the client requirements, and from there they prepare a set of acceptance tests. Acceptance tests are the ultimate thing that tells you how the user is going to interact with your app, and <a href="{% post_url 2015-12-31-day056 %}">as I have mentioned before</a>, J. Rainsberger recommends to start coding your app from the point of view of the client. This makes all the sense as well.</p>
+
+<p>The problem I had is that, because they are starting with the generalization, <strong>the first thing they do is to put the interfaces in place</strong>. They already know how the design of the app looks like, they have all the UMLs and all. They already know all the classes they need. <strong>And so I ended up with a bunch of empty classes and interfaces with no methods</strong>. The abstraction was in place for the things to come, but not because I needed it. Also, <strong>I was creating a bunch of classes and production code from just one test</strong> that was testing "<em>The Wiring Of It All.</em>". So I ended up with no test for the classes, because the test that made me create all their methods was the FAT test to test it all.</p>
+
+<p>Christoph told me that the book is old and that I can stop and go back from time to time to add the detailed tests for each class, and that I can do it my way. To be honest, <strong>I had already started to do it my way, but when I came back to the book, my code and their code were in parallel universes</strong>, and since I never worked with transactions or database mocks, <strong>it was very confusing for me to learn this for the first time and at the same time have different looking code</strong>.</p>
+
+<h3>Exceptions</h3>
+
+<p>I had a method in my database facade to get an employee when provided with an id. The question is... what do you do when the id doesn't exist? You can leave it like that and just check for nulls, as long as you document it in your tests, like:</p>
+
+
+<h4>Test</h4>
+
+<pre><code class="language-java">public class PayrollDBFacadeTest {
+
+    @Test
+    public void returnsNullIfEmployeeIdDoesntExist() {
+        PayrollDBFacade payrollDB = new PayrollDBFacade();
+        assertEquals(null, payrollDB.getEmployee(1));
+    }
+}</code></pre>
+
+
+<h4>Production code</h4>
+
+<pre><code class="language-java">public Employee getEmployee(int employeeId) {
+    return listOfEmployees.get(employeeId);
+}</code></pre>
+
+<p>But everybody knows that every time you do a null check, a kitten dies. So what about implementing the <strong>NULL object pattern</strong>?</p>
+
+
+<h4>Test</h4>
+
+<pre><code class="language-java">@Test
+    public void returnsNullObjectIfEmployeeIdDoesntExist() {
+        PayrollDBFacade payrollDB = new PayrollDBFacade();
+        assertEquals(PayrollDBFacade.NULL, payrollDB.getEmployee(1));
+    }
+}</code></pre>
+
+
+
+
+<h4>Production code</h4>
+
+<pre><code class="language-java">public static Employee NULL = new Employee("", "");
+
+public Employee getEmployee(int employeeId) {
+    return listOfEmployees.get(employeeId);
+}</code></pre>
+
+<p>This is still not good. What happens when the client ask for an employee that doesn't exist? They will get an employee anyway, and they would be able to access all its methods, so they will never realize they are <em>playing with smoke</em>.</p>
+
+<p>I had to ask myself this question when I had to add a time card to the hourly payment type, and I had to check:</p>
+
+<ul>
+	<li>That the employee existed (line 3).</li>
+	<li>That the payment type was hourly, otherwise it can't hold a time card (line 4).</li>
+</ul>
+
+<pre data-line="3,4"><code class="language-java">public class AddTimeCard {
+    public void execute() {
+        Employee employee = payrollDB.getEmployee(employeeID);
+        ((HourlyPayment) employee.getPaymentType()).addTimeCard(new TimeCard(date, hours));
+    }
+}</code></pre>
+
+<p>So now, the unexisting employee problem was transported to the transaction that adds a time card to an hourly employee. Is there where we should take care of unexisting employees? Who knows if the employee exists or not? The database. So there is where everything should happen, or in other words, that's where we should stop the app. In other words, we have to handle this with exceptions.</p>
+
+<p class="center">OOOHHH NOOOOOOOOOOOO.....</p>
+
+<p>Exceptions also kill kittens, at least for me. I hate them so much that I try to avoid them everytime I can. They spread their cancer along your whole application, throwing themselves all over the place, and you have to turn your codebase into a catching adventure.</p>
+
+<p>However, Christoph was there to help, and he told me about Runtime exceptions; <strong>exceptions that don't make you change the signature of your methods</strong>! I didn't know about that because I avoid exceptions! AVOID! AVOID! CRUCIFIX! VADE RETRO! So we made an <strong>internal custom exception</strong> for unexisting employees (<code class="language-java">EmployeeNotInDBException</code>), and we throw it if the employee id doesn't exist:</p>
+
+
+
+
+
+
+<h4>Test</h4>
+
+<pre><code class="language-java">public class PayrollDBFacadeTest {
+
+    @Test(expected = PayrollDBFacade.EmployeeNotInDBException.class)
+    public void throwsExceptionIfEmployeeNotInDB() {
+        PayrollDBFacade payrollDB = new PayrollDBFacade();
+        payrollDB.getEmployee(1);
+    }
+}</code></pre>
+
+<h4>Production code</h4>
+<pre><code class="language-java">public Employee getEmployee(int employeeId) {
+        if (listOfEmployees.containsKey(employeeId)) {
+            return listOfEmployees.get(employeeId);
+        }
+        throw new EmployeeNotInDBException();
+    }
+
+// The custom exception is defined inside the DB facade class
+public class PayrollDBFacade {   
+    public class EmployeeNotInDBException extends RuntimeException {
+    }
+}</code></pre>
+
+
+<p>And the best part is, you don't have to catch it later on in the program, unless you want to do something when the user tries to get an employee that is not there. I imagine you would catch it if you wanted to inform the user with a message in a GUI, or the console, or whatever you use.</p>
+
+<pre><code class="language-java">public class AddTimeCard {
+    public void execute() {
+        Employee employee = payrollDB.getEmployee(employeeID);
+        ((HourlyPayment) employee.getPaymentType()).addTimeCard(new TimeCard(date, hours));
+    }
+}</code></pre>
+
+
+
+<p>For the second point, we do have to throw an exception there, which is the place were the exceptional case happens. As usual, we start with the documentation first (the test). We create an hourly employee and try to assign it a sales card, which can only be assigned to commissioned employees, so we should get an exception:</p>
+
+
+<h4>Test</h4>
+
+<pre><code class="language-java">@Test (expected = PaymentTypeMismatchException.class)
+public void onlyCommissionedEmployeesCanHaveSalesCards() {
+    AddEmployee addHourlyEmployee = new AddHourlyEmployee(payrollDB, 1, "Squiddo", "FishBowl", 1000.0);
+    addHourlyEmployee.execute();
+    employee = payrollDB.getEmployee(1);
+
+    addSalesCard = new AddSalesCard(payrollDB, 1, 10001010, 100.0);
+    addSalesCard.execute();
+}</code></pre>
+
+
+<h4>Production code</h4>
+
+
+<pre><code class="language-java">public class AddTimeCard {
+    public void execute() {
+        Employee employee = payrollDB.getEmployee(employeeID);
+
+        try {
+            ((HourlyPayment) employee.getPaymentType()).addTimeCard(new TimeCard(date, hours));
+        } catch (ClassCastException e) {
+            throw new PaymentTypeMismatchException();
+        }
+    }
+}</code></pre>
+
+
+<p>The <code class="language-java">PaymentTypeMismatchException</code> is in its own file, accessible to all the other classes where there could be a payment type mismatch.</p>
+
+<p>So the learning is: throw the exceptions in the place where they happen, use runtime exceptions so that you don't spread signature cancer, and the system will take care of everything.</p>
+
+<p>And this is why it's so good to pair with a craftsperson, because due to all of this, I asked Christoph for a <em>Zagaku</em> on exceptions, best practices, where to throw and catch them, different types, and uses in the jungle, and he said he will do it!.</p>
+
+<p>Finally, Christoph recommended to add a test for the method in the DB facade that adds an employee:</p>
+
+
+
+
+<h4>Test</h4>
+
+<pre><code class="language-java">@Test
+public void addsAnEmployeeToTheDB() {
+    PayrollDBFacade payrollDB = new PayrollDBFacade();
+    Employee employee = new Employee("name", "address");
+    payrollDB.addEmployee(1, employee);
+    assertEquals(employee, payrollDB.getEmployee(1));
+}</code></pre>
+
+
+<h4>Production code</h4>
+
+<pre><code class="language-java">public void addEmployee(int employeeId, Employee employee) {
+       listOfEmployees.put(employeeId, employee);
+ }</code></pre>
+
+
+<p>OMG<br>
+Does this mean that I'll start using exceptions from now on?</p>
+
+<p>DON'T MISS THE NEXT EPISODE, SAME BAT-HOUR, SAME BAT-CHANNEL!</p>

@@ -1,0 +1,95 @@
+---
+layout:   post
+title:    "67: Four-dimensional feedback"
+date:     2016-01-15 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p class="center">TODAY I PAIRED WITH JIM</p>
+
+<p class="center">AND IT WAS OSOM</p>
+
+<p class="center">SPARKLES</p>
+
+<p>I honestly felt bad because he is busy the whole week and today he had brought his sphero for <em>waza</em>. Later on I learnt that he had connection problems due to the bluetooth not working, so he couldn't use it.</p>
+
+<p>We went through the payroll application doing the story about the addition of a main method to the payroll application in order to wire everything together.</p>
+
+<p>I realized <strong>I suck at explaining my code</strong> when he had to stop me because I was talking about details, details, details, and I hadn't explained him yet what the whole thing was about. So I brought my UMLs from when I was starting the design of the application, and everything was clearer from there on.</p>
+
+<p>We had two diametrally opposite options:</p>
+
+<ul>
+	<li><strong>Killing the paycheck</strong> and doing the pay calculation in the employee. After all, it is the one who knows everything about itself.</li>
+	<li><strong>Making the calculation in the paycheck</strong>, and so giving it a reason to exist.</li>
+</ul>
+
+<p>We made the decision that the <code class="language-java">getPaid()</code> method belonged to the paycheck and not the employee, so we started moving it smoothly, in small steps, and checking that the tests still passed. So now, the philosophy is that <strong>we pass an employee to the paycheck</strong>, and we call its methods to calculate the pay.</p>
+
+<p>Jim decided that the payday transaction was a good place to place the main, because that's the highest level transaction I have in my code. We wrote the main and realized that, after moving the <code class="language-java">getPaid()</code> method there, the <code class="language-java">execute()</code> method of the transaction was simplified a lot.</p>
+
+<p>Another thing we did was to simplify the tests. We moved the tests I had for the pay from the employee to the paycheck, and there were a lot of imports, and a lot of setup, which is a smell. So we created a spy/stub/fake employee, and used it to test the method that calculates the pay.</p>
+
+<p>He also agreed with me that <strong>the code in the book is not the best, and that the payment interfaces should be injected in the constructor</strong>, which is something I will do soon.</p>
+
+<p>In summary, BIUTIFUL code, and everything set up for the behavior of the main. INSERT SPARKLES HERE.</p>
+
+
+
+
+
+
+
+<h2>Challenges</h2>
+
+<p>As I said before, I have to <strong>learn to explain my code better</strong>, I have to forget about the details and start by explaining the big picture. As Jim put it: back-off from my work and see it with perspective.</p>
+
+<p>Also, today was my IPM, and we had again the conversation about feedback and the fact that I feel like I am not learning.</p>
+
+<p>Something like a month ago, I decided to be transparent and upfront with my dear mentors and told them that I was not getting any feedback from them, and also I was not getting any new learnings. <a href="{% post_url 2015-12-14-day046 %}">I wrote about it here</a>.</p>
+
+<p>Later on, when Christoph came back from Christmas holidays, we had again the same conversation. We also talked about feedback, and I exhorted him to read my blog. For me, this blog is like a diary where I write down EVERYTHING that happens during the day. All my struggles, my problems, and my thoughts about my code are there. I don't write for an audience, I write for me, to record what I learnt. But it is also helpful to my mentors.</p>
+
+<p>So, it is a wonderful opportunity for them to give me feedback if they read my blog and go through those struggles. Something like "<em>hey, I read that you are struggling whith this part of the code. why don't you read this chapter of this book, it might give you ideas</em>". I have no idea, I am making this up. But it is an example of what I would do if I had a student.</p>
+
+<p>This doesn't mean that I don't ask them questions in person as well, of course. But since they were focusing on only one of the loads of posts I have, I thought it would be good to mention it.</p>
+
+<p>So yeah, <strong>I think we have a communication problem</strong>, because despite having discussed the topic so many times, including during IPMs, and despite them saying they do read my blog and all the struggles I describe here, they still feel clueless, and we seem to come back to this discussion once and again. I wish I knew what else to do so that they can understand me!</p>
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>The first nice thing was that <strong>we had Sophie visiting our headquarters for the first time</strong>. I was so excited the whole week and I had offered to pair with her in the standup, but at the end, I couldn't because I was in my IPM first and then pairing with Jim.</p>
+
+<p>Rabea gave a talk about auto-boxing in Java, and <strong>it was great from content to delivery, all decorated by Rabea's OSOM sense of humor</strong> that made me crack up laughing. She did great, and she answered the questions like an expert! I think she is very good at giving talks and, like Priya, I would be happy if she was sent to conferences representing the colors of the company. I think she would do an OSOM job!</p>
+
+<p>Also, Christoph came after the IPM to ask me for help regarding the problem that I am not learning. So he had a great idea: <strong>I have to write what I think I've learned and he makes a similar list, and then we compare</strong>. He is also going to pair with me on Monday. I was going to cry manly tears of thankfulness, but instead, I gave him a big hug.</p>
+
+<p>Finally, Jim invited us to a beer in our most frequented pub, the Bleeding Heart. And I don't know how, at some point we ended up speaking about <strong>multidimensional spacetime</strong>, and how people is not able to visualize a four dimensional geometry. I mentioned that looking at the stars could be a way of "<em>seeing in four dimensions</em>", because the star that you are looking at is probably not there anymore, but you are still receiving the light that left there years ago, which is still traveling the universe.</p>
+
+<p>But that was about four dimensions when the fourth is time. What happens when trying to imagine a four-dimensional space <strong>where the fourth dimension is another spacial dimension</strong>? Carl Sagan has <a href="https://www.youtube.com/watch?v=UnURElCzGc0">a very good explanation of it</a> in one of the sketches of Cosmos (the best TV show ever made in the history of TV shows).</p>
+
+<p>That sketch is inspired by a story appearing in a book called <a href="https://en.wikipedia.org/wiki/Flatland">Flatland</a>, about two-dimensional creatures that receive the visit of a three-dimensional being: a sphere. To say hello, the sphere goes through the plane, so the two-dimensional creatures see first a dot, then a circle that increases size, then shrinks and then a dot again, and they get scared (another very graphical example of the possible failures in <a href="{% post_url 2015-12-30-day055 %}">communication between aliens and us</a>).</p>
+
+<p>In the sketch, he takes a cube made of transparent material, and shows the projection on a two-dimensional context: a piece of paper. The result is the well known cube in perspective that we all know and had probably drawn since we were kids.</p>
+
+<figure>
+	<a href="{{ baseurl }}/img/day067-1.jpg"><img src="{{ baseurl }}/img/day067-1.jpg" alt="A three-dimensional cube projection on a two-dimensional space" width="400" height="254"></a>
+	<figcaption>A three-dimensional cube projection on a two-dimensional space.</figcaption>
+</figure> 
+
+<p>Then he takes another cube, a four dimensional cube, that he calls the <a href="https://en.wikipedia.org/wiki/Tesseract">Tesseract</a>, that is "<em>the projection of a four dimensional cube on a three-dimensional space</em>". And it makes all the sense. It blows your mind also, but it makes sense.</p>
+
+
+<figure>
+	<a href="{{ baseurl }}/img/day067-2.jpg"><img src="{{ baseurl }}/img/day067-2.jpg" alt="A four-dimensional cube projection on a three-dimensional space" width="277" height="277"></a>
+	<figcaption>A four-dimensional cube projection on a three-dimensional space.</figcaption>
+</figure> 
+
+<p>Then Felipe searched about String Theory, which uses extra dimensions (up to 10, that I know of) to facilitate calculations in an environment of the Plank constant in the phase space. It's a theory, based on pure math, but I find it interesting nevertheless.</p>

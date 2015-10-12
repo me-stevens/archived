@@ -1,0 +1,307 @@
+---
+layout:   post
+title:    "72: New mentor and Ruby koans"
+date:     2016-01-22 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+
+<p class="center">TODAY WAS THE HAPPIEST DAY OF MY APPRENTICESHIP</p>
+
+<p class="center">SPARKLES</p>
+
+<p class="center">MOAR SPARKLES</p>
+
+
+<p>Today I got a new mentor (Jim) and received a hit of fresh air in my stories: I'M GOING TO LEARN RUBY.</p>
+
+<p class="center">WHERE DO I START</p>
+
+<p>Ok, let's start by the beginning.</p>
+
+
+
+
+
+
+
+
+
+
+<h3>How to set up Ruby in a very simple way</h3>
+
+<p>As in, <strong>not dealing yet with Ruby-version managers</strong>, like <a href="https://rvm.io/">rvm</a>, <a href="http://rbenv.org/">rbenv</a> (what I had installed in Linux last year) or <a href="https://github.com/postmodern/chruby">chruby</a> (what Christoph uses). Just something very basic to start running and do the <a href="http://rubykoans.com/">Ruby koans</a>.</p>
+
+<p>First we check that we have Ruby installed:</p>
+
+<pre><code class="language-bash">$ ruby -v
+ruby 2.0.0p645 (2015-04-13 revision 50299) [universal.x86_64-darwin15]
+</code></pre>
+
+<p>Then we check that we have <a href="http://rspec.info/">rspec</a>, which is like JUnit for Ruby:</p>
+
+<pre><code class="language-bash">$ rspec -v
+3.4.1
+</code></pre>
+
+<p>I didn't have it installed, so I had to install it (as root):</p>
+
+<pre><code class="language-bash">$ sudo gem install rspec</code></pre>
+
+<p>Then we have to set the <strong>project's folder structure</strong>. By convention, we have three folders:</p>
+
+<ul>
+	<li><code class="language-bash">bin</code>: where your executable files are.</li>
+	<li><code class="language-bash">lib</code>: where your source code is.</li>
+	<li><code class="language-bash">spec</code>: where your test files are.</li>
+</ul>
+
+<p>So this is how a simple project would look like:</p>
+
+<pre><code class="language-bash">rubySetup/
+├── bin
+│   └── app
+├── lib
+│   └── app.rb
+└── spec
+    └── app_spec.rb
+</code></pre>
+
+<p>Now let's add a simple test to <code class="language-bash">app_spec.rb</code>:</p>
+
+
+<pre><code class="language-ruby">require 'app'
+describe App  do
+	it 'first test' do
+		expect( App.new.hello ).to eq("hello world")
+	end
+end
+</code></pre>
+
+<p>Which forces us to add some code to the source file in order to make the test pass:</p>
+
+<pre><code class="language-ruby">class App 
+	def hello 
+		"hello world"
+	end
+end
+</code></pre>
+
+<p>Then there is the tricky part: Our executable file is actually a text file (ASCII), with the following contents (this has nothing to do with Ruby, it's just to have the project running):</p>
+
+<pre><code class="language-ruby">#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+
+require 'app'
+puts(App.new.hello)
+</code></pre>
+
+<p>The first line just tells the system to use whatever ruby executable appears first in the user's <code class="language-bash">$PATH</code>. This is an environment variable where the path to executable files is stored. In the second line, <code class="language-bash">File.dirname(__FILE__)</code> is telling the system where the <code class="language-bash">lib</code> directory is, and then adds it to the <code class="language-bash">$PATH</code> variable. The rest of the contents of the file work pretty much as the <code class="language-java">main()</code> method in c-like languages.</p>
+
+
+<p>This is the executable file, so make sure it is executable by changing the permissions:</p>
+
+<pre><code class="language-bash">$ chmod +x bin/app</code></pre>
+
+<p>Finally, you would run the tests with:</p>
+
+<pre><code class="language-bash">$ rspec spec/app_spec.rb
+.
+
+Finished in 0.00132 seconds (files took 0.19861 seconds to load)
+1 example, 0 failures
+</code></pre>
+
+<p>And your source code with:</p>
+
+<pre><code class="language-bash">$ bin/app
+hello world
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Ruby koans</h2>
+
+<p>I guess what comes next is <strong>Ruby from a c-like-language developer perspective</strong>. Also, I discovered that you can edit the tests to assert other things and see what happened, just out of curiosity, so the koans are taking me more time than I expected.</p>
+
+
+
+
+<h3>Test asserts</h3>
+
+<p>You can use any of these:</p>
+
+<pre><code class="language-ruby">assert (true or false statement)
+assert boolean "message to print to the console"
+assert_equal expected, actual
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+<h3>Null</h3>
+
+<ul>
+	<li>In Ruby, <code class="language-bash">nil</code> is an object. If you call a method on a null object you get a NoMethodError Exception.</li>
+	<li>If you want an <code class="language-java">instanceof</code> check, you do: <code class="language-ruby">object.is_a?(type)</code>.</li>
+	<li>If you need a <code class="language-java">try {} catch() {}</code> you use <code class="language-ruby">begin / rescue(Exception) / end</code></li>
+	<li><code class="language-java">object == null</code> is done with <code class="language-ruby">object.nil?</code>.</li>
+	<li><code class="language-java">object.toString()</code> is done with <code class="language-ruby">object.to_s</code>.</li>
+</ul>
+
+<p><strong>Question:</strong> Is it better to use <code class="language-ruby">obj.nil?</code> or <code class="language-ruby">obj == nil</code>?<br>
+<strong>Answer:</strong> According to <a href="http://stackoverflow.com/questions/1972266/obj-nil-vs-obj-nil">Stack Overflow</a> (lol):</p>
+
+<blockquote>"If you like micro optimizations, all the objects will return false to the <code class="language-ruby">.nil?</code> message except for the object <code class="language-ruby">nil</code> itself, while the object using the <code class="language-ruby">==</code> message will perform a tiny micro comparison with the other object to determine if it is the same object."</blockquote>
+
+
+
+
+
+
+
+<h3>Objects</h3>
+
+<ul>
+	<li>Everything is an object: integers, floats, string, nil, arrays, hashes, regexp, etc.</li>
+	<li>Any object can be converted to string. Arrays would return <code class="language-ruby">"[]"</code> or their elements, <code class="language-ruby">nil</code> would just return <code class="language-ruby">""</code>.</li>
+	<li><code class="language-ruby">.inspect()</code> would return a string, <code class="language-ruby">nil</code> would return <code class="language-ruby">"nil"</code>.</li>
+	<li>All objects have an id of type <code class="language-ruby">Fixnum</code> that can be accessed through <code class="language-ruby">.object_id</code>.</li>
+	<li>You can clone objects with <code class="language-ruby">.clone()</code>. Their object ids will be the same.</li>
+</ul>
+
+
+
+
+
+
+
+<h3>Arrays</h3>
+
+
+<ul>
+	<li>You can get the type of a class with  <code class="language-ruby">.class</code>.</li>
+	<li>To add an element you can use either <code class="language-ruby">array[1] = 2</code> or <code class="language-ruby">array &lt;&lt; 2</code> which will add it to the end.</li>
+	<li>Arrays start in 0, and there can be negative indexes; -1 is the last element.</li>
+	<li>There is a class <code class="language-ruby">Range</code> for ranges <code class="language-ruby">(1..3) = [1, 2, 3]</code> and <code class="language-ruby">(1...3) = (1, 2)</code>.</li>
+	<li><code class="language-ruby">.to_a</code> converts to array.</li>
+	<li><code class="language-ruby">push</code> places at the end, <code class="language-ruby">pop</code> takes the last.</li>
+	<li><code class="language-ruby">.unshift()</code> places it at start,  <code class="language-ruby">.shift()</code> takes the first out.</li>
+	<li><strong>Parallel assignment:</strong> <code class="language-ruby">first_name, last_name = ["John", "Smith"]</code> and there can be more elements in the array: if you use the <strong>splat operator</strong>, you can hold those in an array. For example, <br>
+		<code class="language-ruby">first_name, *last_name = ["John", "Smith", "III"]</code><br>
+		would give you:<br>
+		<code class="language-ruby">last_name = ["Smith", "III"]</code>.</li>
+	<li><strong>Parallel assignments with subarrays:</strong><br>
+		<code class="language-ruby">first_name, last_name = [["Willie", "Rae"], "Johnson"]</code>,<br>
+		<code class="language-ruby">first_name = ["Willie", "Rae"]</code>.</li>
+	<li>If you use a comma, <code class="language-ruby">first_name, = ["John", "Smith"]</code> will take the first one.</li>
+</ul>
+
+
+
+
+
+<h3>Hashes</h3>
+
+<ul>
+	<li>The syntax for hashes in ruby is:<br>
+	 <code class="language-ruby">hash = { :one => "uno", :two => "dos" }</code><br>
+	 and then you can access them with:<br>
+	<code class="language-ruby">hash[:one] = "uno"</code> and <code class="language-ruby">hash.fetch(:one) = "uno"</code>.</li>
+	<li>Hashes are not ordered.</li>
+	<li><code class="language-ruby">hash.keys</code> and <code class="language-ruby">hash.values</code> are Arrays.</li>
+	<li><code class="language-ruby">hash.merge</code> merges and overwrites keys values if they have the same key
+default value for undefined keys.</li>
+	<li>You can specify a default value with: <code class="language-ruby">Hash.new("value")</code> or <code class="language-ruby">Hash.new(value)</code>.</li>
+</ul>
+
+<p><strong>Question:</strong> Why might you want to use #fetch instead of #[] when accessing hash keys?<br>
+<strong>Answer:</strong> If the missing key is exception-worthy, use fetch!</p>
+
+
+
+<h3>Strings</h3>
+
+<ul>
+	<li>You can use single and double quotes.</li>
+	<li>You can have quotes inside a string if you alternate the quotes.</li>
+	<li>You can backlash quotes for complex cases.</li>
+	<li>You can also use <strong>flexible quoting</strong>: <code class="language-ruby">%(text)</code>,  <code class="language-ruby">%!text!</code> and <code class="language-ruby">%{text}</code>. The last one also handles multiple lines, and you can count them with <code class="language-ruby">.lines.count</code>, which will include empty lines.</li>
+	<li>You can also use <strong>documents</strong>: <code class="language-ruby">&lt;&lt;EOS lines EOS</code> but the way they count lines and the first character is different.</li>
+	<li>The <strong>shovel operator</strong> is like the plus operator but modifies the string <code class="language-ruby">hello &lt;&lt; world</code>.</li>
+	<li><code class="language-ruby">"\n".size = 1</code>, but  <code class="language-ruby">'\n'.size = 2</code>.</li>
+	<li>Only double quotes <strong>interpolate</strong>:<br>
+		<code class="language-ruby">"The value is #{value}" = "The value is 1"</code><br>
+		but<br>
+		<code class="language-ruby">'The value is #{value}' = 'The value is #{value}'</code>.</li>
+	<li>You can have substrings with <code class="language-ruby">string[7,3]</code>, and <code class="language-ruby">string[7..9]</code>.</li>
+	<li>To target a ruby version you can do:<br>
+<pre><code class="language-ruby">in_ruby_version("1.8") do
+	# do something
+end</code></pre></li>
+	<li><code class="language-ruby">.split</code> separates by space. You can also use regular expressions.</li>
+	<li>You can join strings with <code class="language-ruby">.join(" ")</code>.</li>
+</ul>
+
+
+<p><strong>Question:</strong> Ruby programmers tend to favor the shovel operator (<code class="language-ruby">&lt;&lt;</code>) over the plus equals operator (<code class="language-ruby">+=</code>) when building up strings.  Why?<br>
+<strong>Answer:</strong> According to <a href="http://stackoverflow.com/questions/4684446/why-is-the-shovel-operator-preferred-over-plus-equals-when-building-a">Stack Overflow</a>:</p>
+
+<blockquote>
+	Proof:
+	<pre><code class="language-ruby">a = 'foo'
+a.object_id #=> 2154889340
+a &lt;&lt; 'bar'
+a.object_id #=> 2154889340
+a += 'quux'
+a.object_id #=> 2154742560
+	</code></pre>
+
+	So <code class="language-ruby">&lt;&lt;</code> alters the original string rather than creating a new one. The reason for this is that, in Ruby, <code class="language-ruby">a += b</code> is syntactic shorthand for <code class="language-ruby">a = a + b</code> (the same goes for the other <code class="language-ruby">&lt;op>=</code> operators) which is an assignment. On the other hand <code class="language-ruby">&lt;&lt;</code> is an alias of <code class="language-ruby">concat()</code> which alters the receiver in-place.
+</blockquote>
+
+<p>I had to timebox it to an afternoon, so I have to stop here. It took me longer because I wanted to track my learnings as I was doing the koans. But I will continue doing them in my free time. In total, 69 of 282 koans. <strong>I am starting to think that this number <em>is trying to tell me something</em></strong>. He. Hehe. HeheHEHEhehehe.</p>
+
+
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>My laptop charger's cable (well, one of the four cables) broke into two pieces, and, since I have two normal power cables at home, I was wondering if there was an adapter from normal DC Jack to the one Mac uses, so that I could use one of them with this Mac. <strong>Of course, there is not such an adapter</strong>. Ya nou, MONEY. Apple wants da MONEY.</p>
+
+<p>So I told Mateu, and guess what. <strong>HE HAD A SOLDERING IRON</strong>. HOW COOL IS THAT. AND HE BROUGHT IT. So Priya and me went to the kitchen and in like, five minutes, we had a working cable again. I took one of our stickers and rolled it around the joint, then rolled it around the whole thing, and I AM SO PROUD. People suggested me to just buy a new one, but <strong>fixing it is not only much more fun, it is also much more responsible</strong>.</p>
+
+<p class="center">CONSUMERISM 0, OCTOPUS +1000</p>
+
+<p>Also, Jarkyn noticed the "Suchy" sticker in the charger, and told me "<em>Oh, you got back the Suchy!</em>" (because I had been using another charger until I fixed this), and I told her "<em>Yeah, Suchy is back in my life!</em>", and we both smiled.</p>
+
+<p>I AM SO HAPPY.</p>
+
+

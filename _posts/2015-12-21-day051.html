@@ -1,0 +1,126 @@
+---
+layout:   post
+title:    "51: Don't speak unless you can improve silence"
+date:     2015-12-21 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p><em>Zagaku</em>'s for this week are a bit empty, as all the craftsmen are out except Mateu, Dani and Skim. Dani didn't come today and Skim passed the ball to Mateu, who didn't have anything prepared, but decided to perform a kata and explain it meanwhile. <strong>I think his idea was more interactive, like we would have to tell him what to do</strong>. We chose the coin changer kata, which is cool because I'll have to perform it live, and then we spent the whole time thinking what would we need, in terms of types, and so on.</p>
+
+<p>Regarding the Tic Tac Toe, today I deleted the <code class="language-java">PlayerType</code> enum whose only purpose was to hold the player types and was adding repetition to the codebase:</p>
+
+<pre><code class="language-java">package com.mael.ttt.players;
+
+public enum PlayerType {
+    ALIEN, HUMAN, ROBOT
+}
+</code></pre>
+
+<p>As a consequence, I had to remove the two extra parameteres in the constructor of the <code class="language-java">MenuOption</code> enum, so that this:</p>
+
+<pre><code class="language-java">public enum MenuOption {
+    HUMAN_HUMAN("1", "Human vs. Human", HUMAN, HUMAN),
+    HUMAN_ROBOT("2", "Human vs. Robot", HUMAN, ROBOT),
+    ROBOT_ROBOT("3", "Robot vs. Robot", ROBOT, ROBOT),
+    HUMAN_ALIEN("4", "Human vs. Alien", HUMAN, ALIEN);
+
+
+	MenuOption(String menuOptionId, String menuOptionText, PlayerType player, PlayerType opponent) {
+        this.menuOptionId   = menuOptionId;
+        this.menuOptionText = menuOptionText;
+        this.playerType     = player;
+        this.opponentType   = opponent;
+	}
+
+	...
+}
+</code></pre>
+
+<p>became this:</p>
+
+<pre><code class="language-java">public enum MenuOption {
+    HUMAN_HUMAN("1", "Human vs. Human"),
+    HUMAN_ROBOT("2", "Human vs. Robot"),
+    ROBOT_ROBOT("3", "Robot vs. Robot"),
+    HUMAN_ALIEN("4", "Human vs. Alien");
+
+    MenuOption(String menuOptionId, String menuOptionText) {
+        this.menuOptionId   = menuOptionId;
+        this.menuOptionText = menuOptionText;
+    }
+
+	...
+}
+</code></pre>
+
+<p>And, as a result, the <code class="language-java">PlayerCreator</code> class could use the enum in a more "<em>idiomatic</em>" way, i.e., I went from this:</p>
+
+<pre><code class="language-java">public Player createPlayer(MenuOption option) {
+	return createPlayerOfType(option.getPlayerType(), PLAYER);
+}
+
+public Player createOpponent(MenuOption option) {
+	return createPlayerOfType(option.getOpponentType(), OPPONENT);
+}
+
+private Player createPlayerOfType(PlayerType playerType, Mark mark) {
+	if (playerType == ROBOT) {
+		return new RobotPlayer(gameUI, mark);
+	} else if (playerType == ALIEN) {
+		return new AlienPlayer(gameUI, mark);
+	}
+	return new HumanPlayer(gameUI, mark);
+}
+</code></pre>
+
+<p>To this:</p>
+
+<pre><code class="language-java">public Player createPlayer(MenuOption option) {
+	if (option == ROBOT_ROBOT) {
+		return new RobotPlayer(gameUI, PLAYER);
+	}
+	return new HumanPlayer(gameUI, PLAYER);
+	}
+
+public Player createOpponent(MenuOption option) {
+	if (option == HUMAN_ROBOT || option == ROBOT_ROBOT) {
+		return new RobotPlayer(gameUI, OPPONENT);
+	} else if (option == HUMAN_ALIEN) {
+		return new AlienPlayer(gameUI, OPPONENT);
+	}
+	return new HumanPlayer(gameUI, OPPONENT);
+}
+</code></pre>
+
+<p>Now I have to change things in just one place. And I want to keep the returning of the players in a different method, I want to avoid to return a list.</p>
+
+<p>I left the methods return a human player by default, since the methods take an enum and only an existing one can be passed. However, since this method is public, it could be called from anywhere with any value. I tried a test for an inexisting menu option but I didn't get very far and couldn't make it work:</p>
+
+<pre><code class="language-java">@Test
+public void createsHumanAsPlayerIfInvalidMenuOption() {
+	assertTrue(playerCreator.createPlayer(MenuOption.valueOf("INEXISTING_ENUM")) instanceof HumanPlayer);
+}
+</code></pre>
+
+<p>It also seemed like an unnecessary overkill. Say I have a method like, <code class="language-java">public int foo(String theValue) { ... }</code>. The compiler would never allow me to pass an <code class="language-java">int</code> instead and make a call like <code class="language-java">foo(42)</code>.</p>
+
+<p>If I passed my method a <code class="language-java">null</code> instead, it would return a human by default. I'm not sure if I should return an exception instead, but I hope not.</p>
+
+<pre><code class="language-java">@Test
+public void returnsHumanIfNullMenuOptionIsPassed() {
+    assertTrue(playerCreator.createPlayer(null)   instanceof HumanPlayer);
+    assertTrue(playerCreator.createOpponent(null) instanceof HumanPlayer);
+}
+</code></pre>
+
+<p>At this point I would need a crystal ball to see in which other situation could a client use my API passing a null menu option to the player creator. What does a null menu option mean? How could that happen?</p>
+
+<h2>Nice things</h2>
+
+<p><strong>THE SILENCE</strong>.</p>
+
+<p><em>The perfect working environment</em>.</p>
+
+<p>Today we had total silence with some laughs and small talk from time to time. I wish we had this silence normally at the office. Everybody is much more productive.</p>

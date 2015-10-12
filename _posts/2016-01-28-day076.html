@@ -1,0 +1,199 @@
+---
+layout:   post
+title:    "76: State machines, irb and Enumerable"
+date:     2016-01-28 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Uku gave a <em>Zagaku</em> about <a href="https://en.wikipedia.org/wiki/Finite-state_machine">finite-state machines</a> which is a model of computation. The best part of it was when he show us how to apply it to a real case of business software. According to him, all problems could possibly be formulated in terms of the FSM.</p>
+
+<p>Basically <strong>you have two states and two transitions</strong>, blocked / unblocked, like when you tap your contact card at the underground and the doors open, but only if you have enough money loaded.</p>
+
+<p>In real life, when you "tap" a bunch of things happen: writing stuff to a database, charging a user, etc. For example, for one of our client projects, the state machine goes like this (more or less):</p>
+
+<pre><code class="language-">unbooked => (start boooking) -> Preauthorize payment
+
+Preauthorize payment
+ if failure
+   preauth failed
+ if success
+   booking tickets
+
+Booking tickets
+  if failure
+    ticket book failed
+  if success
+    should book hotel
+
+Should book hotel
+  if no
+    charge
+  if yes
+    book hotel
+
+Book hotel
+  if fail
+    hotel book fail
+  if  pending
+    ---
+  if success
+    charge
+</code></pre>
+
+<p>Imagine this with if-elses! it would get ugly and nested very quickly.</p>
+
+<p>This is like a chain of locked / unlocked states, where the unlocked of one is the lock for the next one, and so on. The pseudo-code looks more or less like:</p>
+
+<pre><code class="language-ruby">state :deciding_to_book_hotel do
+  on_entry :decide_to_book_hotel
+  event :book_hotel :booking_hotel
+  event :skip_hotel :recapturing_payment
+end
+
+state :booking_hotel do
+  on_entry :book_hotel
+  success # do something
+  failure # do something else
+end
+</code></pre>
+
+<p>And so on.</p>
+
+<p>The authorizations are recorded in a database table so we have a nice log and we can decide to print error messages and all that.</p>
+
+<pre><code class="language-">ID  FROM   TO
+ 1  unbook preauth
+</code></pre>
+
+<p>So you can look at this and see where the problem is.</p>
+
+<p>Uku told us that, for the state machine, they are using <a href="https://github.com/slagyr/statemachine/">a gem developed by Micah</a>! The gem uses probably a switch internally, but this is more explicit. You can look at the code and see what is going on. He has some <a href="http://micahmartin.com/statemachine/example.html">documentation pages</a> available. I will probably take a look when the apprenticeship is over.</p>
+
+<p>Another example of problem where a state machine can be applied are TCP connections:</p>
+
+<figure>
+  <a href="http://www.tcpipguide.com/free/diagrams/tcpfsm.png"><img src="{{ baseurl }}/img/day076-1.png" alt="TCP connections can make use of state machines" width="562" height="801"></a>
+  <figcaption>TCP connections can be modeled with state machines.</figcaption>
+</figure>
+
+<p>However, this is a very complex problem, so maybe we wil have to wait until the end of the apprenticeship.</p>
+
+
+
+
+
+
+
+<h3>Interactive Ruby Shell</h3>
+
+<p>The interactive Ruby shell is "<em>a tool to interactively execute Ruby expressions read from the standard input</em>". I imagine it's very similar to typing C++ commands in <a href="https://root.cern.ch/cint-prompt">the ROOT prompt</a>, which has a command interpreter.</p>
+
+<p>To start a session you type <code class="language-bash">irb</code> and the prompt appears. Then you type <code class="language-bash">exit</code> to quit.</p>
+
+<p>I also just happen to discover the class <code class="language-ruby">Enumerable</code> in Ruby, and <strong>it blew my mind</strong>. I first tried to read through the <a href="http://ruby-doc.org/core-2.3.0/Enumerable.html#M003125">documentation</a>, but I couldn't figure out all the details. However, I found <a href="http://www.eriktrautman.com/posts/ruby-explained-map-select-and-other-enumerable-methods">this blog entry</a>, which comes with nice examples. It basically allows you to do a lot in terms of looping anything that can be enumerable (like ranges, arrays or hashes), <strong>in just one line</strong>.</p>
+
+<p><strong>I have to implement a search in all my contact fields</strong>. At the moment they are defined as hashes and saved into an array. To make such a search, I would have to nest several <code class="language-ruby">for</code> loops and <code class="language-ruby">if</code> / <code class="language-ruby">else</code> conditions. I was pretty sure there was "<em>a Ruby way</em>" to prettify this, and that's how I discovered <code class="language-ruby">Enumerable</code>.</p>
+
+<p>The class provides you with several methods, but I had to find the most convenient for this task that allowed me to type something readable at the same time. So I used the Interactive Ruby Shell to help me find out. First, I created an array of dummy contacts:</p>
+
+<pre><code class="language-ruby">contact1 = {name: "name1", address: "address1"}
+contact2 = {name: "name2", address: "address2"}
+contact3 = {name: "name3", address: "address3"}
+contacts = [contact1, contact2, contact3]
+</code></pre>
+
+<p>And then I started a hunting adventure. First I tried <code class="language-ruby">has_value?</code> using the <code class="language-ruby">select</code> method:</p>
+
+<pre><code class="language-ruby">irb(main):005:0> contacts.select{ |contact| contact.has_value?("address2") }
+=> [{:name=>"name2", :address=>"address2"}]
+</code></pre>
+
+<p>The problem is that this method makes exact comparisons only:</p>
+
+<pre><code class="language-ruby">irb(main):006:0> contacts.select{ |contact| contact.has_value?("add") }
+=> []
+</code></pre>
+
+<p>What about <code class="language-ruby">grep</code>? Does it work as in the terminal? Turns out it doesn't:</p>
+
+<pre><code class="language-ruby">irb(main):009:0> contacts.select{ |contact| contact.grep("add") }
+=> [{:name=>"name1", :address=>"address1"}, {:name=>"name2", :address=>"address2"}, {:name=>"name3", :address=>"address3"}]
+
+irb(main):009:0> contacts.select{ |contact| contact.grep("address2") }
+=> [{:name=>"name1", :address=>"address1"}, {:name=>"name2", :address=>"address2"}, {:name=>"name3", :address=>"address3"}]
+</code></pre>
+
+<p>This was a desperate try with <code class="language-ruby">find</code>:</p>
+
+<pre><code class="language-ruby">irb(main):008:0> contacts.select{ |contact| contact.find{|key,value| value == "address2"} }
+=> [{:name=>"name2", :address=>"address2"}]
+
+irb(main):010:0> contacts.select{ |contact| contact.find{|key,value| value == "add"} }
+=> []
+</code></pre>
+
+<p>What about <code class="language-ruby">include</code>?</p>
+
+<pre><code class="language-ruby">irb(main):005:0> contacts.select{ |contact| contact.select{ |key, val| val.include?("address2") } }
+=> [{:name=>"name1", :address=>"address1"}, {:name=>"name2", :address=>"address2"}, {:name=>"name3", :address=>"address3"}]
+</code></pre>
+
+<p>Ok, let's swap that <code class="language-ruby">select</code> for an <code class="language-ruby">any?</code></p>
+
+<pre><code class="language-ruby">irb(main):024:0> contacts.select{ |contact| contact.any? {|key, val| val.include?("address2")} }
+=> [{:name=>"name2", :address=>"address2"}]
+
+irb(main):026:0> contacts.select{ |contact| contact.any? {|key, val| val.include?("add")} }
+=> [{:name=>"name1", :address=>"address1"}, {:name=>"name2", :address=>"address2"}, {:name=>"name3", :address=>"address3"}]
+</code></pre>
+
+<p>BINGO</p>
+
+<p>When I have more time I will also take a look at <code class="language-ruby">chunk</code>. Looks like <a href="http://davidlesches.com/blog/meet-chunk-and-partition-the-enumerators-you-re-not-using-enough-of">some kind of Swiss knife</a>.</p>
+
+<p>And this is how cool irb is!</p>
+
+<p>Apart from all this learning, Christoph reminded me that helper files like my <a href="{% post_url 2016-01-27-day075 %}">runtests file</a> should not be included in the repo. Ooops!</p>
+
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Two very silly things happened regarding today's <em>Zagaku</em>. Georgina mistyped <em>Zagaku</em> for "<strong>ZagaUKU</strong>" in her blog and didn't realize it until I told her, but it was SO FUNNY. Also, Uku kept mentioning the pre-authorising, which totally sounds like "<em>Priyauthorising</em>", although I think we have enough with the <em>Priya pressure</em> already. Anyway, I was ROTFL.</p>
+
+<p>Also, yesterday at Codebar <strong>I got a FREE book of Erlang</strong>, and guess what...</p>
+
+<figure>
+  <a href="{{ baseurl }}/img/day076-2.png"><img src="{{ baseurl }}/img/day076-2.png" alt="Learn you some Erlang for great good, by Fred H&eacute;bert" width="386" height="559"></a>
+  <figcaption>Learn you some Erlang for great good, by Fred H&eacute;bert.</figcaption>
+</figure>
+
+<p class="center">IT HAS AN OCTOPUS IN THE COVER</p>
+
+<p class="center">IS THIS A SIGN</p>
+
+<p>The book <a href="http://learnyousomeerlang.com/">can also be read online</a> for FREE. This is a language that caught my eye long ago when I visited he office for the first time.</p>
+
+<p>DID I JUST SAY LONG AGO</p>
+
+<p>OMG time flies.</p>
+
+<p>Then, some months ago, we had a talk by Robert Virding about how it handles failures and it helps build robust systems and all that. <strong>It's kind of a VIKING language</strong>. Perfect for me!</p>
+
+<p>Finally, and kind of a sad thing, Christoph changed his GitHub avatar. Why is this so dramatic that I have to mention it here? Because it had DA COOLEST HAT EVAH, so I'm gonna share it here (with permission) <strong>to keep its memory</strong>. He changed it to give a good impression to clients, although I'm pretty sure the impression would be +1000 times better with that hat. People would be like, "<em>WHO's THIS GUY. LOOKS LIKE THE COOLEST GUY IN THE UNIVERSE</em>.</p>
+
+<p>Anyway, R.I.P. avatar :-(</p>
+
+<figure>
+  <a href="{{ baseurl }}/img/day076.jpg"><img src="{{ baseurl }}/img/day076.jpg" alt="Cool hat, you will be sorely missed" width="678" height="669"></a>
+  <figcaption>Oh, cool hat, thou will be sorely missed.</figcaption>
+</figure>

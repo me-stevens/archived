@@ -1,0 +1,67 @@
+---
+layout:   post
+title:    "110: Bitwise operations in SQL"
+date:     2016-03-16 20:00:00
+category: journal
+---
+
+<p>Today was a very productive day. I fixed some layout problem in the homepage and then I paired with Christoph on a story related with the exhibitions calendar. Looks like this week we are gonna be able to deliver all the stories!</p>
+
+<p>For this story, a group of checkboxes had to be added to the admin panel, so that it was possibe to choose the days of the week an exhibition is open. By default, it is open the whole range of days. But it may happen that, if it is open from day A to day F, it is really open only on Tuesdays and Fridays, for example.</p>
+
+<p>Christoph had a cool idea to save the days of the week, <strong>using only one integer field, and performing bitwise operations to retrieve the data</strong>. This is something we used long time ago when I was working as a researcher, to identify the CAMAC modules that triggered a signal during a decay measurement, since several of them could have been reached by a particle inside a time window, and that was translated as one "event".</p>
+
+<p>We also saved the ids of the CAMAC modules as a single integer and performed bitwise operations, because researchers are poor as rats, and we didn't have powerful computers or drives with a lot of space for the terabytes of data we needed to store. Saving data like this is a very compact way of keeping your records.</p>
+
+<p>We deal with binary numbers. For every week day, you save a one in a position of a byte (a byte is 8 bits, so 8 positions). Every position represents a number, 1 is 1, 10 is 2, 100 is 4, and so on.</p>
+
+<p>If you assign a week day to every position, and you want to save an exhibition that is open on Tuesdays and Fridays, you would save a 18: Tuesday = 2 (10) plus Friday = 16 (10000) which is 10010, or 18 in binary.</p>
+
+<pre><code class="language-">| 64 | 32 | 16 |  8 |  4 |  2 |  1 |
+------------------------------------
+weekdays =   1    0    0    1    0
+------------------------------------
+ sun  sat  FRI  Thu  wed  TUE  mon    
+</code></pre>
+
+<p>To retrieve the week days from the integer, <strong>you perform a bitwise operation</strong>, basically a logical AND. The AND operation on binary numbers retrieves the ones in that position. Since 1 is true and 0 is false, you follow this table:</p>
+
+<pre><code class="language-">1 + 1 = 1
+1 + 0 = 0
+0 + 1 = 0
+0 + 0 = 0
+</code></pre>
+
+<p>So, if you make the logical AND with a day of the week, only the ones in that position will survive. In the previous example, if we ask if the exhibition is open on Tuesdays, we will get a positive answer, while if we ask if it is open on mondays, we will get a negative answer:</p>
+
+<pre><code class="language-">| 64 | 32 | 16 |  8 |  4 |  2 |  1 |
+------------------------------------
+weekdays =   1    0    0    1    0
+Tuesday?                    1    0
+------------------------------------
+                            1    0   YES!
+------------------------------------
+ sun  sat  FRI  Thu  wed  TUE  mon  
+</code></pre>
+
+<pre><code class="language-">| 64 | 32 | 16 |  8 |  4 |  2 |  1 |
+------------------------------------
+weekdays =   1    0    0    1    0
+Monday?                          1
+------------------------------------
+                                 0   NOPE!
+------------------------------------
+ sun  sat  FRI  Thu  wed  TUE  mon  
+</code></pre>
+
+<p>We can then do an AND operation in the sequel statement. For example:</p>
+
+<pre><code class="language-sql">SELECT title, description 
+FROM exhibitions 
+WHERE (weekdays &amp; 2) > 0
+</code></pre>
+
+<p>will select all the exhibitions open on any Tuesday.</p>
+
+<p>ISN'T IT BIUTIFUL.<br>
+SPARKLES.</p>

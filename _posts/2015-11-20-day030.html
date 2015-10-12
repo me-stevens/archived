@@ -1,0 +1,60 @@
+---
+layout:   post
+title:    "30: All switches burn in hell"
+date:     2015-11-20 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>For thirty days I have been coming to the office, but it feels like yesterday! Everyday I feel so lucky that I have been given this opportunity to learn and turn into a better developer.</p>
+
+<p>I still have to get rid of that switch statement in my Menu class though. I wanted to finish it today because tomorrow I'll be moving to my new flat from the hostel, and chaos is expected to happen. <strong>As usual, I asked for pairs in the stand-up, in the slack channels, during lunch,  shared my pull-requests, and whatnot, but this week seems to have been busy for everybody</strong>. So I left it on pause and went to read the refactoring book and watch some of Uncle Bob's videos to see if I could learn something new that could help me solve the menu, but I couldn't. So the menu story is unfinished for now.</p>
+
+<p>Today I've been watching more Uncle Bob's videos. This is what I learnt from one of them:</p>
+
+<ul>
+	<li>Reduce local variable assignments, <strong>inline whenever you can</strong>.</li>
+	<li>Keep the number of arguments of your methods as low as possible, <strong>maximum three</strong>.</li>
+	<li>It's better to have setters and getters than a constructor full of variables.</li>
+	<li>Never pass a boolean as an argument, because it means that your method does two things. Better create two methods.</li>
+	<li>Passing by reference (output variables used as arguments) is confusing (I can think of "<code class="language-c">int &index</code>" in C or "<code class="language-csharp">out int index</code>" in C&#35;).</li>
+	<li>If you can pass a null, it means your tests are not preventing you from using nulls.</li>
+	<li>Put the public members and methods at the top, the private ones at the bottom.</li>
+</ul>
+
+<p>Regarding <strong>switch statements</strong>: We can get rid of them using the <a href="{% post_url 2015-11-17-day027 %}">Dependency Inversion Principle</a>, which opposes the flow of control.</p>
+
+<p>If A depends on B, they follow the flow of control, and they have to be deployed together. If we add an interface in between, the source code dependency opposes the flow of control. Many B's can be plug to A using polymorphism, and we can have independent deployability.</p>
+
+<p>The other option is to place them where they make no harm, for example, in the main part of your application's code.</p>
+
+<p>Polymorphism in my case seems like an overkill, since I would have to create a new class everytime I want to add an option to the menu. Moving it to the main part of my app would mean moving it to either the GameRunner class or the Game, where it was before, which are also not good options. I DON'T KNOW WHAT TO DO.</p>
+
+<p>Finally, he also speaks about the <strong>Law of Demeter</strong>, or "<em>tell, don't ask</em>", which means that functions should not know the navigation of your system (which is very common in Java). For example, don't do this:</p>
+
+<pre><code class="language-java">getX().getY().getZ().doSomething()</code></pre>
+
+<p>The Law of Demeter is sometimes called "<em>The suggestion of Demeter</em>", because it's very hard to follow.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today was the Quarter event. This is an event where the team relaxes and has some social time.
+We went bowling, and to my surprise, we had a whole room reserved for us with three bowling lanes, one of which was for the kids.</p>
+
+<p>I had never bowled before, so my score went up exponentially until my right arm said ENOUGH, and I had to continue bowling with my left hand. My right arm is destroyed from the times I was working as an illustrator, and sometimes it hurts in several diferent places and ways, even when I am lying on the bed, i.e. not using the arm.</p>
+
+<p>We kept on bowling, playing football table and watching Daniel monopolize the Karaoke microphone. It was a fun night!</p>

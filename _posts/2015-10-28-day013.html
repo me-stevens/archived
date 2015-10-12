@@ -1,0 +1,67 @@
+---
+layout: post
+title:  "13: Dummies, stubs, spies, fakes"
+date:   2015-10-28 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+
+<p>So, according to <a href="https://blog.8thlight.com/uncle-bob/2014/05/14/TheLittleMocker.html">Uncle Bob's blog post</a>, there are several types of "Test Doubles" (that he calls test "stunts"):</p>
+
+<ul>
+	<li><strong>Dummy:</strong> These are the objects that you pass as an argument, but just for the tests. They will never be used in production. It could be a login object, because you don wan't to do a real login, or something related to a database, etc.</li>
+
+	<li><strong>Stub:</strong> When your dummy has a method that just returns the hardcoded value you want to use for the test. For example, a method that simulates a login and returns a true or a false (logged in or not logged in), but you never really log in anywhere.</li>
+
+	<li><strong>Spy:</strong> Checks if a method was called, or counts the number of invocations, or checks the values of the values passed, etc. You gotta be careful and beware the coupling, because the more you spy, the more you get attached to the logic of your code.</li>
+
+	<li><strong>Mock:</strong> It's very similar to a spy in that it basically tests behaviour. In fact, a mock is always a spy. It checks interactions between your objects.</li>
+
+	<li><strong>Fake:</strong> It is different to all the others. It implements business behaviour, which is the behaviour you would expect from your production code, but returns a hardcoded value. It's like a simulator of your production code.</li>
+</ul>
+
+<p>We could say that a mock performs a <strong>behaviour verification</strong>, while the others do a <strong>state verification</strong>.</p>
+
+<p>Easy peasy, right? Specially when you look at code examples. That's why I wanted to see code written by other people, as much as possible, although I didn't have much luck finding code with mocks.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Challenges</h2>
+
+
+<p>What looked easy peasy in the previous section, started to make no sense when I started coding my echo server from zero. I wanted to implement what I had just learnt, making a spy out of my dummy object, one that would verify that the methods were called, and that the values were passed. And suddenly, there was I and my brain, and we didn't understand it anymore.</p>
+
+<p>I'm still trying to understand how the whole mocking thing works. <strong>I have a lot of ups and downs, where at some moment I am like "<em>this is simple, I got it!</em>" and five minutes next I am like "<em>I thought I understood it, but I have no idea!</em>"</strong>. I think that frustration can only mean that I'm getting there. I'm in the stage of feeling dumb and stupid, that I have touched the deepest, so now I can only go up. From now on, every time I feel this way, I'll just remember that slide in Priyas' talk that I have seen so many times applied to the creative process in illustration and comic art. I'm in the stage called "<em>I am crap</em>", which comes after "<em>everything I do is crap</em>", and just before "<em>hey, this is actually cool</em>".</p>
+
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today Jarkyn and Priya couldn't be at Codebar, but I went with Emily, as a coach again. Emily wanted to finish her ruby koans with the help of a Codebar coach, because she feels a bit stuck. I didn't knew what to teach, so I just raised my hand when they asked for an HTML coach.</p>
+
+<p>They wanted to go through the Codebar HTML tutorial. I haven't done any Codebar tutorial yet, but when one of the students opened it, I saw the first lines and they where explaining the meaning of the HTML acronym. Which is cool if you are doing the tutorial alone at home, but I think if I started there, the coaching would look like a normal school class.</p>
+
+<p>So, as I did with Abi in my first day at Codebar, <strong>I just made up the whole thing</strong>. I started writing html tags in a text editor and refreshing the file in my browser. They were doing the same in their own editors and browsers. I would ask them to predict what would appear on the screen, and if they guessed right, we high-fived. They started making comments on how much they were enjoying the coaching, and how much they were learning, and how cool a coach I was. And I was so happy =) </p>
+
+<p>I'm starting to think they choose the students on purpose, or maybe it's just that the people that go there is there because they really want to learn. The thing is that before Codebar, I'd never seen anybody be so excited about a simple p tag. I'm so happy to be making other people happy with so little!</p>

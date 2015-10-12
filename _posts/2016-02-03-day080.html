@@ -1,0 +1,143 @@
+---
+layout:   post
+title:    "80: Equality &amp; File IO"
+date:     2016-02-03 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Daniel explained the "why" behind why hashes are faster for searches and told us to be careful with the way we make copies of our objects.</p>
+
+<p>Lets' say we have this in Java:</p>
+
+<pre><code class="language-java">// Basic types
+5 == 6; // Bitwise comparison
+
+// Objects
+a = new Foo();
+b = new Foo();
+a == b // Diferent memory locations, so a.equals(b)
+</code></pre>
+
+<p>In Ruby:</p>
+
+<pre><code class="language-java">5 == 6 # they are objects, equals internally
+5 == 5 # same because numbers have the same id in Ruby
+</code></pre>
+
+<p>There is a lot of complexity going on behind the scenes. For example, to implement equality in Java, <code class="language-java">public bool equals(Object o)</code>, a series of things happen:</p>
+
+<ul>
+     <li>check that it is not <code class="language-java">null</code></li>
+     <li>check the types with <code class="language-java">instanceof</code></li>
+     <li>check the hash</li>
+</ul>
+
+<p>This is to make sure that for same objects it will return the same value, but for different objects it will return a different value. So if you overwrite <code class="language-java">equals()</code>, you should overwrite <code class="language-java">hash()</code>.</p>
+
+<p>Hashes are fast and don't have many collisions. For example, in <code class="language-java">Map&lt;Foo, Bar></code> you are going to use the keys when you perform a search.</p>
+
+<p>The way it works is, I have a table key/object, I get a hash, how do I place that hash in the table? I do some mathematical algorithm with the numbers of the hash and obtain a set of objects:</p>
+
+<pre><code class="language-">1 | F1, F2, F3, F4
+2 | F3, F4, F5, F6
+</code></pre>
+
+<p>The method <code class="language-java">get int hashcode()</code> is defined for every object, and will get a hash based on all of the field members. But if you have a hash already, you can use the key because it is unique, so it will be faster.</p>
+
+<p>Imagine we do this:</p>
+
+<pre><code class="language-java">class Foo()
+List&lt;Integer> keys;
+public Object clone()
+
+f = new Foo()
+g = f.clone()
+</code></pre>
+
+<p>This is what we have in memory:</p>
+
+<pre><code class="language-">------------------------|------------------------
+0 0 0 0 5 e f            0 0 0 0 5 e f
+0x4af                    0x4af+8
+f                        g
+
+sizeof(f) = 8
+</code></pre>
+
+<p>Here, <code class="language-java">g</code> is a new instance but points to the same value.</p>
+
+<p>Both Java (<code class="language-java">clone()</code>) and Ruby (<code class="language-ruby">dup</code>) have an implementation of a <strong>shallow copy</strong>. But what you probably want is a <strong>deep copy</strong>.</p>
+
+<p>Now the comparison with a real client project: the project that Daniel and Mateu are working on compares a JSON document, with the one received from the server. If the document has changed, the app sends a request to the server to ask for more questions and another JSON document is sent.</p>
+
+<p>To compare, we could implement a checksum (hashcode) and the equals method. The problem is that <strong>
+it gets out of sync if the document changes</strong>, and you have to remember to go back to the equals method and update it. This is a source of bugs and coupling.</p>
+
+<p>One solution would be, instead of rewriting the equals method, you could <strong>use observers</strong>. Another solution is to <strong>aim for immutability</strong>, but only if it makes your code simpler and readable.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3>File IO</h3>
+
+<p>Today in the afternoon, Skim and me were trying to solve a problem with my ConMan&trade; app. I was passing a file instance in the constructor of the Reader and Writer classes, which was then used inside those classes to call <code class="language-ruby">read</code> and <code class="language-ruby">write</code>. But <strong>I didn't have the right tests, because despite them being green, my app was not reading nor writing to a file</strong>.</p>
+
+<p>In my research I discovered several options:</p>
+
+<ul>
+     <li>You can use <code class="language-ruby">require 'tmpdir'</code>. It creates a <a href="http://ruby-doc.org/stdlib-2.0.0/libdoc/tmpdir/rdoc/Dir.html">temporal file</a> that is not persistent. So, after you run the tests, the file is gone.</li>
+     <li>You can use the <code class="language-ruby">IO</code> class (where all the others are coming from). It can be used for <a href="http://ruby-doc.org/core-2.3.0/IO.html">short files that could live in memory</a>. It's used in a similar way to <code class="language-ruby">File</code>:
+     <pre><code class="language-ruby">IO.write("path", "text")
+contents = IO.read("path")</code></pre>
+     </li>
+     <li><code class="language-ruby">StringIO</code>, which I had already used, can also be used for <a href="http://ruby-doc.org/core-2.3.0/StringIO.html">short in memory files</a>.</li>
+     <li>For bigger files, you can use <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/tempfile/rdoc/Tempfile.html">Tempfile</a>, as long as you close and unlink them.</li>
+</ul>
+
+<p>We entered a pry session and we discovered that if I passed the file through the constructor, then my read and write methods were not reading nor writing to the file. We then discovered that you had to close the file in order for the contents to be written to it. But it was appending instead of rewriting. So we thought it could be the cursor, and tried to position it at the begining first. But then, if the new content was shorter than the one present in the file, the characters from the previous version that were not overwritten where still in the file. So we had to wipe the contents of the file before writing to it, for which we needed to write in <code class="language-ruby">"w+"</code> mode.</p>
+
+<p>In summary: the only way to write to the file was to have the file opened inside the method of the class, then read or write, then close it.</p>
+
+<pre><code class="language-ruby">file = File.open("filename", "w+") # "r" for reading
+file.write(contentsOfFile)         # .read for reading
+file.close
+</code></pre>
+
+<p>But... how can you test this? I was running out of time for my stories, so I did this very ugly thing:</p>
+
+<pre><code class="language-ruby">def initialize(path, file = nil)
+  @path = path
+  @file = file
+end
+
+def write_contacts(contacts)
+  file.nil? ? write(contacts) : tests_write(contacts)
+end
+
+def tests_write(contacts)
+  file.write(parse(contacts))
+end
+</code></pre>
+
+<p>So I pass nothing in production, and a fake in the tests. My eyes were bleeding as I typed, but I had other stories to finish and I was running out of time, so I will take a look again during the weekend.</p>
+
+<p>For example, Jim recommended trying <code class="language-ruby">$stdout.print "test"</code> and <code class="language-ruby">$stdout.flush</code>. Apparently, if you use <code class="language-ruby">flush</code>, you force the writing to the file and don't need to close the file in order to write to it. Felipe also mentioned that he had faked the entire filesystem for his photoblog, so that when he was doing <code class="language-ruby">File.open</code>, he used his fake instead of <code class="language-ruby">File</code>. This seemed like too much for the simple thing I wanted to do.</p>
+
+<p>Anyway, I'll take a look at it on the weekend.</p>

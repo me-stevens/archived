@@ -1,0 +1,33 @@
+---
+layout:   post
+title:    "65: Affiliations"
+date:     2016-01-13 20:00:00
+category: journal
+---
+
+<p>Today I finished the payroll application. Well, finished is a way of speaking. I still have to polish it.</p>
+
+<p>This part of the app is one that I had left to the end, when I had everything working, and all the abstractions in place. In the book, they treat them differently to the rest of the code, but for me it has exactly the same shape as a payment type with cards and a schedule. Maybe I am spoiled by my own code, but I can see it following a similar pattern, with only one difference: the table that relates member ids and employee ids.</p>
+
+<p>The app now has methods in the employee class to handle their affiliation. The employee can have or not have an affiliation, and this can change along the life of the employee. So they are created with a NULL object for affiliation. There is an Affiliation interface, that has UnionAffiliation and NoAffiliation as subclasses.</p>
+
+<p>There is only one affiliation for now, the Union. So I could have added the affiliations as a list, but I didn't, because I don't know of any other affiliations from the client requirements. The union charges some fees on a weekly schedule. Apart from these weekly fees, the union can charge other service charges as well, on a weekly schedule too. All this is deducted from the employee pay on a weekly schedule. So I used the Affiliation class in a similar way to the payment class, and created an affiliation card to record those charges, as I did with the other cards.</p>
+
+<p>I updated the method in the employee class that calculates the pay, and now it subtracts the deductions from its gross pay.</p>
+
+<p>Finally, the payroll DB has now a "<em>table</em>" (a hashmap, actually) that relates affiliation member id's with employee id's. For example, a transaction to add a union member, adds one record to this table, and updates the affiliation hold by the employee. A transaction to delete a union member, removes one record from this table and sets a NoAffiliation object as the affiliation of the employee. The change affiliation transaction just changes the affiliation but keeps the same member id. To change an affiliation, the employee has to have an affiliation to begin with. This is done totally differently in the book.</p>
+
+
+<p>There are still things that I don't like, like the isInPeriod() method, which should be moved to the schedule payment subclasses. Right now it is in the payment classes, but they have no idea of the schedule that the employee has, which could change at any point.</p>
+
+<p>Another thing that is in limbo, is the pay() method in the payment type classes. There is no information whatsoever in the client requirements about what does it need to do.</p>
+
+<p>Something I am not sure if I will do is, to abstract the concept of a card, and make the monthly employee take a null card object? I don't like this idea too much, but I also don't know how to deal with the castings that I have to add if I don't have a card interface in place. Also, it would be another interface with no methods... maybe getDate, but the second argument is different for them all.</p>
+
+<p>Finally, I would like to revisit the design holes that I have here and there, maybe rethink some of the interfaces' methods. Also give a sense to the paycheck's existence so that it stops being a waste of oxygen.</p>
+
+<p>Something I have not done yet is a main() to wrap all this up and have a working app where you can actually run the acceptance tests, or interact with the app, even if only manually. I would like to see it working!</p>
+
+
+
+<p>Working in this application was nice because I could apply the things I am now aware of, from the very beginning. As a result, the app is much better structured.</p>

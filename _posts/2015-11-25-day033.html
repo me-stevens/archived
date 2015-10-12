@@ -1,0 +1,104 @@
+---
+layout:   post
+title:    "33: Making Java functional"
+date:     2015-11-25 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>It was time for <a href="http://www.uml.org/">UML (Unified Modeling Language)</a> to be introduced to us by my dear mentor, Christoph. He didn't go through all the details, but just the basic modeling tips that you would use on a daily basis. Rabea mentioned another type of modeling language, the <a href="https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model">Entity Relationship Diagram (ERD)</a> which is used for databases. It's not exactly UML, but is very similar, and I have also used it in the past.</p>
+
+<p>Somebody mentioned <strong>auto-generators that would generate all the classes for you based on the UML diagrams that you draw</strong>. I wondered how would that align with test driven development, where you first have to create the test and from the test you create the class, while here it looked like you where generating a lot of code out of nowhere. They would be empty classes, true, but still... Ginny said that <strong>it would be like when you use a library provided by a third party: you trust that they have tested the generated code and that it works correctly</strong>.</p>
+
+<p>Later on I paired with Ginny, and it was amazing. She is more of a JavaScript and Ruby developer, so she wasn't familiarized with Java. That's why she had a brilliant idea to get rid of the switch statement I had in my menu, which looked like this ugly thing (<em>beware: may cause eye bleeding</em>):</p>
+
+<pre><code class="language-java">public Player[] createPlayers() {
+    Player player1;
+    Player player2;
+    char option = setOption().charAt(0);
+
+    switch (option) {
+        case '1':
+            player1 = new HumanPlayer(gameUI, "X");
+            player2 = new HumanPlayer(gameUI, "O");
+            break;
+        case '2':
+            player1 = new HumanPlayer(gameUI, "X");
+            player2 = new RobotPlayer(gameUI, "O");
+            break;
+        case '3':
+            player1 = new RobotPlayer(gameUI, "X");
+            player2 = new RobotPlayer(gameUI, "O");
+            break;
+        case '4':
+            player1 = new HumanPlayer(gameUI, "X");
+            player2 = new AlienPlayer(gameUI, "O");
+            break;
+        default:
+            player1 = null;
+            player2 = null;
+            break;
+    }
+
+    return new Player[] {player1, player2};
+}
+</code></pre>
+
+<p>Ginny had the idea of <strong>using hash maps to assign every menu option with its action</strong>. She was thinking JavaScript-wise, where functions are just like variables and you can pass them as arguments (I never thought I'll say this, but I miss JavaScript!). Since I'm just a physicist and we used code as a tool, without calling things by their name, I'm very ignorant to the world of computer science and the names they have for every concept, but I think this thing of passing a function as an argument is called "<em>lambda</em>". Now the question was, how can you do that in Java? Can you even do it?</p>
+
+<p>We used our best friend: GOD. I mean, Google. We found something called "<em>method references</em>", and a whole post with different examples of it, "<a href="https://blog.idrsolutions.com/2015/02/java-8-method-references-explained-5-minutes">Java 8 Method References explained in 5 minutes</a>". There where things like "<code class="language-java">Predicate</code>", "<code class="language-java">Consumer</code>" and so on, that I had never heard of in my life, and Ginny was surely regretting sitting by my side.</p>
+
+<p>I was pretty sure Felipe would know how to deal with that, because <a href="{% post_url 2015-11-11-day023 %}">he always knows all the quirks and the weirdest Java stuff</a>. He used something very similar, the "<code class="language-java">Supplier</code>" class, which, if you search it in Oracle's documentation, has a very similar definition as the "<code class="language-java">Predicate</code>" and "<code class="language-java">Consumer</code>" classes. It allows you to pass a method name as an argument, and we passed it to the value of every hash map element. Then, when we called the hash map, the method would be executed to return the pair of players created by it. This is Java 8, so we had to <a href="https://maven.apache.org/plugins/maven-compiler-plugin/examples/set-compiler-source-and-target.html">add some configuration lines to the pom file</a>.</p>
+
+<p>I got rid of both the switch statement and the ugly returning of an array. And now it looks like this:</p>
+
+<pre><code class="language-java">private Map&lt;String, Supplier&lt;List&lt;Player>>> menuOptions;
+
+    public Menu(UserInterface gameUI) {
+        this.gameUI        = gameUI;
+        menuOptions        = new HashMap&lt;&gt;();
+        printedMenuOptions = new ArrayList&lt;&gt;();
+
+        initializeOptions();
+    }
+
+    private void initializeOptions() {
+        menuOptions.put("1", this::twoHumans);
+        printedMenuOptions.add(" 1) Human vs. human\n");
+
+        menuOptions.put("2", this::humanAndRobot);
+        printedMenuOptions.add(" 2) Human vs. robot\n");
+
+        menuOptions.put("3", this::twoRobots);
+        printedMenuOptions.add(" 3) Robot vs. robot\n");
+
+        menuOptions.put("4", this::humanAndAlien);
+        printedMenuOptions.add(" 4) Human vs. alien\n");
+    }
+
+    public List&lt;Player> createPlayers() {
+        String option = setOption();
+        return menuOptions.get(option).get();
+    }
+
+    private List&lt;Player> twoHumans() {
+        Player player1 = new HumanPlayer(gameUI, "X");
+        Player player2 = new HumanPlayer(gameUI, "O");
+        return Arrays.asList(player1, player2);
+    }
+</code></pre>
+
+<p>And so on for the other functions. There is still a lot of room for improvement, but this looks soooooo much better!</p>
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today at Codebar my student from the pasts weeks couldn't come, so I helped another student with her php/html project. I didn't want to make her install XAMPP or some kind of server like that in order to run the PHP files in her web project, so I showed her how to use FileZilla to upload stuff to a server, and we used a 000webhost server, because they are free, and she can make tests with it that way, have fun, and learn.</p>
+
+<p>She seemed so happy and thankful and that made me happy too. Later on <a href="https://twitter.com/KaraMarck/status/669665972878462976">she tweeted about it</a> and I thought, "<em>where are the Kleenex when you need them?</em>".</p>
+

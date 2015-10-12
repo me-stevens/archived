@@ -1,0 +1,62 @@
+---
+layout:   post
+title:    "114: Setting up JS testing with Jasmine"
+date:     2016-03-22 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Jarkyn gave her first <em>Zagaku</em> as a craftswoman. It was about JavaScript objects, and it was OSOM. To the point that the apprentices asked for more <em>Zagaku</em>s in the future.</p>
+
+<h2>Setup using Jasmine</h2>
+
+<p>Yesterday I spent some time setting up the working environment for SortMan&trade;. I tried to think about <strong>the simplest thing that could possibly work</strong> and ended up making these decisions:</p>
+
+<ul>
+	<li>Use Jekyll and GitHub pages to deploy. Simple!</li>
+	<li>There are no optimizations, for example, there is no JavaScript minification or concatenation, although I plan to use Grunt in the future, maybe.</li>
+	<li>Also, no extra libraries apart from Jasmine (i.e. no jQuery).</li>
+	<li>I'm against frameworks, but I think the <a href="https://html5boilerplate.com/">HTML5 boilerplate</a> is a nice and very basic skeleton with just what you need to get started. It does all the boring and repetitive setup tasks for you (but <em>nothing</em> else).</li>
+	<li>Nothing in the UX or styling department either, not even a dedicated favicon.</li>
+</ul>
+
+<p>For Jasmine I followed the <a href="https://github.com/jasmine/jasmine/blob/master/README.md">README</a> and went to the <a href="https://github.com/jasmine/jasmine/releases
+">releases</a> page. At first I couldn't figure out how to make it work, until I learnt that I should download the standalone version. Then I followed the <a href="http://jasmine.github.io/2.4/introduction.html">docs</a> to learn how to use it.</p>
+
+<p>The standalone version comes with a <code class="language-">SpecHelper.html</code> file that you open in the browser. That's how you run the JavaScript tests. This file includes the production JS and the tests in <code class="language-markup">script</code> tags. The production JS is inside an <code class="language-">src</code> folder, while the tests are in a <code class="language-">spec</code> folder. Jasmine libraries are in the <code class="language-">lib</code> folder:</p>
+
+<pre><code class="language-markup">  &lt;script src="lib/jasmine-2.4.1/jasmine.js">&lt;/script>
+  &lt;script src="lib/jasmine-2.4.1/jasmine-html.js">&lt;/script>
+  &lt;script src="lib/jasmine-2.4.1/boot.js">&lt;/script>
+
+  &lt;!-- include source files here... -->
+  &lt;script src="src/Player.js">&lt;/script>
+  &lt;script src="src/Song.js">&lt;/script>
+
+  &lt;!-- include spec files here... -->
+  &lt;script src="spec/SpecHelper.js"></script>
+  &lt;script src="spec/PlayerSpec.js"></script>
+</code></pre>
+
+<p>The folder structure is pretty much like a Ruby project. <strong>I decided to put the <code class="language-">jasmine</code> folder inside the <code class="language-">js</code> folder</strong> (no idea what people usually do), and use the boilerplate's <code class="language-">main.js</code> file as "the main" who will run my production JS living in <code class="language-">js/jasmine/src</code>. I have this files included as the last thing in the html document:</p>
+
+<pre><code class="language-markup">&lt;script src="js/jasmine/src/splitter.js">&lt;/script>
+&lt;script src="js/jasmine/src/displayer.js">&lt;/script>
+// etc. ...
+&lt;script src="js/main.js">&lt;/script>
+</code></pre>
+
+
+
+<p>For Jekyll, I set in the <code class="language-">_config.yml</code> file the "exclude" keyword, <strong>so that I don't include the Jasmine libraries when the page is generated</strong>:</p>
+
+<pre><code class="language-yaml"># Build settings
+exclude: [.gitignore, exclude/, js/jasmine/lib, js/jasmine/spec, js/jasmine/SpecRunner.html, README.md]
+</code></pre>
+
+<p>Regarding GitHub, I <strong>deleted the <code class="language-">master</code> branch of the project and kept only the <code class="language-">gh-pages</code> branch</strong>, which is the one that has the page-generation magic. I followed <a href="http://oli.jp/2011/github-pages-workflow/#deleting-master">this very famous tutorial</a> which references a post by Lea Verou, who uses this technique for all her projects for which the project is the page (just like SortMan&trade;).</p>
+
+<p>GitHub also <strong>allows you to point a domain to your pages</strong>. For this you have to include a <code class="language-">CNAME</code> file with the domain name without the protocol. So I did what I usually do for all my other project pages, I set a free domain at <a href="http://sortman.tk/">http://sortman.tk/</a>. The only problem is that it will always show what's in the gh-pages branch, so <strong>the last changes to the repo won't be seen until I merge the branches of the pull requests</strong>.</p>
+
+<p>With this setup, I had everything in place to start test-driving my JavaScript code.</p>

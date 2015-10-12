@@ -1,0 +1,20 @@
+---
+layout:   post
+title:    "47: UI spies and fake players"
+date:     2015-12-15 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Several things! Felipe told me to change my board so that <strong>instead of being a two-dimensional array of strings, it could be a LinkedList of Mark enums</strong>. I said that I did it with strings because when I started TDDing it it was the easier solution, and because I wanted it to be as game-agnostic as possible. He told me that, if I wanted it to be so general, I could also call it Matrix instead of board. So maybe I will change that in the future.</p>
+
+<p>After that, Christoph offered to pair with me (he had also announced it in the stand-up), which was cool and weird at the same time. Craftsmen don't usually pair with residents since they are on client sites. And Christoph is usually VERY busy with his own stuff. So I'm wondering about his reasons. I'm sure something was going on inside that head. But, if your mentor offers to pair with you, YOU'RE NOT GONNA ASK WHY, RIGHT.</p>
+
+<p>Anyway, I suggested we could work on the story to make a user-interface spy, and it was cool, and I learnt a lot. We ended up making a fake player too and fixing the turn class. The inputs are now integers instead of strings.</p>
+
+<p>He also told me to run <code class="language-bash">mvn clean test</code> before pushing, since I had made one push in which I was just checking one test and I forgot to run all the tests before I pushed. Everything was green for me of course, but for travis some tests were red; the ones I was not looking at! OF COURSE, YOU STONED SQUID. Later on, Felipe told me to set that up as a pre-push or even <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks">pre-commit hook</a>, which can come in handy.</p>
+
+<p>The last bit of wisdom was a nemotechnic rule to remember the difference between query and command methods: SQL query, returns something. Command gives orders, returns nothing.</p>
+
+<p>In summary, beautiful code that I shared to the other apprentices in the form of a <a href="https://github.com/me-stevens/tdd-ttt/pull/14">pull request</a>. Of course Felipe came to claim him, hehe, and so the pairing session finished.</p>

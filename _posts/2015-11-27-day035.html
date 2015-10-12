@@ -1,0 +1,148 @@
+---
+layout:   post
+title:    "35: Arduinos and hacking day"
+date:     2015-11-27 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>ARDUINOS! And I am so happy that I am going to fan-boy all over the place and regret nothing.</p>
+
+<p>Today <strong>Mateu brought his Arduino and toolbox</strong> (which included an LCD display, like, HOW COOL IS THAT) as his <em>waza</em> project, and many of the residents wanted to join, me included. His model is an <a href="https://www.arduino.cc/en/Main/ArduinoBoardDiecimila">Arduino Diecimila</a>, which was named like that after the Arduino number 10000 (<em>diecimila</em> in italian) was produced (Arduino started in 2005 as a project for students at the Interaction Design Institute Ivrea in Ivrea, Italy). </p>
+
+<figure>
+	<a href="https://www.arduino.cc/en/uploads/Main/ArduinoDiecimilaComponents.jpg"><img src="{{ baseurl }}/img/day035-1.jpg" alt="The Arduino Diecimila board that Mateu brought to the office" width="650" height="373"></a>
+	<figcaption>Isn't it BEAUTIFUL.</figcaption>
+</figure> 
+
+
+<p>The first thing I tried was the typical example to turn a LED on. Mateu's toolbox included a LED, resistances, cables, a breadboard, and whatnot (it reminded me of my first university years doing all the electronics lab practices)..</p>
+
+<p>I had already installed the <strong>Arduino IDE</strong>, that you can download from <a href="https://www.arduino.cc/en/Main/Software">their site</a> for every operating system. It's cool because it shows you the code you are running and it has a small terminal embedded at the bottom, where you can see the results of the execution. For the set-up, I went to the <strong>Tools</strong> menu, and chose:</p>
+
+<ul>
+	<li>Board: "Arduino Diecimila"</li>
+	<li>Processor: "ATmega168"</li>
+	<li>Port: USB serial</li>
+</ul>
+
+<p>The reason why the port is that one is because the Arduino board has three pins to set where the power is coming from, either from a normal plug (EXT) or from the computer through a USB cable (USB). Since I had it connected to my computer through an USB cable, I placed the power selection jumper in the USB pin.</p>
+
+<p>Next, I went to <strong>File > Examples</strong>, and chose <strong>01: Basics > Blink</strong>, to turn a LED on and off. They have <a href="https://www.arduino.cc/en/Tutorial/Blink">a tutorial page</a> for it explaining how to plug in the LED. I run the code in the IDE and it worked!</p>
+
+<p>After that, Priya and Sara came to the office and joined the fun. So I tried the <a href="https://www.arduino.cc/en/Tutorial/Fade">fade tutorial</a> (in <strong>File > Examples > 01: Basics > Fade</strong>), which demonstrates the use of analog output to fade an LED. We had to use the breadboard and a resistor, and I had already forgotten the color codes of the resistor stripes, so I had to <a href="http://www.allaboutcircuits.com/textbook/reference/chpt-2/resistor-color-codes/">refresh my memory</a>. We changed some lines in the program to understand the code, and it worked! All the examples are written in C++, and have very easy and short code. The code for the fade example is just:</p>
+
+<pre><code class="language-cpp">/*
+ Fade
+
+ This example shows how to fade an LED on pin 9
+ using the analogWrite() function.
+
+ This example code is in the public domain.
+ */
+
+int led = 9;           // the pin that the LED is attached to
+int brightness = 0;    // how bright the LED is
+int fadeAmount = 5;    // how many points to fade the LED by
+
+// the setup routine runs once when you press reset:
+void setup() {
+  // declare pin 9 to be an output:
+  pinMode(led, OUTPUT);
+}
+
+// the loop routine runs over and over again forever:
+void loop() {
+  // set the brightness of pin 9:
+  analogWrite(led, brightness);
+
+  // change the brightness for next time through the loop:
+  brightness = brightness + fadeAmount;
+
+  // reverse the direction of the fading at the ends of the fade:
+  if (brightness == 0 || brightness == 255) {
+    fadeAmount = -fadeAmount ;
+  }
+  // wait for 30 milliseconds to see the dimming effect
+  delay(30);
+}
+</code></pre>
+
+<figure>
+	<a href="https://www.arduino.cc/en/uploads/Tutorial/simplefade_bb.png"><img src="{{ baseurl }}/img/day035-2.png" alt="The fade example connects a LED to the Arduino board and makes it fade" width="641" height="280"></a>
+	<figcaption>This is similar to what we did at the Uncodebar workshop.</figcaption>
+</figure> 
+
+<p>Priya and Sara left, so I was looking for which tutorial to do next, when Mateu pulled out an LCD display to connect to the Arduino. With sparkles in my eyes, we started preparing cables to connect everything and run all the tutorials at <strong>File > Examples > LiquidCrystal</strong>. These all use a library called <a href="https://www.arduino.cc/en/Reference/LiquidCrystal">LiquidCrystal</a> with specific functions that deal with the really low level stuff happenig inside the LCD, and which Mateu recommended that I taked a look at to <em>really</em> understand what was going on. The tutorials can be found at <a href="https://www.arduino.cc/en/Tutorial/LibraryExamples">the Library examples section in the Arduino site</a>.</p>
+
+<p>This LCD in particular was a <a href="http://www.rapidonline.com/electronic-components/powertip-pc1602-f-alphanumeric-lcd-display-16x2-57-0911">Powertip PC1602-F Alphanumeric LCD Display 16x2</a>. It has 14 functional pins and two for a LED. The connections in the image are similar to what we had. The 14 pins are:</p>
+
+<ul>
+	<li>1: Ground - connected to Arduino's ground.</li>
+	<li>2: Potential, in our case, +5 V - connected to Arduino's 5V pin.</li>
+	<li>3: Contrast, connected to ground for maximum contrast.</li>
+	<li>4: Register select - connected to pin 12 in the Arduino.</li>
+	<li>5: R/W, Mateu explained that normally, the W has a bar over it, and that means that if we set that pin to 0 we will be in Write mode, which is what we did: we connected it to Arduino's ground. To read, the pin has to be set to 1 instead.</li>
+	<li>6: Enable - connected to pin 11 in the Arduino. Mateu told me that if we had two identical displays connected to the same board, this pin would allow us to control to which LCD we talk at every moment.</li>
+	<li>Pins 7 to 14 are data buses, and we used only four of them since all the examples worked in 4-bit mode. Each receives a 1 (+5V) or a 0 depending on the data we send them.</li>
+</ul>
+
+<figure>
+	<a href="{{ baseurl }}/img/day035-3.jpg"><img src="{{ baseurl }}/img/day035-3.jpg" alt="The LCD pins and their meaning" width="383" height="319"></a>
+	<figcaption>LCD-display pins, from 1 to 14.</figcaption>
+</figure>
+
+<p>After some fiddling around with the cables, we tried the Hello World example and... it worked! And it was SO COOL. Because, you know, playing with Arduinos is what COOL people do and that gives them EXTRA SWAG points (<em>kidding</em>). This is how our board looked like:</p>
+
+<figure>
+	<a href="{{ baseurl }}/img/day035-4.jpg"><img src="{{ baseurl }}/img/day035-4.jpg" alt="TThe LCD connected to the breadboard and the Arduino board and printing a Hello World" width="600" height="450"></a>
+	<figcaption>Again, isn't it BEAUTIFUL.</figcaption>
+</figure>
+
+<p>One of my favourite tutorials was the <strong>Custom Character</strong>. In the LCD model name, the 16x2 means the display has two rows and 16 characters. Each character is made up of 5 columns and 8 rows of pixels that you can access either by printing something to the display, or setting each pixel separately. The tutorial allowed you to control every pixel of a character in the display, by setting it to 1 or 0, so you could make the display print a lot of.... ASCII ART!!! apart from being so cool to have access to such details so granularly.</p>
+
+<p>Another cool one was the <strong>Serial Display tutorial</strong>. It's basically a listener; a listener to what? To messages we send the board. How do we send them? Using the Serial Monitor in the Tools menu. You can then write ANYTHING (I wrote "<em>Hey, Priya</em>", because she came to visit me again and see if I was still playing with my toys), and the message appears in the LCD display. SO COOL.</p>
+
+<p>And that's all regarding the Arduino board!</p>
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Another COOL thing today was Mateu's lightning talk about how to <strong>reverse-engineer the compiled version of a program</strong>. It was a bit related to Nathan's talk of past Friday. For example, if you had a C program, you would compile it like this:</p>
+
+<pre><code class="language-bash">$ gcc program.c -o program</code></pre>
+
+<p>That would create a compiled and executable version of our program, that we would run with:</p>
+
+<pre><code class="language-bash">$ ./program</code></pre>
+
+<p>But what if we had the executable, <code class="language-bash">./program.out</code>, and we wanted to get the program code back from it? Well, <strong>there are programs that do that, and that's what people use to crack software</strong>. They allow you to "open" or read the compiled version and get back the code, so you can find the lines that require a serial number and delete them, jump over them, etc. For that, you just have to edit the executable, searching the relevant hexadecimal words and changing them to something else. This process reminded me again of those <a href="http://octopusinvitro.tk/code/magnetic-tapes-and-octal-dump-3/">painful days searching through oceans of octal words</a> in files of size of megabytes and doing things with them.</p>
+
+<p>At the end of Mateu's talk, Nathan pointed to a book called "Hacking" that we had at the office, and I started to salivate. He said it has the best introduction to C he has ever seen. I plan to read that book, so it will be a nostalgic refreshment of the first programming language that I learnt, very long ago, in my first year of uni.</p>
+
+<p>Since the creation of the <strong>&sharp;robot-mayhem-london</strong> slack channel, and specially today, <strong>something contagious filled the atmosphere, and everybody started showing off their interest</strong>: Makis had taken the last number of a magazine about Raspberry-Pi, that came with a Raspberry-Pi board. Enrique told us he has the complete Arduino kit, and he will bring it to the office to play. Jim plans to bring his, when he comes back from Chicago, and his Sphero StarWars robot as well. Nathan came to the office to show us his new mega-cool super-keyboard with which you can KILL people, etc.</p>
+
+<p>I don't know what you think, but I would say <strong>this is THE BEGINNING OF THE ROBOLUTION</strong>.</p>
+
+
+
+
+
+<h2>Other</h2>
+
+<p>Today <strong>we started the book-reading club</strong>, where we will sit every Friday and discuss something that we will decide to read during the week. This week we had to read the first 4 chapters of a paper suggested by Makis, which I will cite in the proper way<sup><a href="#pub">1</a></sup>: (so long since the last time I did this!)</p>
+
+<p id="pub" class="footnote">[1] B. Moseley, P. Marks. <a href="http://shaffner.us/cs/papers/tarpit.pdf">Out of the Tar Pit</a>. <em>Publication name</em>, Publishing company name, February 6, 2006.</p>
+
+<p>Turns out it's not exactly an academic paper, or at least, <strong>not like the ones I am used to read</strong>. This one reads as easily as a blog post, and you could see concepts, development of ideas, and structure, as if it was written to be read by HUMANS. It was a nice surprise.</p>
+
+<p>However, I do agree with Rabea that the author was very sharp in the presentation of his ideas, <strong>as if everything was black or white</strong>. Which reminded me of that talk from Deborah Frances-White, where she says that men say their opinion as if it was fact, and women express facts as if it was their opinion. I would add, specially if they are relatively famous.</p>
+
+<p>Apart from that, I enjoyed the discussion about how codebases can get overcomplicated with time, how saving state contributes to complexity, etc. <strong>But what really hit me was, the discussion about not having the right tests</strong>, because it revived the insecurity I had when I started learning TDD in the apprenticeship. I had to learn to rely in the tests, and something inside me was telling me... what if this is not enough? How can I be sure? And there it was, a paper suggested by one of the craftsmen, more or less stating the same insecurities.</p>
+
+<p>We have to read 2 or 3 chapters more for next week, and we will make a repo with notes from the discussion. I will be also discussing it here.</p>

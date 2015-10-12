@@ -1,0 +1,197 @@
+---
+layout:   post
+title:    "83: Single Responsibility Principle"
+date:     2016-02-08 20:00:00
+category: journal
+---
+
+<p>The <strong>Single Responsibility Principle</strong> is part of the SOLID principles, and it tells us that every piece of your code, be it a module, a class or a method, should have only one reason to change.</p>
+
+
+
+<h2>SRP applied to classes</h2>
+
+<p>When classes get too big and start doing too much, they become difficult to maintain. Imagine a well intentioned class like this:</p>
+
+<pre><code class="language-ruby">class Octopus
+
+  def eat
+    # eating routine...
+  end
+
+end
+</code></pre>
+
+<p>We have the coolest of the animals in the animal kingdom doing a basic survival activity. I have omitted the details of that method. Maybe the octopus has a hunting strategy, maybe it steals food from other sea creatures, maybe it just goes to the OctoMarket. All that would be defined inside the <code class="language-ruby">eat</code> method.</p>
+
+<p>But food doesn't fall from heaven (unless you eat plancton, which is not the case) so it may have to... go to work? The octopus may also want to take some rest and play, or even make time to learn new stuff (it would be a shame to have that huge brain unused!):</p>
+
+<pre><code class="language-ruby">class Octopus
+
+  def eat
+    # eating routine...
+  end
+
+  def work
+    # whatevah octopi do
+  end
+
+  def play
+    # playing some videogames maybe?
+  end
+
+  def read
+    # exercise for those neurons
+  end
+
+  ....
+
+end
+</code></pre>
+
+<p>At some point you would see how the poor animal <strong>is doing too much</strong>. What if it changes job? What if it wants to play Twister instead of videogames? What if it realized stealing food from others is wrong and started going to the OctoMarket instead? <strong>Everytime we would have to come to change this class. It has too many reasons to change</strong>.</p>
+
+<p>So what time is it? It's <strong>extraction time</strong>, baby.</p>
+
+<p>We would extract all this behaviours into separate classes, and those classes will be in charge of knowing how to perform those behaviours. Also, each of those clases would have just one reason to change.</p>
+
+<p>In other words: tentacles to the rescue. You did know octopuses arms have a mind of their own, didn't you? (two-thirds of an octopus’ neurons reside in its arms, not its head, so they can act independently from each other.)</p>
+
+<pre><code class="language-ruby">class EatingTentacle
+
+  def eat
+    # eating routine...
+  end
+
+end
+</code></pre>
+
+
+<pre><code class="language-ruby">class WorkingTentacle
+
+  def work
+    # whatevah octopi do
+  end
+
+end
+</code></pre>
+
+<p>An so on. Then, the Octopus class would delegate those actions to the classes that know how to handle them:</p>
+
+<pre><code class="language-ruby">class Octopus
+
+...
+
+  def eat
+    eating_tentacle.eat
+  end
+
+  def work
+    working_tentacle.work
+  end
+
+  def play
+    playing_tentacle.play
+  end
+
+  def read
+    reading_tentacle.read
+  end
+
+...
+
+end
+</code></pre>
+
+<p>The octopus doesn't need to know how its tentacles do their functions, it just sends a message to the tentacle in charge, and the tentacle should know what to do. If the octopus decided to change its diet and become vegetarian, the only class that would need to change is that of the eating tentacle. Just as its nervous system sends an electric signal to keep its three hearts beating or its digestive system doing its job, but has no idea what's going on behind the scenes.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>SRP applied to methods</h2>
+
+<p>The Single Responsibility Principle also applies to methods. <strong>A method should do one thing and do it well</strong>. Methods should ideally be small, with no more that four or five lines. This can be a challenge in verbose languages like Java, but try to keep them below ten lines and you'll be good.</p>
+
+<p>Two indications of a method that is getting too long (apart from the number of lines it has), is that it has different responsibilities, and local variables that are used all over the place. If that's the case, that method could be "<em>the place where all your classes went to hide</em>", and you should aim to extract them. Those local variables are probably asking to be fields.</p>
+
+<p>Consider for example this method:</p>
+
+<pre><code class="language-ruby">class EatingTentacle
+
+...
+
+  def eat
+    if (digestive system is prepared and it is the right time of the day)
+      # searches recipe in recipes book
+      # goes to the OctoMarket
+      # buys food
+      # cooks it
+      # eats it
+    end
+  end
+
+...
+
+end
+</code></pre>
+
+<p>This method has many reasons to change:</p>
+
+<ul>
+	<li>When the octopus is finished trying all the recipes in its book, it would probably search in the vast Internet ocean for inspiration.</li>
+	<li>If the OctoMarket starts providing a service to send your purchase directly to your fishbowl, the octopus would stop going there, because octopuses are lazy.</li>
+	<li>On weekdays, the octopus comes home tired from work, and the last thing it wants to do is to cook.</li>
+	<li>That boolean condition is too long, it should be extracted into its own method with a readable name.</li>
+</ul>
+
+<p>A better eat method would be:</p>
+
+<pre><code class="language-ruby">  def eat
+    if (hungry? &amp;&amp; lunch_time?)
+      decide_what_to_eat
+      get_food
+      eat_it
+    end
+  end
+
+  def hungry?
+    # checks that digestive system is prepared 
+  end
+
+  def lunch_time?
+    # definition of what is lunch time for an octopus
+  end
+
+  def decide_what_to_eat
+    # decisions, decisions...
+  end
+
+  def get_food
+    # OctoMarket? Order pizza?
+  end
+
+  ...
+</code></pre>
+
+<p>And so on. We have identified the parts that could change in the future and separated them into small methods with informative names that are in charge of one thing. As a result, we have a method that is easy to understand and maintain, and all our class's methods are related with eating.</p>
+
+<p>What's more, if our codebase got more complex, it would be easy to move these methods around to other classes. Since they only do one thing, they are easily pluggable where they are needed.</p>
+
+
+<h2>In summary</h2>
+
+<p>SRP helps you keep your code as <strong>a healthy group of individual pieces of reusable code</strong>. Since each piece does just one thing, you can plug them in and out at your convenience to build something more complex without making your life unnecessarily harder.</p>
+
+<p>A way of thinking about it is: "<em>gather together the things that change for the same reasons. Separate those things that change for different reasons</em>".</p>
+
+<p>Applying this principle and keeping it in mind when you code will allow you to have a system that is flexible and easy to maintain, and will simplify updating and development in the future.</p>
+
+

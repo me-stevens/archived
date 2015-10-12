@@ -1,0 +1,74 @@
+---
+layout:   post
+title:    "61: Sane date handling"
+date:     2016-01-07 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>I've been reading through the part in the book that wires everything up and pays the employees, and I happily discovered that the payday transaction is doing something very similar to what I had in my previous UML. There is even an <code class="language-java">isPayDay()</code> method, so THERE IS HOPE.</p
+
+<p>Also, in one of my pull requests, Christoph recommended that I used <code class="language-java">LocalDate</code> for the dates, which is a class that I didn't know about (it's new, it comes with Java 8), and I love it. I was using <code class="language-java">Calendar</code>, and everything was getting super verbose, like:</p>
+
+<pre><code class="language-java">public boolean isLastDayOfMonth(Date date) {
+    Calendar cal = Calendar.getInstance();
+
+    cal.setTime(date);
+    int month = cal.get(Calendar.MONTH);
+
+    cal.add(Calendar.DATE, 1);
+    int nextMonth = cal.get(Calendar.MONTH);
+        
+    return month != nextMonth;
+}</code></pre>
+
+<p>An now I have something like:</p>
+
+<pre><code class="language-java">public boolean isLastDayOfMonth(LocalDate date) {
+    Month month     = date.getMonth();
+    Month nextMonth = date.plusDays(1).getMonth();
+    return month != nextMonth;
+}</code></pre>
+
+<p>So I started implementing the classes for the payment types and the payment schedules, which where empty. I started with the monthly employee, because it doesn't have any cards, so it's easier to have everything set up. Finally, I had behavior in my classes!</p>
+
+<ul>
+    <li>In the payment type, I had to add the method <code class="language-java">calculatePay()</code>. This method is needed for all the payment types, so I added it to the interface.
+
+<pre><code class="language-java">@Override
+public double calculatePay(LocalDate payDay) {
+    return getMonthlyRate();
+}</code></pre>
+
+    </li>
+
+    <li>In the payment schedule, I had to add the method <code class="language-java">isPayDay()</code>, which has a different implementation for every subclass. I also added it to the relevant interface.
+
+<pre><code class="language-java">@Override
+public boolean isPayDay(LocalDate date) {
+    return isLastDayOfMonth(date);
+}
+
+private boolean isLastDayOfMonth(LocalDate date) {
+    Month month     = date.getMonth();
+    Month nextMonth = date.plusDays(1).getMonth();
+    return month != nextMonth;
+}</code></pre>
+
+    </li>
+    <li>In the payment method, I had to add <code class="language-java">pay()</code>, which is going to send the payment to the employee. I still don't know what this method does, though.</li>
+</ul>
+
+<p>I also had to add a paycheck, that knows everything about the payments, deductions, and affiliations, if any. I haven't implemented the affiliations yet, though. So my paycheck doesn't calculate deductions yet.</p>
+
+<p>As a result of the addition of this functionality, I had to add a method in the Employee class to calculate the pay and check if it is payday, which is used in the payroll app.</p>
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Felipe has been coaching every single apprentice during his holidays, from the weirdest places, and even from his phone. I feel for him! Even he was very bored or he really enjoys looking at our code and helping us.</p>

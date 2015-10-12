@@ -1,0 +1,22 @@
+				<div class="search">
+{% if page.layout == 'post' %}
+					<h1 class="search__title">Search this blog</h1>
+{% endif %}
+    	    		<script>
+        		    	var GOOG_FIXURL_LANG = (navigator.language || '').slice(0,2),GOOG_FIXURL_SITE = location.host;
+     		   		</script>
+        			<script src="//linkhelp.clients.google.com/tbproxy/lh/wm/fixurl.js"></script>
+        			
+        			<script>
+        				document.getElementById("goog-wm-qt").value = "";
+        				document.getElementById("goog-wm-sb").value = "Search";
+        			</script>
+
+{% if page.layout == 'default' %}
+        			<script>
+        				ul = document.getElementsByClassName("search").getElementsByTagName("ul")[0];
+        				ul.firstChild.style.display = "none";
+        			</script>					
+{% endif %}
+
+				</div>

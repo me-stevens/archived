@@ -1,0 +1,47 @@
+---
+layout:   post
+title:    "36: There is only place for one of us"
+date:     2015-11-30 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>THE MENU IS STILL THERE.</p>
+
+<p>IT'S HERE TO STAY.</p>
+
+<p>FOR ONE MORE WEEK.</p>
+
+<p>What did I do to it? Didn't I treat it with care? didn't I TDD it when it was growing up? Didn't I refactor it so that it could go out and conquer the world?. AND THIS IS HOW IT PAYS ME. STAYING AT HOME UNTIL FORTY. Hey, dear Menu, you know I love you, but... WHY DON'T YOU GO GET A LIFE.</p>
+
+<p>However, I think I have an idea. An idea that, as soon as I had it, seemed like the wrong idea. AGAIN.</p>
+
+<p>I was pretty happy with <a href="{% post_url 2015-11-25-day033 %}">the mind-blowing discovery of the <code class="language-java">Supplier</code> class</a>. But now <strong>I have more code than before, and I have repetition in the menu options</strong>. What if instead of 1, 2, 3... I had a, b, c... or anything else? Also, I thought I had understood the Open-Closed Principle, but I hadn't. It's true that my menu options had to be now edited in just one place, but by <strong>adding a new method for every new option I am modifying the class. I thought I was extending it</strong>. So now I have to give a lightning talk about the OCP this Friday.</p>
+
+<p>The other idea, <strong>making a different subclass for every option</strong> (which is what every refactoring of a switch statement that I've seen lately is doing to get rid of it), is something I had tried in the past but discarded for being an overkill for this particular problem. I already have polymorphism in my players, the options just create players, two polymorphisms of the same type, in the same place, for the same thing... doesn't sound right.</p>
+
+<p>Another option I considered is, what if there was a way of implementing polymorfism <strong>for two players at once</strong>? Instead of having subclasses of players, I would have subclases of pairs of players. Is a pair of players just the result of choosing a menu option, or could it be also a type of game? What's the right abstraction or concept that I have to represent here? As I have defined the game right now, I could not really create types of games... <strong>but what about types of rounds</strong>?</p>
+
+<p>When I paired with Mateu last week, I realized that my code is very shitty, and felt like deleting the whole thing and starting over again. There were many things to improve, and one of them was <a href="{% post_url 2015-11-24-day032 %}">the excessive integration</a>. So one of the items on my to-do list was to refactor the game and <strong>extract the round</strong> and the turn (still not clear if the turn should be extracted too).</p>
+
+<p>As the Spanish saying goes, this could kill two birds in one shot. I'll try this and chech out tomorrow if I am still in Mordor or if I defeated Sauron.</p>
+
+
+
+
+
+<h2>Challenges</h2>
+
+<p>Today Dave Moore was at the office as an intermediate step in his trip to Spain, where he will be speaking at the <a href="http://cas2015.agile-spain.org/en/">CAS conference</a>, together with Enrique. He wanted to practice a workshop that he is going to give there, so he practiced with us, the residents. We had to do a very simple exercise: make an HTTP request to an URL provided by him, fetch some JSON, and deal with them.</p>
+
+<p>He wanted to teach us that <strong>you should not trust APIs 100%, because, there could be inconsistencies that you have to check</strong>. For example, the JSON object you obtain from the request could not be in the format you expect, or you could not even get a JSON, or the waiting time could be too long and delay your system, etc. <strong>We should be able to detect and handle all those situations</strong>. And we were given one hour.</p>
+
+<p>I had worked with http requests in the past only in JavaScript, and that's what made more sense to me to use for this exercise. However, I have only done it two or three times, and never through TDD. What a sacrilege to do this without tests at the company's headquarters, right?</p>
+
+<p>So, what time was it? It was time for... THE OVERCOMPLICATOR.</p>
+
+<p>I proposed to TDD the connection to make sure that we obtained a status code of 200, then that we obtained a JSON object, etc. And nobody disagreed with me. WHY NOBODY DISAGREES WITH ME (maybe because Emily loves me and Rabea still had sparkles in her eyes from last week session with the Echo Server... JUST KIDDING). Anyway, we used Jasmine, which is something I have in my other to-do list to learn at some point in my life. Then we found a library to make a fake server. Then the library used another library that implemented spies. And so on. Hello rabbit holes of the world! Half an hour and we hadn't figure out how to integrate it all.</p>
+
+<p>We took a different approach and managed to see what the four http requests where sending us. We were able to TDD the business logic, but the time run out before we could get to test the actual connection (i.e., we never connected, apart from through the terminal). Anyway, now I want to do the exercise again, but do it well.</p>
+

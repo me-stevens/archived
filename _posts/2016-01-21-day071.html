@@ -1,0 +1,128 @@
+---
+layout:   post
+title:    "71: String validation"
+date:     2016-01-21 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>In today's <em>Zagaku</em>, Christoph talked about the interfaces you use in between your code and an external thing that you want to plug, a console, a database, a server connection, etc.</p>
+
+<p>Then I went on with my story for today, <strong>refactor the human player</strong>.</p>
+
+<p>The idea of the human player is to return a valid cell index. The method <code class="language-java">setCell()</code> is called in the turn. I don't want to make checks there because the class is already respecting SRP and OCP. Also, the alien and robot players will always return a valid option, is the human input who needs to be validated.</p>
+
+<pre><code class="language-java">// Turn class
+public void placeMark(Player player) {
+	gameUI.printBoard(board);
+	board.setCell(player.getMove(board), player.getMark());
+}</code></pre>
+
+<p>I tried the approach of an exception, but the code was ugly. How do you say in code "<em>while an exception is raised</em>?" This is the only thing I could think of:</p>
+
+<pre><code class="language-java">// Human player class
+private String getValidCellIndex(Board board) {
+	String cellIndex = gameUI.getInput();
+	boolean isNotValidCellIndex = true;
+
+	while(isNotValidCellIndex) {
+		try {
+			Integer.parseInt(cellIndex);
+		} catch (Exception e) {
+			gameUI.printNotValidCellMessage();
+			cellIndex = gameUI.getInput();
+		} finally {
+			isNotValidCellIndex = false;
+		}
+	}
+
+	return cellIndex;
+}</code></pre>
+
+<p>With this approach, there is one generic message, although I'm not sure if this is a good idea to have such precise messages as I have. Maybe I 'll change that in the future.</p>
+
+<p>But the most important thing is that this code won't work because it would accept any number, not only a valid cell index. I could return a list of integers and then, convert the string input into an integer, followed by a check with the integer list to see if the human input is in the range of valid cells... but that will only make the previous code longer. It feels like, comparing the input with an integer, even if what I am returning is an integer, just overcomplicates things:</p>
+
+<pre><code class="language-java">// Human player class
+private String getValidCellIndex(Board board) {
+	String cellIndex = gameUI.getInput();
+	boolean isNotValidCellIndex = true;
+
+	while(isNotValidCellIndex) {
+		try {
+			isNotValidCellIndex = !board.getEmptyCellIndexes().contains(Integer.parseInt(cellIndex));
+		} catch (Exception e) {
+			gameUI.printNotValidCellMessage();
+			cellIndex = gameUI.getInput();
+		}
+	}
+
+	return cellIndex;
+}</code></pre>
+
+<p>Still not good... first, the thing to the right of <code class="language-java">isNotValidCellIndex</code> would have to be extracted into a boolean method, to avoid eye-bleeding. Second, I have a boolean negation. Third, I'm not sure if this while loop would continue rolling if there is an exception thrown (but this is pseudo-code, I haven't tried it yet). Fourth, the feedback message would only be printed if an exception is raised, but not if the number is not a valid cell. So what about this:</p>
+
+<pre><code class="language-java">// Human player class
+private String getValidCellIndex(Board board) {
+	String cellIndex = gameUI.getInput();
+	boolean isNotValidCellIndex = true;
+
+	while(isNotValidCellIndex) {
+		try {
+			isNotValidCellIndex = checkInput(board, cellIndex);
+
+			if (isNotValidCellIndex) {
+				gameUI.printNotValidCellMessage();
+				cellIndex = gameUI.getInput();
+			}
+
+		} catch (Exception e) {
+			gameUI.printNotValidCellMessage();
+			cellIndex = gameUI.getInput();
+		}
+	}
+
+	return cellIndex;
+}
+
+private boolean checkInput(Board board, String cellIndex) {
+	return !board.getEmptyCellIndexes().contains(Integer.parseInt(cellIndex));
+}</code></pre>
+
+
+<p>This is only getting worse. So at the end, I went back to my mental sanity and used the list of strings. I was using a method that constructed a list with the cells of the board. Since the human input is a string, the board cells are saved as strings, so that I can compare the input with the string. That method was in the user interface, but I moved it from the user interface to the board. Now, the human player methods are more symmetric but feels weird to have that method in the board, because board should not know about strings.</p>
+
+
+<pre><code class="language-java">private boolean isNotValidCellIndex(Board board, String cellIndex) {
+	// before
+	return !gameUI.getValidIndexes(board.getSize()).contains(cellIndex);
+	// after
+	return !board.getValidIndexes().contains(cellIndex);
+ }
+
+	private boolean isCellBusy(Board board, String cellIndex) {
+	return board.isCellBusy(Integer.parseInt(cellIndex));
+}</code></pre>
+
+
+<p>P.S.:<br>
+This is how it looks like now:</p>
+
+<pre><code class="language-java">// Human player class
+private String getValidCellIndex(Board board) {
+	String cellIndex = gameUI.getInput();
+
+	while (invalidInput(board, cellIndex)) {
+		gameUI.printNotValidCellMessage();
+		cellIndex = gameUI.getInput();
+	}
+
+	return cellIndex;
+}
+
+private boolean invalidInput(Board board, String cellIndex) {
+	return !board.getEmptiesAsStrings().contains(cellIndex);
+}</code></pre>
+
+<p>Much more compact, but I would move <code class="language-java">getEmptiesAsStrings()</code> to the user interface class.</p>

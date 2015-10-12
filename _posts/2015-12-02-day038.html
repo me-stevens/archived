@@ -1,0 +1,65 @@
+---
+layout:   post
+title:    "38: Ask why. Repeat."
+date:     2015-12-02 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Today we had a learning experience in the apprentices Slack channel, when Rabea asked about enums that she needed to implement for her rock, paper, scissors game. <strong>Mateu jumped in and started asking interesting questions to make us think why would we use one solution or another</strong>. Because the WHY is important! I love when Mateu does this, I feel as if I was sleeping and he slapped me in the face.</p>
+
+<div class="chat">
+	<strong>Rabea:</strong>
+	<blockquote>Has anyone used enums for their rock, paper, scissors and can explain to me why/what/who/where/how? I’m implementing them but just changing them to a String... not sure if that’s the purpose!</blockquote>
+
+	<strong>Mateu:</strong>
+	<blockquote><code class="language-java">String possibility = "ROCK";</code>  / <code class="language-java">String possibility = "TROLLFACE";</code>. You can put <code class="language-java">"TROLLFACE"</code> in a <code class="language-java">String</code>. If your rock/papers/scissors variable contains <code class="language-java">"TROLLFACE"</code> the program is going to misbehave. I don’t think the client of your rock/papers/scissors wants the trollface...</blockquote>
+
+	<strong>Me:</strong>
+	<blockquote>They won't get it, 'cause we have powerful viking enums</blockquote>
+
+	<strong>Mateu:</strong>
+	<blockquote>Why are they powerful?</blockquote>
+
+	<strong>Me:</strong>
+	<blockquote>As opposed to strings living in the wild, if you wanted to change the options you just change them in the enum, instead of enjoying a string-hunting adventure</blockquote>
+
+	<strong>Mateu:</strong>
+	<blockquote>Why would you have to do a hunt? Duplication?</blockquote>
+
+	<strong>Me:</strong>
+	<blockquote>Yes, she has the options in the menu and in the code behind. If she had to change the name of the enum element, the IDE would change it everywhere, while the wild string just hides in the bushes and laughs hard at you.</blockquote>
+
+	<strong>Mateu:</strong>
+	<blockquote>What about using constants? Why are enums better than String constants?</blockquote>
+
+	<strong>Georgina:</strong>
+	<blockquote>You can bind methods to enums, you can’t to constants.</blockquote>
+
+	<strong>Mateu:</strong>
+	<blockquote>You can bind methods to any class. Why an enum?</blockquote>
+
+	<strong>Georgina:</strong>
+	<blockquote>To represent rock, paper and scissors you’d need three instances of that class and implement the equals method. You only need one enum. Or you’d have to keep checking is it a Rock, is it a Scissors etc.</blockquote>
+
+	<strong>Mateu:</strong>
+	<blockquote>Why do you need to implement the equals method? / Why do you need to compare two instances?</blockquote>
+
+	<strong>Georgina:</strong>
+	<blockquote>I imagine there are lots of way of implementing it, in my implementation you need to compare the two gestures to know which one ‘won’ and if they are the same, it’s a draw. so they need to be comparable in some way, for my solution anyway.</blockquote>
+
+	<strong>Felipe:</strong>
+	<blockquote>How about the fact that I know ​<strong>exactly</strong>​ how many variants (Rock, Paper and Scissor) I will need? They are not even independent.</blockquote>
+</div>
+
+<p>Felipe got the correct answer, and I learnt that you can bind methods to enums.</p>
+
+<iframe width="420" height="315" src="https://www.youtube.com/embed/MuKwtBtgPPA" frameborder="0" allowfullscreen></iframe>
+
+
+<h2>Nice things</h2>
+
+<p>Today's <em>Zagaku</em> was about HTTP, and although most of the stuff I knew it already from my years working in web-development-related stuff, Mateu turned it into a different experience. <strong>He connected to a VPN server he has running in Spain, and suddenly we ended up talking about <a href="https://en.wikipedia.org/wiki/Tor_%28anonymity_network%29">Tor</a></strong>, lol.</p>
+
+<p>I guess we are all tired of our Tic Tac Toes and want to try the hacker hat for a change, he he he. But honestly, I love this stuff and would like to know more about it. So I hope Mateu has the time and the patience to give more talks on the topic!</p>

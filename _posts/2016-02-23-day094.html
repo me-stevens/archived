@@ -1,0 +1,89 @@
+---
+layout:   post
+title:    "94: The marks"
+date:     2016-02-23 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Today we started a series of <em>Zagaku</em>s on consulting from Gerald M. Weinberg books, and we covered the ten laws of trust.</p>
+
+<ul>
+	<li>Nobody but you cares about the reason why you let another person down.</li>
+	<li>Trust takes years to win and minutes to lose.</li>
+	<li>People don't tell you when they stop trusting you.</li>
+	<li>The trick of earning trust is to avoid all tricks.</li>
+	<li>People are never liers in their own eyes.</li>
+	<li>Always trust your client but cut the cards (trust but be in control of the situation).</li>
+	<li>Never be dishonest even if the client request it.</li>
+	<li>Never promise anything. Comunicate estimations so that the client understands that it's not a promise.</li>
+	<li>Always keep your promises.</li>
+	<li>Get it on writing but get it dependant on trust.</li>
+</ul>
+
+<p>Also: don't be interested only on the code, but also on the product and the system. I think the one I agree with the more is the second one.</p>
+
+<p>Long ago Jim gave a <em>Zagaku</em> on estimations. Basically, we give a range of dates, instead of a fixed date.</p>
+
+
+<h3>The marks</h3>
+
+<p>Today I tried to think about <strong>the best solution for the marks</strong>. Should I use a struct? Should I use symbols? I have several possibilities:</p>
+
+<ul>
+	<li>Wrapping constants in a class:
+	<pre><code class="language-ruby">class Marks
+  X = "X"
+  O = "O"
+  E = "E"
+end</code></pre> 
+	At the moment I have no methods yet, so Jim says he wouldn't create a class to just hold constants.</li>
+	
+	<li>I could use a module instead of a class:
+	<pre><code class="language-ruby">module Marks
+  X = "X"
+  O = "O"
+  E = "E"
+end</code></pre>
+	and then include it as a mixin whenever it's needed. But it seems a bit weird to include the marks in the board. At least the methods are not forcing me to have the marks in the board. But maybe I'll consider this option later, since you can have methods inside a module.</li>
+	
+	<li>I could use a <a href="http://ruby-doc.org/core-2.2.0/Struct.html">Struct</a>, although according to Christoph "<em>A struct is not a well suited place for a constant</em>".</li>
+</ul>
+
+<p>When I searched for Structs, I found some articles that convinced me that <a href="http://stephaniehoh.github.io/blog/2013/12/28/the-ruby-struct-class/">maybe a Struct is what I needed for the marks</a>. It holds data and it can have methods. According to <a href="http://stackoverflow.com/questions/3275594/when-to-use-struct-instead-of-hash-in-ruby/3275624#3275624">this answer in StackOverflow</a>:</p>
+
+<blockquote>When you want to model objects with a known set of attributes, use structs. When you want to model arbitrary use hashmaps.</blockquote>
+
+<p>They also seem to be faster than hashes, and you can add behavior (methods) which you can't add to a hash.</p>
+
+<p>However, structs <a href="http://thepugautomatic.com/2013/08/struct-inheritance-is-overused/">seem to have its downsides</a> as well.</p>
+
+<p>Georgina told me that she used symbols wrapped in a class, in other words:</p>
+
+<pre><code class="language-ruby">class PlayerSymbols
+  X = :X
+  O = :O
+  E = :O
+end</code></pre> 
+
+<p>There are also a couple of methods in there. Jarkyn told me that symbols are faster than strings, and comparisons and other operations are also faster.</p>
+
+<p>I asked her, what if I wanted to change them to smileys? Jarkyn told me you can create symbols that contain special characters (for example spaces) if you use them between quotes:</p>
+
+<pre><code class="language-ruby"># Symbol with character
+X = :"hello world"
+</code></pre> 
+
+<p>But I haven't tried this. So after researching all the possibilities I found, I think I'm gonna stick with symbols.</p>
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Jarkyn laughed at me for using Matrix and told me "<em>THAT'S SO CLEVER</em>" and "<em>I think you are the first apprentice that uses the Matrix class for the board</em>". So I have a feeling that is going to be the wrong decision and I'm gonna be asked to remove it, lol.</p>

@@ -1,0 +1,137 @@
+---
+layout:   post
+title:    "52: Parameterized tests"
+date:     2015-12-22 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Mateu was feeling ill today and Skim just smiled when asked to do one, so today we had no <em>Zagaku</em>.</p>
+
+<p>Very simple things can escape your eyes if you have been looking at your code for too long. In the MenuOption enum, I had a condition that read like this:</p>
+
+<pre><code class="language-java">if (id != null &amp;&amp; id.equals(menuOption.getId())) { ... }</code></pre>
+
+<blockquote>OMG! A wild null-check appeared!<br>
+ Octopus is confused!<br>
+ It hurts itself in its confusion!</blockquote>
+
+<p>Well, how <em>easy</em> it is to avoid that null check? JUST SWAP THE FREAKING CHECK:</p>
+
+<pre><code class="language-java">if (menuOption.getId().equals(id)) { ... }</code></pre>
+
+<p>AND YOU'RE DONE. Why oh why can't I spot this little stupid things?</p>
+
+<p>Also, I started implementing the 4x4 board. My plan is to prepare the tests and the classes for a 4x4 board first. Then introduce a menu to choose the size of the board, and pass the option to the game.</p>
+
+<p>Many of my tests set an <code class="language-java">int size</code> variable in the <code class="language-java">setUp()</code> method. That's the size of the board, and in the past, I set it like that so that it would be easy to set it to 4 and see if the tests failed. BUT:</p>
+
+<ul>
+	<li>Every time I want to test for <code class="language-java">size = 4</code>, I have to go to all the tests one by one and change the size manually.</li>
+	<li>If I want to go back to <code class="language-java">size = 3</code>, then I have to go to all the tests one by one and change the size manually.</li>
+	<li>Keeping two copies of <strong><em>all</em></strong> the test classes, one for <code class="language-java">size = 3</code> and another for <code class="language-java">size = 4</code> is not an option (although for some of them I would have to make a copy, for example, the robot test class).</li>
+</ul>
+
+<p>AAARRRGGHHHHH...!!!</p>
+
+<p>For example, this is the beginning of my board test:</p>
+
+<pre><code class="language-java">public class BoardTest {
+    private int size;
+    private Board board;
+
+    @Before
+    public void setUp() {
+        size  = 4;
+        board = new Board(size);
+    }
+
+    @Test
+	// All the tests here
+    ...
+}
+</code></pre>
+
+<p>I wish I could have <strong>some configuration file to set the tests I want to run</strong> for <code class="language-java">size = 3</code> and <code class="language-java">size = 4</code>, <strong>and pass the size as a parameter</strong>. That way, I could run all the tests that have to work for sizes 3 and 4 without having to go file by file changing 3 by 4. I could just pass 3 or 4 as a parameter <em>in one place</em> and the tests will run.</p>
+
+<p>Georgina told me that I can write <strong>parameterized Junit tests</strong>, so that I can pass a size which is used to construct the board. I have to provide <strong>an annotation and a constructor</strong>. I can then provide tests that are called once per parameter. So basically, in my previous board test class, I would have something like this:</p>
+​
+<pre data-line="1, 6, 11-15"><code class="language-java">@RunWith(Parameterized.class)
+public class BoardTest {
+    private int size;
+    private Board board;
+
+    public BoardTest(int boardSize) {
+        size  = size;
+        board = new Board(size);
+    }
+
+    @Parameterized.Parameters
+    public static Collection dataSetup() {
+        return Arrays.asList(new Object[][]{ {3}, {4} });
+	}
+
+    @Test
+	// All the tests here
+	...
+}
+</code></pre>
+
+<p>In line 1 <strong>I use an annotation</strong> for a parameterized test class. In line 6, <strong>I provide the constructor</strong> (which is similar to what I had in the <code class="language-java">setup()</code> method), where I tell Junit that the test is going to take the size of the board as a parameter, and then in the <code class="language-java">dataSetup()</code> method (lines 11 to 15), <strong>I pass the values that the size will take</strong> (3 and 4). When the test class is run, it will run all my test methods twice, first with <code class="language-java">size = 3</code> and then with <code class="language-java">size = 4</code>.</p>
+
+<p>I wonder what happens when you have a test failing for one of the parameters, in regards to the error messages?</p>
+
+<p>Also, what happens if there is a test method that was hardcoded to test a 3x3 board? For example:</p>
+
+<pre><code class="language-java">@Test
+public void getsTheEmptyCellIndexes() {
+	board.setCell(1, PLAYER);
+	List<Integer> expected = asList(2, 3, 4, 5, 6, 7, 8, 9);
+	assertEquals(expected, board.getEmptyCellIndexes());
+}
+</code></pre>
+
+<p>I could do two things: I could <strong>change the test</strong> to automate the calculation of "<code class="language-java">expected</code>", but I feel it's more readable as is. Or I could <strong>add a whole new test class</strong> that only has that test method, and accepts as parameters not only the board size but also an array with the empty cell indexes. None of these ways looks like an optimal solution to me.</p>
+
+<p>Also, seems like the community feels <strong>the tests end up a bit less readable</strong> if you use parameterized tests, but they have their place too, so I guess I'd need to weight it up.</p>
+
+<p>So, on one side, it could <strong>prevent test duplication</strong>, like in my robot test class, where I have the same test with just different inputs/outputs (I pass a board as input, I assert the robot move is correct). But the downside is that the test has to be named more generically because it is being applied to multiple scenarios. Also you could end up with a lot of setup. So it is a trade-off, does it provide more value than duplicating the tests?</p>
+
+<p>Felipe suggested something different: a tool called <a href="http://richardwarburton.github.io/lambda-behave/">Lambda behave</a>, "<em>a modern testing and behavioral specification framework for Java</em>", according to the web. He added that, when looking at Lambda behave, I should also <strong>look at lambdas and method-references in Java</strong>. Seems a bit like an overkill for me at this point, but if I get some free time, I will try to sit through it and try to understand it. Felipe said he hasn't used it yet.</p>
+
+<p>Felipe also told me to ask myself some questions:</p>
+<ul>
+	<li>Do my tests really care about size?</li>
+	<li>Is there some statement that is critical for 3, but not for 4?</li>
+	<li>Is my API exposing something related to size?</li>
+</ul>
+
+<p>My tests only care about size when I have to do things with the board. For example, create a new one (which happens almost in every test class), check for winner or full, or check that if I pass a certain board, I get a move from the robot in the correct position. So I don't think there is anything critical for 3 or for 4, nor am I exposing something related to size.</p>
+
+<p>Jarkyn told me that <strong>in rspec for ruby there is a way to specify context</strong>, so for example you can group tests and setup different variables for those contexts which are shared across tests within context. She said there is a way to do it in JUnit, but its a little hacky. She suggested me to <strong>watch Uncle Bob's <a href="https://cleancoders.com/episode/clean-code-episode-20/show">video episode 20</a>, <em>Clean Tests</em>, around minute 58</strong>. He uses the <code class="language-java">@RunWith</code> annotation and inner classes to create contexts, so tomorrow I'm gonna watch that one.</p>
+
+<p>I already have some possible paths over the table. After I watch Uncle Bob's video I will choose one. I want to start preparing the codebase for a 4x4 board, and I am going to do it class by class, one class at a time.  I don't want to make a bad choice and then have to repeat everything again!</p>
+
+
+
+<h2>Nice things</h2>
+
+<p>We had pizza for lunch and <strong>while we ate it we watched Office Space</strong>, the movie that <a href="{% post_url 2015-12-18-day050 %}">Micah mentioned in his talk last Friday</a>. It's about a group of developers who work in a very corporate-like company, in tiny cubicles, and are very fed-up of their jobs. They decide to get some revenge using their secret power: the power of code! but things don't go as expected. It was a fun watch and even Chris (CJ) came from home just to see it.</p>
+
+<p>Now I finally understand where does this GIF come from.  I've been seeing it my whole life!</p>
+
+<figure>
+	<a href="{{ baseurl }}/img/day052.jpg"><img src="{{ baseurl }}/img/day052.gif" alt="A gif from the movie Office Space" width="500" height="269"></a>
+	<figcaption>So this is Michael Bolton. Like the artist, yeah. No, they are not related.</figcaption>
+</figure> 
+
+
+<h2>Post data</h2>
+
+<p>I tried the parameterized tests and they work. THIS IS BIUTIFUL.</p>
+
+<figure>
+    <a href="{{ baseurl }}/img/day052.png"><img src="{{ baseurl }}/img/day052.png" alt="Parameterized tests in IntelliJ" width="360" height="227"></a>
+    <figcaption>This is how it looks like in IntelliJ when you run the whole set of tests for each of the parameters you specify, in this case, <code class="language-java">size = 3</code> and <code class="language-java">size = 4</code>.</figcaption>
+</figure>

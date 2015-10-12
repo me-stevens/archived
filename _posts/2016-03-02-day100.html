@@ -1,0 +1,110 @@
+---
+layout:   post
+title:    "100: attr_reader and client IPM"
+date:     2016-03-02 20:00:00
+category: journal
+---
+
+<h2>Today I lear-TODAY IS DAY 100. WOOHOOOO</h2>
+
+<p>In my base class for the players, I had:</p>
+
+<pre><code class="language-ruby">class Player
+
+  def initialize(ui, chip)
+    @ui   = ui
+    @chip = chip
+  end
+
+  def mark
+    chip
+  end
+
+  private
+
+  attr_reader :ui, :chip
+
+end
+</code></pre>
+
+<p>I got a correction in my Pull Request <strong>to change the word "chip"</strong>. I couldn't use "mark", because then Ruby would make a recursive call with that method defined that way. Jim showed me that there was a way to do what I wanted whilst avoiding the confusion introduced by giving the same thing two different names.</p>
+
+<p>I first tried this:</p>
+
+<pre data-line="9"><code class="language-ruby">class Player
+
+  def initialize(ui, mark)
+    @ui   = ui
+    @mark = mark
+  end
+
+  def mark
+    @mark
+  end
+
+  private
+
+  attr_reader :ui, :mark
+
+end
+</code></pre>
+
+<p>But I couldn't make it work. In the game, there was a "NoMethodError" and it complaint that mark was private.</p>
+
+<p>But there was a better solution. I was using the <code class="language-ruby">attr_reader</code> as private always, and it never occurred to me that, since it is just a reader and not a "writer" or an "accessor", I could perfectly move it to the top, where everything public in the class lives.</p>
+
+<pre data-line="3"><code class="language-ruby">class Player
+
+  attr_reader :mark
+
+  def initialize(ui, mark)
+    @ui   = ui
+    @mark = mark
+  end
+
+  private
+
+  attr_reader :ui
+
+end
+</code></pre>
+
+<p>This works and I can get the mark with <code class="language-ruby">player.mark</code>, and it's less code!</p>
+
+
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today I went to a client site for the first time, not knowing what to expect or what was I expected to do. But I wanted to <strong>observe the interaction between our craftspeople and the client</strong>. I also wanted to check how different the IPMs with a client where from ours, and if so, where was the difference. When it was over, I felt pretty much like <a href="https://www.youtube.com/watch?v=UnURElCzGc0">the two-dimensional guy of Flatland</a> who receives the visit of a tri-dimensional being.</p>
+
+<p>When I arrived, the client people were there. They had been at our headquarters so I recognized them, but I don't think they remembered me.</p>
+
+<p>The first thing I did was to sit with Uku. The IPM was going to take place in two hours from then, so he went through all the stories. The project is pretty complex, it's <strong>a booking website using a PostgreSQL database and connecting to five different APIs</strong>. There were a lot of details too.</p>
+
+<p>They use Artisan, and make around 40 points every week. I was surprised that they had like four or five stories in the "working" column that were not going to make it to the IPM, and three in the "ready" column. So they were only delivering like 20 points or so.</p>
+
+<p>Another difference I found is that <strong>they were adding stories to the "working" column as they found little bugs or unexpected behaviors</strong>. Some of them were addressed at the moment, and solved before the IPM. Others proved to be more complex that they appeared at first. While Uku was showing me the stories that would enter the IPM, more stories kept popping up in the "working" column.</p>
+
+<p>I noticed some stories had a border with a color. It was to underline that those were design stories. Reminded me of an attempt I'd seen by a craftsperson and her apprentice were <a href="http://www.stephaniebriones.com/work/projects/artisan.html">they totally redesigned the Artisan look and feel</a>. I always wondered why their work wasn't included in Artisan. It was so RAD.</p>
+
+<p>After an hour, Uku wanted to take a break so I sat with Makis and Nathan, and I learnt some things.</p>
+
+<p>First, Nathan replaced some mocks created as stubs with my old friend <code class="language-ruby">allow(some_class).to receive(:method_name)</code> etc. Apparently, <a href="http://www.agileventures.org/articles/testing-with-rspec-stubs-mocks-factories-what-to-choose">stub is deprecated</a>.</p>
+
+<p>Also, you can use <code class="language-ruby">before do</code> and it will default to <code class="language-ruby">before :each do</code>. Apparently, that's because you will almost never use <code class="language-ruby">before :all do</code>.</p>
+
+<p>Finally, in one of the classes they were using a function that acted like a second constructor, with an execute method inside. I can't remember now the details of the code, but I found it interesting.</p>
+
+<p>The IPM was pretty much like our IPMs, just faster, and with a bunch more of stories. The craftspeople didn't have any problems to estimate the stories. They did that by presenting their fists, counting to three and showing a number of fingers (the number of points they estimated).</p>
+
+<p>Also, <strong>the client USED UBUNTU!!</strong> (YEAH! &lt;3) and was driving the IPM like a fish in the water, using Artisan as if he had coded it, checking stories and adding stories. He spoke very fast and was joking all the time, but when he asked the craftspeople for things to do, he changed into assertive mode, looking at them very seriously and intensely while he added more and more requirements.</p>
+
+<p>The IPM lasted for an hour and there were a lot of nice stories for the next week. It helped me to review them before with Uku and Nathan/Makis, so that I didn't get lost.</p>

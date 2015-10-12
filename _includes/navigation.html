@@ -1,0 +1,22 @@
+				<!-- NAVIGATION -->
+				<nav class="nav">
+
+					<!-- Nav Left -->
+					<a rel="prev"{% if page.previous %} href="{{ page.previous.url }}"{% else %} class="nav__disabled"{% endif %}>
+{% include arrow-left.svg %}
+						<span class="nav__text">{% if page.previous %}{{ page.previous.title }}{% else %} {% endif %}</span>
+					</a>
+
+					<!-- Nav Home -->
+					<a class="nav__home" href="{{ site.baseurl }}/">
+{% include octopus.svg %}
+						<span class="visuallyhidden">Home</span>
+					</a>
+
+					<!-- Nav Right -->
+					<a rel="next"{% if page.next %} class="nav__right" href="{{ page.next.url }}"{% else %} class="nav__right nav__disabled"{% endif %}>
+						<span class="nav__text">{% if page.next %}{{ page.next.title }}{% else %} {% endif %}</span>
+{% include arrow-right.svg %}
+					</a>
+
+				</nav>

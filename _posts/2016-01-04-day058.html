@@ -1,0 +1,151 @@
+---
+layout:   post
+title:    "58: Command and Query separation"
+date:     2016-01-04 20:00:00
+category: journal
+---
+
+<p>Command and Query separation (or CQS, for friends) usually refers to the practice of separating your methods into command type methods and query type methods. The idea is that they should be of one type or another, but not of both types.</p>
+
+<p><em>And what's a query or a command even, you ask, as you fix your blue eyes on mine</em><sup><a href="#becquer">[1]</a></sup>.</p>
+
+<p>Allow me to explain.</p>
+
+
+
+
+
+
+<h2>Query methods</h2>
+
+<p>As the name implies, a <strong>Query method</strong> represents a question we are asking the system. When you make a question you usually get a reply (don't you wish life was so easy). So these are methods that allow you to enquire about a specific part of your codebase and return a result. For example:</p>
+
+<pre><code class="language-java">Octopus coolio  = new Octopus("Coolest squid in Seatown");
+Octopus clownio = new Octopus("Funniest squid in Seatown");
+
+public Octopus getTheCoolestSquid() {
+	return coolio;
+}</code></pre>
+
+<p>The main difference with the Command methods is that Query methods don't change the state of the system as command methods do. They just <em>read the state</em> of the system.</p>
+
+
+
+
+
+
+<h2>Command methods</h2>
+
+<p><strong>Command methods</strong> are those that allow us to "give orders" to the system, they will go and perform some action and won't return anything. Just like when your mother asked you to make your bed, you would go and do it without returning anything (well, no. In real life you would return your anger and probably launch some object to the wall. BUT).</p>
+
+<p>This could be an example of a command method:</p>
+
+<pre><code class="language-java">Octopus ninja  = new Octopus("Deadliest squid in Sintown");
+Octopus coolio = new Octopus("Coolest squid in Seatown");
+ninja.kill(coolio);
+
+public void kill(Octopus victim) {
+	victim.setLifeTo(0);
+}</code></pre>
+
+<p>As you can see, command methods <em>change the state</em> of the system, as opposed to query methods, which just read the state of the system.</p>
+
+
+
+
+<h2>Command and Query methods in the jungle</h2>
+
+<p>How can CQS help you?</p>
+
+<p>Strict Query methods don't change the system, so <strong>you can use them in any situation, in any order</strong>. Imagine, for example, that there is a squid race in Seatown. So we start calling the participants one by one. We could decide to call the squids in order of coolness, in order of funniness, or in dull alphabetical order, and the result would be exactly the same: a bunch of squids ready to start the race.</p>
+
+<p>However, command methods have to be used with more care. <strong>Since they are modifying the system, the order in which you call them matters</strong>. Imagine Coolio had been preparing for that race for an entire squid-year. When the day of the race arrives:</p>
+
+<ul>
+	<li>If the ninja appears <em>before</em> the start of the race, when we start calling the participants and arrive to <code class="language-java">getTheCoolestSquid()</code>, we'll get a dead octopus. That's not cool.</li>
+	<li>If the ninja appears <em>after</em> the race, then Coolio would be able to run the race (and it would win, of course). It would be dead soon anyway, but the result of the events would be very different.</li>
+</ul>
+
+
+<p>Now imagine that we didn't have this separation. We could have a method like this:</p>
+
+<pre><code class="language-java">Octopus ninja  = new Octopus("Deadliest squid in Sintown");
+Octopus coolio = new Octopus("Coolest squid in Seatown");
+ninja.getTheCoolestSquidAndKillIt();
+
+public Octopus getTheCoolestSquidAndKillIt() {
+	coolio.setLifeTo(0);
+	return coolio;
+} </code></pre>
+
+<p>If I used this method, every-time I wanted to know who is the coolest squid in town, I would also KILL IT! JUST BY ASKING! How could you be able to live with that death in your conscience? You would certainly be more careful with the questions you ask your system.</p>
+
+<p>This method is also a bad idea because the "<em>and</em>" in the name is already telling you that it's doing <strong>two</strong> things. In other words, it's violating the <a href="https://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a>.</p>
+
+<p>What Command-Query separation is trying to achieve here is that <em>asking a question should not change the answer</em>. In other words, <strong>methods that are not supposed to change the state of the system should not have any side effects</strong>. All the side effects should be handled in one place, inside Command methods. All the return values should be returned by Query methods.</p>
+
+
+
+
+
+
+<h2>Heisenbugs</h2>
+
+<p>One example of what may happen if you don't use CQS is that <strong>Heisenbugs</strong> may appear. What is a Heisenbug?</p>
+
+<p>Heisenbugs are named after Werner Heisenberg, who postulated the <a href="https://en.wikipedia.org/wiki/Uncertainty_principle">uncertainty principle</a>, or as Jorge Cham put it in the context of a researcher's life:</p>
+
+<p class="center">"<a href="http://www.phdcomics.com/comics/archive.php?comicid=931">(<em>No idea about what I'm doing now</em>) &times; (<em>No idea about what to do with the rest of my life</em>) &gt; <em>healthy amount of uncertainty</em></a>".</p>
+
+<p>This principle is related to the <a href="https://en.wikipedia.org/wiki/Observer_effect_%28physics%29">observer effect</a>, which is about the fact that <strong>a measurement can affect what you are actually measuring</strong>. These concepts catapulted <a href="https://en.wikipedia.org/wiki/Schr%C3%B6dinger's_cat">Schr&ouml;dinger's cat</a> to fame, to the point that it is indeed the most famous creature in the history of the animal kingdom (but not the coolest), at least among nerds.</p>
+
+<p>Doing a measurement is like asking a question. - "<em>How long is this table?</em>" - "<em>One and a half meters</em>". If the table shrunk while measuring it, you wouldn't have any idea of what's the real size of the table at any given moment, because, just by asking, you are changing its size.</p>
+
+<p>That's a Heisenbug, <strong>a bug that changes when you try to study it</strong>. Command-Query separation can help in preventing you from them.</p>
+
+
+
+
+
+
+
+
+
+<h2>Protect me from myself!</h2>
+
+<p>Some languages, like functional languages, support CQS by default, in the sense that they have it ingrained into the design of the language. Martin Fowler proposes to use some kind of annotations so that you can tell the system that "this method is a command" and "that other is a query". Object-oriented languages, don't exactly enforce it, but I hope I have shown you that it is not that difficult to follow it, since I used Java (an OO language) for my code examples.</p>
+
+
+
+
+
+
+
+
+
+
+
+<h2>Conclusion</h2>
+
+<p>Command-query separation, if followed consistently, can simplify programs, making them easier to understand and reason about. This separation allows us to decouple our system, for example, we could have the validation checks in one part, all handled by query methods, and the rest of the business logic in the other, handled by command methods.</p>
+
+<p>So, think of your methods wisely. Separate the returners from the modifiers. Write them as if your code should be shipped with a "<em>No animals were harmed</em>" disclaimer.</p>
+
+<p>At least think of those squids' and cats' families.</p>
+
+
+
+
+
+<h3>More information</h3>
+
+<ul>
+	<li><a href="https://docs.eiffel.com/book/method/object-oriented-software-construction-2nd-edition">Object-Oriented Software Construction</a>, by Bertrand Meyer.</li>
+	<li><a href="http://martinfowler.com/bliki/CommandQuerySeparation.html">Command Query Separation</a>, by Martin Fowler.</li>
+	<li><a href="https://en.wikipedia.org/wiki/Command%E2%80%93query_separation">Command-query separation</a>, Wikipedia.</li>
+</ul>
+
+
+
+<p id="becquer" class="footnote"><sup>[1]</sup> From <a href="http://wutheringexpectations.blogspot.co.uk/2012/07/what-is-poetry-singing-along-with.html">What is poetry</a>, by Gustavo Adolfo B&eacute;cquer.</p>
+

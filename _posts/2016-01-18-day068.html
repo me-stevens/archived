@@ -1,0 +1,100 @@
+---
+layout:   post
+title:    "68: The enums who wanted to be Hash-Maps"
+date:     2016-01-18 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Today I had an OSOM pairing session with Christoph, regarding the introduction of the board size menu in the game. I had already started to apply a suggestion he made, but the code was looking awful and I didn't like it at all.</p>
+
+<p>So, this is the story of the enums who wanted to be Hash-Maps.</p>
+
+<p>Once upon a time, I had two enums for the different menus (the players menu and the board size menu), and they had very similar behavior. So, it seemed like they wanted to be Hash-Maps inside subclasses of an interface, where they could share similar methods, and just pass a different hash map for each subclass.</p>
+
+<p>The menu was using both in a very similar way, the only thing that was different was the part where the enum was used:</p>
+
+<pre><code class="language-java">    public MenuOption getUserOption() {
+        String option = "";
+        while (isInvalidOption(option)) {
+            gameUI.printMenuPrompt();
+            option = gameUI.getMenuOption(gameUI.formatMenuOptions());
+        }
+        return MenuOption.inputToOption(option);
+    }
+
+    private boolean isInvalidOption(String option) {
+        return !MenuOption.contains(option);
+    }
+</code></pre>
+
+<pre><code class="language-java">    public SizeOption getUserOption() {
+        String option = "";
+        while (isInvalidOption(option)) {
+            gameUI.printMenuPrompt();
+            option = gameUI.getMenuOption(gameUI.formatMenuOptions());
+        }
+        return SizeOption.inputToOption(option);
+    }
+
+    private boolean isInvalidOption(String option) {
+        return !SizeOption.contains(option);
+    }
+</code></pre>
+
+<p>This made my brain think of interfaces, but <strong>there are no interfaces for enums</strong>. Also, turning the enums into subclasses would mean that we would need to have a Hash-Map of Strings in the constructor of the class, which would be passed as strings to the PlayerCreator factory, which is now conveniently using enums.</p>
+
+<p>The solution we applied was to <strong>separate the part of the menu code that is not related to the enums</strong>, and just pass the values of the enums around, instead of the enums. We moved the <code class="language-java">contains()</code> method from the enums to the menu, and created separate methods to return the different types of enums. Laater on, we discovered we didn't even need that method, because we could just call <code class="language-java">containsKey()</code> on the Hash-Map. Now the menu looks like this:</p>
+
+ <pre><code class="language-java">   public PlayerOption getPlayerOption() {
+        String input = askUntilRightOption(PlayerOption.getPlayerOptions());
+        return PlayerOption.convertToOption(input);
+    }
+
+    public SizeOption getSizeOption() {
+        String input = askUntilRightOption(SizeOption.getSizeOptions());
+        return SizeOption.convertToOption(input);
+    }
+
+    private String askUntilRightOption(Map<String, String> playerOptions) {
+        String input = "";
+        while (isInvalidInput(input, playerOptions)) {
+            gameUI.printMenuPrompt();
+            input = gameUI.getMenuOption(gameUI.formatMenuOptions(playerOptions));
+        }
+        return input;
+    }
+
+    private boolean isInvalidInput(String input, Map<String, String> playerOptions) {
+        return !playerOptions.containsKey(input);
+    }
+</code></pre>
+
+<p>This solved the repetition in the user interface as well, since the formatting of the options before they are printed was the same for both enums. Now, instead of passing an enum and having two identical methods, we just pass a hashmap to a single method.</p>
+
+<p>And this is the story of the enums who wanted to be HashMaps.</p>
+<p>At least it has a happy ending!</p>
+<p>No enums (or Has-hMaps) were harmed.</p>
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today, I connected to Dani's virtual box while he was working with Mateu through Skype. He uses something similar to tmux. It sends his screen and Mateu can type in things, so they can edit the same file, at the same time, while being at different locations. It's so cool!</p>
+
+<p>I started typing things in the document they were both editing, but I wanted it to be REALLY intellectual, spiritual and deep. For example, I was typing things like:</p>
+
+<blockquote>KISS MY SHINY BUTT!</blockquote>
+
+<p>And both Mateu and Dani could see me as I typed such an eloquent sentence. So Mateu replied, in a more articulate way:</p>
+
+<blockquote><code>:-* (  |  )</code></blockquote>
+
+<p>LOL.</p>
+
+<p>I had only done something like that with <a href="https://livestream.com/">Livestream</a>, when I was working as an illustrator, to send my screen to my "<em>fans</em>", so that they could see me draw. That thing didn't use Skype, but I could send my audio too, and I usually would send music. Some illustrators talked to their audience, like, to answer the questions their fans were making in real time, while they were drawing. There was a small chat too, which is how your "fans" would communicate with you. It was cool too.</p>

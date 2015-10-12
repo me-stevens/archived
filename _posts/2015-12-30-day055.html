@@ -1,0 +1,158 @@
+---
+layout:   post
+title:    "55: Some patterns for the Payroll app"
+date:     2015-12-30 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Fifty five days, YOOHOOO!!</p>
+
+<p>In other news, more book reading. This time, the Payroll example. In section three, there is an exercise where you have to build a payroll app. According to the book, this is what the client told us:</p>
+
+<ul>
+	<li>Some employees are paid by hour and have a field for that. Daily, they submit date and hours worked. They get paid 1.5 times an hour for extra hours after 8 hours. They get paid on Friday.</li>
+	<li>Flat salary employees get paid at the end of the month and have a field for that.</li>
+	<li>Salaried: receive commissions. They submit date and sale amount. Commission rate is a field. Paid every other Friday.</li>
+	<li>Paychecks can be send home, picked by the Paymaster or deposited in the bank.</li>
+	<li>Employees belonging to the union have a field for the deductions from their services/</li>
+	<li>Payroll runs once per day and pays the relevant employees.</li>
+</ul>
+
+<p>The book says to make your own UML or try to implement the payroll app with these premises. I did an UML, but I'm sure it's gonna be wrong. <strong>I didn't know very well how to manage the time</strong>. Who is going to make the daily calls to submit the sales cards when they happen? Is there a main app that can be accessed by any employee? Do I need a user interface? What kind of user interface, a console? a GUI? a text-file based? XML, as the book mentions somewhere?.</p>
+
+<p>Also, <strong>I still don't know how to mock a database, so I did the design as if there was no database</strong>, I just had a list of employees <code class="language-java">List&lt;Employee&gt;</code>. I didn't think of the whole system as a database. I hadn't think of all the details like names and addresses of employees, just the main behavior of the app. When I saw the use cases in the book, I knew I'm lacking a physical place to store all that information, which I should probably use instead of my list of employees. That's the database, ehem.</p>
+
+<p>When I was learning about the different types of databases in an advanced course I took this year to refresh and update my database knowledge, we saw things like <a href="http://hibernate.org">hibernate</a> in Java, where you could tell NetBeans to produce the structure of your classes automatically from an existing database. So, <strong>it would map every table in the database with a class, so that the table's fields would be the class fields</strong>. In my design, I didn't have this too present, but again, when I saw the use cases in the book, they felt like SQL queries done against a specific table and its fields, to insert, delete or modify a record. I mean, look at this:</p>
+
+<pre><code class="language-bash">AddEmp &lt;EmpID&gt; "&lt;name&gt;" "&lt;address&gt;" H &lt;hourly-rate&gt;
+</code></pre>
+
+<p>This is totally an SQL query!</p>
+
+<pre><code class="language-sql">UPDATE Employees 
+SET name="&lt;name&gt;", address="&lt;address&gt;", hourlyRate=&lt;hourly-rate&gt;.</code></pre>
+
+<p>Anyway, this is my first UML for the payroll app (beware, it is not strictly a UML diagram since I added a lot of stuff to it):</p>
+
+<figure>
+	<a href="{{ baseurl }}/img/day055.png"><img src="{{ baseurl }}/img/day055.png" alt="My UML design for the payroll app" width="877" height="637"></a>
+	<figcaption>This design is shit and I'm going to find out why very soon. Also, is not strictly a UML diagram.</figcaption>
+</figure>
+
+<p>That thing at the end that says "<em>Not sure about this</em>" next to the <code class="language-java">isPayDay()</code> method, is my way of saying that I still don't know how to handle the time management, although I'm taking care of that in the Payroll class, in a very shitty way.</p>
+
+<p>Also, the <code class="language-java">send()</code> method in the Payroll class would be calling a <code class="language-java">send()</code> method in the payment-method enum, which is not shown because of lazyness (or I forgot).</p>
+
+<p>The book tells you to approach the problem in many ways, I decided to take the path of reading about the patterns first, since they are new to me, and then coding the Payroll app. So these are the patterns I learnt today:</p>
+
+
+
+
+
+<h3>The COMMAND pattern</h3>
+
+<p>This chapter is about an interface <code class="language-java">Command</code>, that has only one method with no arguments: <code class="language-java">do()</code>.</p>
+
+<p>The client is injected with a command and calls its <code class="language-java">do()</code> method, and at compile time, it has no idea what it's doing. Only at run time, where the initialization was done already. <strong>In the initialization, every client is bound to its corresponding command, so that the wiring is in one place, outside of the program</strong>, and it can be changed outside of it without recompiling.</p>
+
+<p class="footnote">Good thing: half into the chapter, I see the separation into classes is similar to what I have done. What I called <code class="language-java">EmployeeRecord</code> is called <code class="language-java">PayClassification</code>, and its subclasses are Commissioned, Salaried and Hourly, as opposed to Union, Monthly and Hourly. First difference: I was including the commissions logic inside the monthly subclass, since I understood that the hourly employees couldn't earn commissions. The book makes a whole subclass for that. It also separates the time card and sales card into their own classes as I did, but bounds them to the record subclasses instead of the employee class, as I had it.<br>
+
+<br>
+
+I have nothing to communicate with the database though, because, I don't have one in my design.</p>
+
+<p>A <strong>transaction</strong> is an application of the COMMAND pattern. You have an interface <code class="language-java">Transaction</code> that validates input data and executes some command with that data (for example, updates a database with the data). So you can make subclasses of that interface for every transaction you need, that have the same fields that the class you are updating (for example, <code class="language-java">AddEmployeeTransaction</code> has the same fields than <code class="language-java">Employee</code>). That way, you <strong>decouple the validation from the business logic</strong>.</p>
+
+<p>Which makes me think about how I do the validation of the user inputs in my own TicTacToe.</p>
+
+<p>But, wouldn't it be an overkill to have one transaction subclass for every class?</p>
+
+<p>The <code class="language-java">undo()</code> method sounds like a rollback in the database. The example in the book describes the deletion of an object in a GUI for drawing, by matching the object's id.</p>
+
+
+
+
+<h3>The ACTIVE OBJECT pattern</h3>
+
+<p>I still don't understand this pattern very well, but it looks like it implements threads of control. Looking at the examples, <strong>I imagine they will use it for read/write operations to the database?</strong> Which are the "<em>events</em>" we are waiting for?</p>
+
+<p>I haven't work with threads a lot, but I remember they were a bit painful, specially if they didn't have to run independently, but in a certain order.</p>
+
+
+
+
+
+<h3>TEMPLATE METHOD and STRATEGY patterns</h3>
+
+<p><strong>The TEMPLATE METHOD pattern</strong> is about abstracting the generic behavior of the app into a class that you can extend in subclasses. It uses inheritance to reuse common generic code, and the details of the algorithm implementation are left to the methods of the subclasses.</p>
+
+<p><strong>The STRATEGY pattern</strong> is similar, but it uses an interface, so while in the previous case the details of the algorithm where known at compile time, in this case they are only known at run time, with costs in run time and data space, because you need an extra class, the application runner, which is going to receive an application interface in the constructor. There is no code shared between any class.</p>
+
+
+
+
+
+
+<h3>FACADE and MEDIATOR</h3>
+
+<p>A FACADE is a layer you place in between the app and something like a database. For example, we could have an intermediary class in between our app and the Java library <code class="language-java">java.sql</code>, which knows all the details about how to use the library (connect, update database, etc), and for our app it would be as if the library didn't exist at all. The intermediary class would be a facade (sounds like a mock or a fake!).</p>
+
+<p>The mediator is not visible as the facade, acts in an invisible way. While the facade exposes existing functionality and delegates to other objects, the mediator adds/creates functionality. The facade is a structural pattern, the mediator is a behavioral pattern. The mediator takes care of communication between objects without them knowing about the mediator or about each other.</p>
+
+
+
+
+
+
+<h3>SINGLETON and MONOSTATE</h3>
+
+<p>A SINGLETON is a class with a private constructor. There can only be one instance of the class at any moment</p>
+
+<p>A MONOSTATE allows you to have all instances of a class behave as one, without the constrain of having only one instance of the class at any moment. For this, we make all fields static.</p>
+
+<p>Subclasses of MONOSTATE can decorate the shared state with different behavior.</p>
+
+<p>The SINGLETON is a structural pattern, the MONSTATE, a behavioral one. Both save a global state. Also, SINGLETON usage is not transparent, but MONSTATE is. Both can lead to inflexible systems that are tightly bound</p>
+
+
+
+
+
+<h3>NULL OBJECT</h3>
+
+<p>We create a NULL OBJECT when a call to a method that should return an instance of a class can return a null if there is an error (for example, trying to get an employee that doesn't exist). We create an object that has the same methods than the proper object to be returned, but they do nothing, and if there is an error, we return an instance of that object instead of a null.</p>
+
+<p>This eliminates the checks for null in your code, which simplifies the code. Instead of:</p>
+
+<pre><code class="language-java">if (o != null &amp;&amp; o.someBooleanMethod()) {...}</code></pre>
+
+<p>We would have just:</p>
+
+<pre><code class="language-java">if (o.someBooleanMethod()) {...}</code></pre>
+
+<p>Because <code class="language-java">o</code> will <em>never</em>, NEVER, <strong>never</strong>, be null.</p>
+
+<p>In the book, they suggest that this object would be unique, so you would hold it in a static variable of the interface and use it to check if the method failed.</p>
+
+
+<p>Now I wonder if I should return a null player object in my TicTacToe's player creator? And/or a null menuOption enum in the <code class="language-java">idToOption()</code> and <code class="language-java">contains()</code> methods? (Probably not, because, what would those do? What would the game do if passed those?).</p>
+
+<p>I'll leave it here, and tomorrow I'll start doing the payroll app.</p>
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>The other day talking about <a href="https://en.wikipedia.org/wiki/Solaris_%281972_film%29">Solaris</a>, a film I want to rewatch (and will probably do so with Jarkyn because she hasn't seen it), I remembered about the <a href="https://en.wikipedia.org/wiki/Fermi_paradox">Fermi paradox</a>. The movie is based on a Science-Fiction novel about an alien planet that has some intelligence.</p>
+
+<p>I have thought about this so many times. I'm pretty sure we are not alone but the universe is not only too big, it is also unknown to us. If we fail at communication with the species in our own planet (hell, we even fail at communication with other humans!) how could we even expect to communicate with alien species? What about the fact that <a href="https://en.wikipedia.org/wiki/Fermi_paradox#They_are_too_alien">they might be too alien</a>, or it <a href="https://en.wikipedia.org/wiki/Fermi_paradox#It_is_dangerous_to_communicate">could be dangerous to communicate</a>?.</p>
+
+<p>And yet, I would love to get to know at least one alien civilization. What would their culture be? Their believings? Their technology? Their way of looking at life? Their society and values? Ours is so determined by our physical body and its limitations. One of my favorite Sci-Fi authors, <a href="https://en.wikipedia.org/wiki/Ursula_K._Le_Guin">Ursula K. Le Guin</a>, wrote about those societies a lot. In <a href="https://en.wikipedia.org/wiki/The_Word_for_World_Is_Forest">The Word for World Is Forest</a>, the aliens considered trees the center of their society and lifes... for a reason. In <a href="https://en.wikipedia.org/wiki/The_Left_Hand_of_Darkness">The Left Hand of Darkness</a> she describes the society of a world where gender doesn't exist. We can not even IMAGINE what is waiting for us outside of this tiny blue dot.</p>

@@ -1,0 +1,92 @@
+---
+layout: post
+title:  "4: Making up for the screw ups"
+date:   2015-10-15 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>It was Felipe's Zagaku time, and he used yesterday's exercise (the one where I screwed up) to teach us what a good pull request (PR) looks like. In short:</p>
+
+<ul>
+	<li>Create a new branch and commit your changes to it.</li>
+	<li>Write concise and clear commit messages.</li>
+	<li>Check that all the tests are passing before you push.</li>
+	<li>It's ok to make a PR of something that is not complete yet, just explain it in you message in a clear way.</li>
+	<li>It's ok to rebase some commits before making the PR, if they are too granular, so that the reviewer of the PR is not faced with 30 commits all of a sudden.</li>
+	<li>Once the PR is placed, in GitHub (and I think also in BitBucket and GitLab), you can tag other users if you want them to review the PR.</li>
+	<li>When agreeing with a PR, it is considered negative to just say "It's ok". Because in written communication you lack things like tone, body language and so on, it sounds neutral, even if it is positive. So you have to... add an emoji! I kind of like this one but I fear of me abusing it.</li>
+	<li>LGTM = "Looks good to me", is something you can also use as a comment when you agree with the commits.</li>
+	<li>If the discussion on a PR is more than 5 comments long, move it somewhere else, for example discuss it in person.</li>
+</ul>
+
+<p>He asked us to practice during the following days making PR's and commenting them. I shared the <a href="https://github.com/8thlight/8thlight.com/pull/154">PR Jim and I did</a> for the addition of my picture to the company's website, which followed all the previous points, and Georgina started making pull requests to her own repos so that we could practice discussing pull requests. That allowed me to see her code for the first time and it blew my mind. She is really good. I would work with her in any project, and I would like to learn from her coding style. Just look at this beautiful comment in her <a href="https://github.com/gemcfadyen/Apprenticeship-JavaTicTacToe/pull/4">Acceptance tests</a> pull request:</p>
+
+<blockquote>Acceptance tests were written to drill out the logic for the Game class. Test coverage is showing as 100% for classes, except for Game.java, which is showing at 83% method coverage and 73% line coverage. Through Intellij I can see the untested code is all within the main method.
+
+<p>In places Spy's were used in order to capture behaviour from the Player and Prompt, used in the test assertions.</p>
+
+<p>Other refactorings taken into account were:</p>
+
+<ul>
+	<li>renaming UserPrompt to CommandPrompt as it's now used for both the Players and the Game</li>
+	<li>introducing Player interface to allow for a PlayerSpy and a HumanPlayer to be used within the Game</li>
+</ul>
+</blockquote>
+
+<p>This is so BEAUTIFUL. As a reviewer, if I received this, I would be so glad. Her commit messages are also very concise and clear.</p>
+
+<p>On other topics, I had a conversation with Amelia where she explained to me all the bureaucratic and legal stuff and documents, and all that. It was interesting to see all the similarities and differences between the laws in the US and Europe. There are a lot of things I have to learn, and a lot of things I have to read as well.</p>
+
+
+
+
+
+
+<h2>Challenges</h2>
+
+<p>Today I managed to practice <strong>the bowling kata</strong>. I had finished it this weekend, but there was a lot of knowledge to get from it, so I felt I needed to repeat it a couple of times. This week's story came so timely, because Jim told me to practice it until I was able to do it by memory and record a screencast of me typing it.</p>
+
+<p>My approach to this task was:</p>
+
+<ul>
+	<li>I went through Uncle Bob's slides and tried to get the main concepts of what was going on.</li>
+	<li>When I figured out the steps, I wrote them down, and that helped me with the process of sinking them in my brain. I'm the kind of person who writes things down.</li>
+	<li>Once I had the basic steps, I used them as a "cheat-sheet", and tried to make the exercise by memory. I failed and had to peek from time to time.</li>
+	<li>When I was able to make it without peeking, I started recording my screen. However, I had to do it twice because Kazam crashed the first time around for no reason and I didn't notice until I was finished.</li>
+</ul>
+
+
+<p><a href="https://www.youtube.com/watch?v=UEcr2a8qDJI">This is the result of my screencast</a>. I was supposed to do it in around 15 minutes, but it took me 19. I'm such a slow typer!</p>
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today I paired with Priya and was happy to <strong>prove useful for once (and even helped her TWO TIMES! WOAH!)</strong>, instead of just suggesting things like "<em>Let's use a HashMap! Yeah! that sounds like a great idea!</em>" and screwing her katas.</p> 
+
+<p>So, she wanted to know how to compile and run Java apps in the console. This was an easy one:</p>
+
+<p>To compile:</p>
+
+<pre><code class="language-bash">javac ClassName.java
+</code></pre>
+
+<p>To run:</p>
+
+<pre><code class="language-bash">java ClassName
+</code></pre>
+
+
+<p>Then we solved some problems she was having with some tests not passing in one of her apps, which turned out to be... <strong>a mine sweeper game!</strong> How cool is that? It was a console app. but it can be a good exercise of a very simple game that can be used as a breakable toy. I kind of want to give it a try and make the GUI and everything.</p>
+
+<p>Also, Enrique brought some issues of <a href="http://shop.oreilly.com/product/9780596518387.do?intcmp=il-npa-books-video-product_chimera">"Apprenticeship Patterns"</a>, by David H. Hoover and Adewale Oshineye for us residents, which was cool, because I was starting to get annoyed by my commute (which is not long, but I can't be doing nothing for more than 10 minutes). So now I have something nice to read while I travel. Sweet!</p>
+
+

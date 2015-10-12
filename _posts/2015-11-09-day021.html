@@ -1,0 +1,25 @@
+---
+layout:   post
+title:    "21: Stacks vs. heaps"
+date:     2015-11-09 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>In today's <em>Zagaku</em>, Felipe explained the difference between <strong>Stacks</strong> and <strong>Heaps</strong>. Stacks are like memory frames that are created and destroyed on the fly, every time a program makes a function call. The variables are local to the frame and don't change their values while living in the stack. Stacks are nice because they allocate a very small piece of memory, which is liberated fast. A stack overflow is caused when you overpass the maximum number of stacks that the system can create, which is around 65000 in Java.</p>
+
+<p>Heaps are bigger, they are usually of the order of Gigabytes. Since their use of space is not efficient, they are slower, because the computer has to play Tetris with the size of the elements in the heap, and the available space gets very fragmented. Also, you have to do all the memory management manually. In C, that would be done with calls to <code class="language-c">malloc()</code> and <code class="language-c">calloc()</code>, for example, which then you will free with <code class="language-c">free()</code>, as opposed to a stack, where the system takes care of the garbage collection for you.
+</p>
+
+<p>Sara mentioned our <a href="{% post_url 2015-11-03-day017 %}">last week's issue</a>, when we asked for the difference between a stack overflow and an infinite while loop. The infinite while loop stays in its frame forever, and that doesn't cause the system to explode. However, it's very rare to reach the so many stacks needed for that. But it's a good practice to use the while loop instead of a recursive method!</p>
+
+<p>Next I had my IPM just with Christoph, since Jim was out today. We went through all my tests and classes, and he told me how to avoid exposing certain methods unnecessarily, by making them private and testing the father method that calls them.</p>
+
+<p>Then it was time to introduce the computer player, which means I have to deal with my old friend, the MiniMax algorithm. But that will take me ages. It took me ages when I did my first Tic Tac Toe. How to split that task so that we can give feedback to a client in the time span of a week? I'll have to make a computer player that doesn't use MiniMax but still blocks the user or has some intelligence. Let's see what I can come up with.</p>
+
+
+
+<h2>Nice things</h2>
+
+<p>Basically food related! Today, Emily invited me to breakfast in the office: milk and cereals with fruits and seeds. It was delicious. Also, Priya brought chocolate cake in a very fancy box, and it was also delicious.</p>

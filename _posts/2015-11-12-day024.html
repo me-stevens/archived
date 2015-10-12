@@ -1,0 +1,81 @@
+---
+layout:   post
+title:    "24: Tail call optimization"
+date:     2015-11-12 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+
+<p>Uku was in charge of today's <em>Zagaku</em>, and for some weird reason all the other craftsmen attended the <em>Zagaku</em> for the first time. Uku introduced the concept of <strong>tail call optimisation</strong>. To understand this, first we need to know what <strong>tail recursion</strong> is.</p>
+
+<p>A function call is said to be "tail recursive" if there is nothing to do after the function returns except return its value<sup><a href="#recursion">1</a></sup>. Tail recursion is said to be as efficient as a normal iteration, because, instead of creating a new frame, the compiler reuses the current stack.</p>
+
+<p>To explain how the tail call optimisation works, he used the calculation of the factorial of a number as an example:</p>
+
+<pre><code class="language-java">public int factorial(n) {
+	if (n == 0) 
+		return 1;
+	return n * factorial(n-1);
+}
+</code></pre>
+
+<p>If we passed a humongous number to this method, we could have a <a href="{% post_url 2015-11-09-day021 %}">stack overflow</a>, because after calling the <code class="language-java">factorial(n-1)</code>, the compiler has to multiply it by <code class="language-java">n</code> before returning it. This creates a new stack every time the method returns:</p>
+
+<pre><code class="language-java">(factorial 3)
+(* 3 (factorial 2))
+(* 3 (* 2 (factorial 1)))
+(* 3 (* 2 (* 1 (factorial 0))))
+(* 3 (* 2 (* 1 1)))
+(* 3 (* 2 1))
+(* 3 2)
+6
+</code></pre>
+
+<p>We can rewrite it so that it uses tail recursion instead:</p>
+
+<pre><code class="language-java">int product = 1;
+public int factorial(n, product) {
+	if (n == 0) 
+		return product;
+	return factorial(n-1, n*product);
+}
+</code></pre>
+
+<p>Now the method is the last thing to be returned, so the result will be:</p>
+
+<pre><code class="language-java">(factorial 3)
+(factorial 3 1)
+(factorial 2 3)
+(factorial 1 6)
+(factorial 0 6)
+6
+</code></pre>
+
+<p>Uku also told us that the compilers of some languages like Python or Java don't have implemented the "feature" of tail recursive optimization (and don't plan to add it, because apparently it's not a trivial thing to do). So I just lied to you, because the code I wrote is in Java. HE.</p>
+
+<p id="recursion" class="footnote"><sup>1</sup> A tail call does not necessarily always imply recursion.</p>
+
+<p>And that would be it for tails and recursion. I am also finally reading the book <a href="http://www.amazon.co.uk/Refactoring-Improving-Design-Existing-Technology/dp/0201485672">"<em>Refactoring: Improving the Design of Existing Code</em>", by Martin Fowler</a>. This is what I read so far, and what I'm trying to do in my code:</p>
+
+<ul>
+	<li>Focus on having solid tests. After that you can start refactoring.</li>
+	<li>If you have a spaghetti, try to extract a method: look for the local variables, keep the ones that are modified in the method, and pass the ones that are not.</li>
+	<li>If a method uses information from a single class only, it may make sense to move it to that class instead.</li>
+	<li>Try to avoid temporary variables, but pay attention to performance.</li>
+	<li>If the refactoring makes your code temporarily slower, don't worry, it will also make it easier to change after you do a future performance profiling.</li>
+</ul>
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today I paired with Georgina, which was nice because we hadn't paired yet since I arrived here. She is more or less in the same stage that I am, adding a computer player to her Tic-Tac-Toe, which means, implementing the MiniMax algorithm.</p>
+
+<p>She had a working version where she first went through all the recursion and saved the scores in a list. Then she would check for the biggest score of the list and return that. However, she wanted to make the other version work; the one that didn't use a list, which would be ideal in case of a big board.</p>
+
+<p>The method was also much more verbose than the one she had working, so I tried to remember what I did for my submission and we reduced the lines of code a bit. However, the algorithm was working only up to the last level, where it just kept the last score shipped to it. Felipe helped us pass the tests when he spotted that we were initializing the scores for each level of inception in the wrong place. Finally, he suggested to refactor the working version with lists using what we had done, so that it worked without the need of the list. It was late but we wanted to see how the movie ended. We made it work! In, like, five minutes XD. So we went for a well-deserved beer.</p>
+
+<p>My story for this week was to make the computer player at least block the human player, and I was planning to use a ruled-based strategy, but I think I'll use MiniMax, since now I have it fresh from the session with Georgina.</p>

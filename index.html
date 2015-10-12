@@ -1,0 +1,59 @@
+---
+layout: default
+---
+{% assign f         = site.posts     | size | minus: 1 %}
+{% assign sorted    = site.posts     | sort: 'date' %}
+{% assign firstdate = sorted[0].date | date: '%s' %}
+{% assign lastdate  = sorted[f].date | date: '%s' %}
+{% assign onemonth  = 30 | times: 24 | times: 60 | times: 60 %}
+{% assign month     = lastdate       | minus: firstdate | divided_by: onemonth | plus: 1 %}
+{% assign previous  = month %}
+{% assign state     = site.states[month] %}
+		<div class="wrapper lightbeam">
+			<section id="month{{ month }}">
+
+				<h1 class="status">
+					<span class="status__month">Month</span> 
+					<span class="status__number">{{ month }}</span> 
+					<span class="status__state">{{ site.months[month] }}</span>
+				</h1>
+
+				<p class="state">
+{% include {{ state }} %}
+				</p>
+
+				<ul class="posts__list">{% for post in site.posts %}
+{% assign pdate = post.date | date: '%s' %}
+{% assign month = pdate     | minus: firstdate | divided_by: onemonth | plus: 1 %}
+{% if previous <= month %}
+					<li class="post">
+						<span class="post__date">
+							<span class="date__month">{{ post.date | date: "%b" }}</span>
+							<span class="date__day">{{   post.date | date: "%-d" }}</span>
+							<span class="date__year">{{  post.date | date: "%Y" }}</span>
+						</span>
+						<a class="post__link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+					</li>{% else %}
+{% assign previous = month %}
+{% assign state    = site.states[month] %}
+				</ul>
+
+			</section>
+
+			<section id="month{{ month }}">
+
+				<h1 class="status">
+					<span class="status__month">Month</span> 
+					<span class="status__number">{{ month }}</span> 
+					<span class="status__state">{{ site.months[month] }}</span>
+				</h1>
+
+				<p class="state">
+{% include {{ state }} %}
+				</p>
+
+				<ul class="posts__list">{% endif %}{% endfor %}
+				</ul>
+
+			</section>
+		</div>

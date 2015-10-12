@@ -1,0 +1,69 @@
+---
+layout: post
+title:  "5: End of first week"
+date:   2015-10-16 20:00:00
+category: journal
+---
+
+
+<h2>Today I learnt</h2>
+
+<p><strong>Fridays are <em>waza</em> time<sup><a href="#waza">1</a></sup></strong>. And it was the turn for Daniel to show us what he's been working on. His project is a static site generator made with clojure, and it's called "pynaclj". I guess the <strong><em>j</em></strong> at the end stands for clojure (clj = clojure?). The structure, set up and workflow is very similar to that of Jekyll, with some differences. Fun fact: Skim forked the repo and renamed it "cyniclj". That is so Skim.</p>
+
+<p id="waza" class="footnote"><sup>1</sup></strong> <em>Waza</em> is a Japanese word for "practice" or "technique". On Fridays, we don't do any client work, and instead, we work in personal projects that could benefit the company. I have a couple of personal projects that could maybe fulfil that description, but I'll wait until I'm a better developer to bring them out.</p>
+
+<p><strong>We also met Wolfram</strong>, a possible future member of the team. Enrique told us his Tic-tac-toe was the best thing he had seen in many years. Wolfram spoke after Daniel, and gave us three topics to choose from: speak about himself, speak about one of his projects, or speak about how he teaches Test Driven Development to his kids. We wanted it ALL, so he had to speak about the three. He seems like a cool guy, I hope he joins us!</p>
+
+<p>Finally, I could sit with my dear mentor, Christoph, for the Roman numerals kata, which is pretty simple, but I wanted to do the TDD right, and I'm still a bit green. We couldn't finish it, but he taught me some useful short-cuts that put sparkles in my eyes. He had watched my screen-cast, and probably face-palmed several times while doing it.</p>
+
+
+<figure>
+	<a href="{{ baseurl }}/img/day005.jpg"><img src="{{ baseurl }}/img/day005.jpg" alt="Double facepalm" width="500" height="400"></a>
+	<figcaption>I know of two who may probably look like these other two.</figcaption>
+</figure> 
+
+
+
+
+
+
+<h2>Challenges</h2>
+
+<p>Today was the first time I was at a <a href="http://www.foundersandcoders.com/">Founders and coders class</a>. It's about training students in JavaScript web development for free. The students receive code reviews of their projects and talks by people in the industry or the CAF partners, i.e., us! I'm so happy to know that we help or support so many projects out there: codebar, Code First Girls, CAF, and much more. Kind of makes me think we would be a good candidate for a <a href="https://courses.platzi.com/">Platzi</a> talk. Jim, Enrique, Christoph, Priya and me, were there in representation of the company to show TDD done right and help the students with our code reviews.</p>
+
+<p><strong>Enrique talked about our responsibility as developers</strong>, and how when something is screwed up because of the code, we have to sing the <em lang="lt">Mea Culpa</em>. It reminded me a bit of that talk by Mike Monteiro called "<a href="https://vimeo.com/68470326">How designers destroyed the world</a>", where he explains how the bad decisions made by Facebook's privacy-settings designers lead to the suicide of a young woman.</p>
+
+<p>Then we went to work with the students and review their code. Priya and me did our review together because we are still residents. <strong>The project we reviewed was a version of Stack Overflow</strong>, where you would ask a question and obtain an answer. The first thing the students said was... "<em>we have a problem with a cookie and...</em>", and I'd never done anything with cookies before. So I told them exactly that... That was me freaking out again. But then Priya said the magic words:</p>
+
+
+<blockquote>Can I see your tests?</blockquote>
+
+
+<p>And saved the day. THANK YOU PRIYA. I relaxed a bit, because her smartness kicked my insecurities in the butt, and I recovered my self esteem. So I tried to keep cool and read the code, and I recognized my own code weeks ago. I've only been doing TDD for a week or two, but seeing all those code smells made me realize how lucky I am to be working where I am and learning to do things the right way.</p>
+
+<p>They didn't have tests, or had very few. So <strong>Priya explained very cleverly how TDD is done and why it is so important</strong>. How it can seem counter-intuitive at first, and how it looks like it takes a lot of time, but is only at the beginning. Because it takes much more time to search for a bug in a codebase that is not readable. She also explained how tests help you understand what your code is doing, because they are like a documentation of your code.</p>
+
+<p>My only contribution was to tell them to check for the existence of the cookie instead of checking for the path, since it looked like their infinite if-else chain was redirecting the user to the home page, so the cookie was generated every-time the user refreshed the page. Then I told them to make the function that checked for the cookie existence to return something they could use in their conditionals, and to break that huge method into smaller methods with single responsabilities, maybe extract the code under every if-else into its own method. That would probably not solve their problem, but at least would help them find it. We received lots of "<em>what a cool idea!</em>" for that, which was nothing, really. Kind of made me remember my dear student Abi from codebar, the best student I ever had.</p>
+
+<p>When the code review was finished, the students presented their projects. Jim told us that <strong>they work on a new different project every week to present there, and then they throw it away and never work back on it</strong>. Christoph also told me this afternoon that there was no need to commit my katas to GitHub, because they are things you do in five minutes and then throw away. They are just to practice, to keep the muscle in tone. If you need the code again, you just write it again. That detachment from the code is something new to me. I have to learn how to do that!</p>
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>After the CAF, I told Priya that I'm working on this blog and that my posts are getting too long. With her natural charm she looked back at me and said:</p>
+
+<blockquote>
+	<p>Then you know what you have to do, right?</p>
+	<p>YOU HAVE TO REFACTOR.</p>
+</blockquote>
+
+<p>I almost peed myself laughing. Priya is the best.</p>
+
+<p>So far this is the end of my first week. I make a good balance of things I learned, challenges I've faced and things that made me smile. This octopus will continue following the light at the end of the tunnel.</p>
+
+<p>(And I should really stop exhausting the jokes with the word "light")</p>
+

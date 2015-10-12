@@ -1,0 +1,50 @@
+---
+layout:   post
+title:    "26: Mac smells tiny branches"
+date:     2015-11-16 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+
+<p>This Mac' processor has only two cores, as opposed to the eight cores of my Mountain, and I am starting to notice it when I run my tests, because they are taking some time to finish. This is going to force me to write more performant code. For example, in my IPM, I was told that I had too many for loops in my tests, which is  a sign of code smell. So I'll work on that this week.</p>
+
+<p>Mac key shortcuts don't work exactly the same in IntelliJ. I can use <kbd>Ctrl</kbd> + <kbd>X</kbd> and <kbd>Ctrl</kbd> + <kbd>V</kbd>, though, which is nice, but confusing if you have to use <kbd>Command</kbd> for everything else. Other things I had to do in the Mac today include:</p>
+
+<ul>
+	<li>Show hidden files in Finder:
+		<pre><code class="language-bash">defaults write com.apple.finder AppleShowAllFiles YES, Badges</code></pre>
+		then Hold the <kbd>Option</kbd> key, while right-clicking on the Finder icon in the dock and click Relaunch.
+	</li>
+	<li>Hide the "<em>Minimap</em>" in Sublime: View > Hide Minimap</li>
+	<li>My iTerm was still white text over black background for everything except git, and I was a bit lost as to what were folders or files. I downloaded my favorite syntax highlighter, <a href="https://github.com/idleberg/Hopscotch/blob/master/Shell/hopscotch.sh">Hopscotch</a>, and created a <code class="language-bash">.bash_profile</code> file in my home directory, containing:
+		<pre><code class="language-bash">alias ls="ls -G"
+. hopscotch.sh</code></pre>
+		I'll probably be adding more stuff to it in the future, but at least now it's in place.
+	</li>
+	<li>For some reason, when I copied files from my USB to my laptop using Finder, the permissions of the files got all screwed up. So:
+		<pre><code class="language-bash">find . -type d -exec chmod 755 {} \;
+find . -type f -exec chmod 644 {} \;</code></pre>
+		for directories and for normal files.
+	</li>
+</ul>
+
+<p>I also had some other problems to fight with IntelliJ today, but with the help of Felipe, I installed maven and told IntelliJ to install the dependencies of my project, which I had just copied from my Ubuntu to this Mac. I wonder what the solution would be to make the new version of IntelliJ work also in my dear Ubuntu.</p>
+
+<p>Felipe talked about <strong>code smells</strong> in today's <em>Zagaku</em>, and how to detect them. The answer is experience, practice, and reading loads of code. For me, the most interesting part was the Gauss-sorta-shaped curve of experience years. I'm aware this curve is moving to the left lately, as more and more people are joining the field of software development. Felipe asked where we thought was the average number of that curve (i.e., average years of experience). <strong>It's five</strong>. He and Uku debated that <strong>for more years of experience, you start having other managing roles that keep you away from writing code</strong>. Or that you stop caring because you are going to retire in a couple of years. He then highlighted the importance of mentoring and how we need more people on the right side of the curve to teach the people in the left side of it.</p>
+
+<p>He also told me, at the end of the day, to stop commiting everything to my <em>hodgepodge</em> branch, and <strong>do instead small, tiny branches with very specific purposes</strong>. I think it will help me focus and stop doing 40 things at the same time.</p>
+
+<p>Finally, today I started learning about "continuous integration". I also signed up for <a href="https://travis-ci.org/me-stevens/tdd-ttt">a Travis account</a>. I still have to spend some time playing with it to figure out all what's going on there.</p>
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Rabea was officially introduced in the office today. I'm happy to see that we are growing and adding more cool people to the team!</p>
+
+<p>Also, I'm very glad that my IPM today went well, since I didn't have much time to do everything I wanted, and I was feeling that my code was a mess, which it certainly was, as most of my stories this week are about refactoring my code. Also, Christoph realized that I hadn't commited in a while, which only comes to show how messy these days have been.</p>

@@ -1,0 +1,53 @@
+---
+layout:   post
+title:    "60: Changing employees through transactions"
+date:     2016-01-06 20:00:00
+category: journal
+---
+
+
+<p>Sixty days WOOHOOO!... </p>
+
+<h2>Today I learnt</h2>
+
+<p>At some point today I tried to add the affiliation of an employe. I had more or less an idea of what I was supposed to do, and even made some commits, but when I went to the book it didn't make sense. They were creating like 5 objects more than me, and everything in the book was confusing (or maybe I'm just tired). So, I decided to forget about that branch and just start doing the next thing: changing employees.</p>
+
+<p>However, there was a commit in that branch that I wanted to have in the new branch, so I cherry-picked it. I had done merges and rebases in the past, but never a cherry-pick, so this is what I did:</p>
+
+<pre><code class="language-bash">$ git checkout change-employees
+$ git show 56919dd55c6fb723051a11e74da1dd7cb593d06a
+</code></pre>
+
+<p>The show command would show everything, author, mail, date, commit message and diffs of the changed files. That way you can check that the commit you are going to cherry-pick is the one you want.</p>
+
+<pre><code class="language-bash">$ git cherry-pick 56919dd55c6fb723051a11e74da1dd7cb593d06a</code></pre>
+
+<p>Done! The commit in the other branch is in this branch! I don't think I will merge the other branch, in any case, I would merge specific files only, if anything.</p>
+
+<p>Back in the code, in the book they abstract the transaction to change the payment type of an employee, with getters that return different types of payment types depending on the subclass. But it seemed to me like an overkill, and I already have an abstract class for the common behavior of the transactions that change an employee, since all of them have to retrieve an employee from the database:</p>
+
+
+
+
+
+<pre><code class="language-java">public abstract class ChangeEmployee {
+    private PayrollDBFacade payrollDB;
+    private int employeeId;
+
+    public ChangeEmployee(PayrollDBFacade payrollDB, int employeeId) {
+        this.payrollDB  = payrollDB;
+        this.employeeId = employeeId;
+    }
+
+    public void execute() {
+        Employee employee = payrollDB.getEmployee(employeeId);
+        change(employee);
+    }
+
+    protected abstract void change(Employee employee);
+}</code></pre>
+
+<p>Tomorrow I'll work on the payment algorithms and hope that those empty interfaces are filled in with methods and behaviour.</p>
+
+
+

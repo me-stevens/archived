@@ -1,0 +1,238 @@
+---
+layout:   post
+title:    "115: TDDing JS"
+date:     2016-03-23 20:00:00
+category: journal
+---
+
+
+<h2>Today I learnt</h2>
+
+<p>How to test JavaScript. Or that's what I think.</p>
+
+<p>Honestly, I've never written JavaScript like this. Due to the test-driving, I have tiny and specialized methods inside objects, and each object lives in a different file. When I load the main page in a browser, everything just worked. INSERT SPARKLES HERE.</p>
+
+<p>After <a href="{% post_url 2016-03-22-day114 %}">setting Jasmine up</a>, I made a very simple skeleton of the main page. It contains the main three elements needed for this task:</p>
+
+<ul>
+	<li>The textarea where the user will type the attendees (<code class="language-markup">id="attendees")</code>).</li>
+	<li>The table where the sorted attendees will be displayed (<code class="language-markup">id="results")</code>).</li>
+	<li>A button to trigger the action: reading from the textarea, sorting, displaying in table (<code class="language-markup">id="split")</code>).</li>
+</ul>
+
+<pre data-line="7"><code class="language-markup">---
+layout: default
+---
+
+&lt;section>
+    &lt;h1>SortMan&trade;&lt;/h1>
+    &lt;p>Please enter attendees below (each on a separate line):&lt;/p>
+    &lt;textarea id="attendees">&lt;/textarea>
+    &lt;button id="split" class="split">Sort into groups&lt;/button>
+&lt;/section>
+
+&lt;section>
+    &lt;h2>Results&lt;/h2>
+
+    &lt;table>
+        &lt;thead>
+            &lt;tr>
+                &lt;th>Group A&lt;/th>
+                &lt;th>Group B&lt;/th>
+                &lt;th>Group C&lt;/th>
+                &lt;th>Group D&lt;/th>
+            &lt;/tr>
+        &lt;/thead>
+
+        &lt;tbody id="results">
+        &lt;/tbody>
+
+    &lt;/table>
+&lt;/section>
+</code></pre>
+
+<p>Line 7 is what I was talking about this <a href="{% post_url 2016-03-21-day113 %}">Monday</a>. It's an explanation for the user.</p>
+
+<p>Once I have this in place, I have an idea of the flow and what needs to happen.</p>
+
+
+
+
+
+
+
+
+<h3>Simple tests</h3>
+
+<p>Next I was faced with the question... what's my first test? I decided to make a <code class="language-markup">Splitter</code> class, which would read the textarea contents and split them into four groups. So I imagined my first function would be one that when you pass it a string, it returns the lines in an array:</p>
+
+<pre><code class="language-javascript">describe("Splitter", function() {
+  var splitter;
+
+  beforeEach(function() {
+    var numberOfGroups = 4;
+    splitter = new Splitter(numberOfGroups);
+  });
+
+  it("should split the contents by line", function() {
+    var userInput  = "Jon Doe\nJane Doe";
+    var splitInput = [ "Jon Doe", "Jane Doe" ];
+    expect(splitter.getAttendees(userInput)).toEqual(splitInput);
+  });
+</code></pre>
+
+<p>And the production code to make it pass is:</p>
+
+<pre><code class="language-javascript">function Splitter(numberOfGroups) {
+  this.numberOfGroups = numberOfGroups;
+
+  this.getAttendees = function(userInput) {
+    return userInput.split("\n");
+  };
+}</code></pre>
+
+<p>That was easy! Looks pretty much like Ruby.</p>
+
+
+
+
+
+
+<h3>Fixtures</h3>
+
+<p>Now things got complicated. Because I will have to get this string from the textarea, I wanted to test that I got the right element and returned its contents. This one took me some time to figure out.</p>
+
+<p>I asked in the slack channel how to pass Jasmine a dummy HTML element that I could use in the tests. I was told to use a library called "jasmine-jquery". But as I could understood it needed jQuery, and I am using vanilla JS. Also, I didn't want to get crazy with libraries.</p>
+
+<p>What's the simplest thing that could possibly work?</p>
+
+<p>Mateu passed me <a href="http://mateuadsuara.github.io/8thlight/2015/06/25/testing-browser-code-1.html">some</a> <a href="http://mateuadsuara.github.io/8thlight/2015/06/27/testing-browser-code-2.html">links</a> to <a href="http://mateuadsuara.github.io/8thlight/2015/07/01/testing-browser-code-3.html">his</a> blog, and that gave me an idea. Since the specs runner is nothing but an HTML document with an empty body, and it includes the production-JS scripts in the header, I could just inject an element there, and the scripts would work on the page as they do on my app:</p>
+
+<pre><code class="language-javascript">  var textarea;
+
+  var createTextArea = function() {
+    textarea = document.createElement("textarea");
+    textarea.setAttribute("id", "attendees");
+    textarea.value = "Jon Doe\nJane Doe";
+    document.body.appendChild(textarea);
+  };
+
+  var removeTextArea = function() {
+    document.body.removeChild(textarea);
+  };
+
+  it("should take a textarea and return its contents", function() {
+    createTextArea();
+    expect(splitter.getContentsFrom("attendees")).toEqual("Jon Doe\nJane Doe");
+    removeTextArea();
+  });
+</code></pre>
+
+<p>I have a method to create a textarea and another to remove it after I'm done with the tests. I'm not sure if performancewise I should just create it and leave it there for the execution of all tests or if I can just create it and remove it as I'm doing only in the tests where I need it. <strong>Any tips on this topic will be welcome</strong>!</p>
+
+<p>The production JS looks like this:</p>
+
+<pre><code class="language-javascript">this.getContentsFrom = function(textareaId) {
+  var textarea = document.getElementById(textareaId);
+  return textarea.value;
+};
+</code></pre>
+
+<p>Another thing that I'm not sure about is the repetition. I have a textarea that looks pretty much like the textarea I have in <code class="language-javascript">index.html</code>. I was wondering if I can take advantage of Jekyll in some way since it lets you inject pieces of HTML wherever you need them. But that seemed overcomplicated, and I'm focusing on keeping things simple!</p>
+
+<p>WHAT DOES THIS MEAN</p>
+
+<p>AM I TAMING THE LITTLE OVER-COMPLICATOR INSIDE ME</p>
+
+<p>WHAT DOES THIS MEAN</p>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Paau5J196qM" frameborder="0" allowfullscreen></iframe>
+
+
+
+
+
+
+
+
+
+<h3>Spies</h3>
+
+<p>Sooner or later when you start testing something, you're gonna need spies. In Jasmine, they proved to be very simple to set-up. Or at least I hope I'm doing it well!</p>
+
+<p>My "splitting button" receives a "button action" in the constructor. This button action has a method <code class="language-javascript">act()</code> which wires the splitter with the displayer so that when the button is clicked, the splitter splits what's in the textarea and sends it to the displayer to spit it in the table.</p>
+
+<p>If I just used the button action in the button tests, I would need a lot of setup. I would need to provide a textarea for the splitter and a table for the displayer.</p>
+
+<p>However, if I just use a spy, <strong>I can create a dummy button-action object with the method I want to test, and check that it was called</strong>. This is because the logic of the wiring and the logic of the splitter and displayer are already tested, and I just need to test that when I click the button, something happens.</p>
+
+<p>So this is how I create the dummy for the button action:</p>
+
+<pre><code class="language-javascript">  beforeEach(function() {
+    buttonAction  = { act: function(inputId, outputId) {} };
+    buttonWrapper = new Button("split", buttonAction);
+  });
+</code></pre>
+
+<p>It's just an object with an act method that has the same signature that the real thing. And then I use the Jasmine method <code class="language-javascript">spyOn()</code>, which takes an object and the method you want to spy in that object:</p>
+
+<pre><code class="language-javascript">  it("doesn't do anything if button is not initialized", function() {
+    spyOn(buttonAction, "act");
+    button.click();
+    expect(buttonAction.act).not.toHaveBeenCalled();
+  });
+
+  it("performs action if button is initialized", function() {
+    spyOn(buttonAction, "act");
+    buttonWrapper.initialize("inputId", "outputId");
+    button.click();
+    expect(buttonAction.act).toHaveBeenCalledTimes(1);
+    expect(buttonAction.act).toHaveBeenCalledWith("inputId", "outputId" );
+  });
+</code></pre>
+
+<p>Here, the <code class="language-javascript">button</code> is the HTML element that I inject in the body of the spec runner in order to test the <code class="language-javascript">Button</code> class:</p>
+
+<pre data-line="2, 6, 12, 17, 23"><code class="language-javascript">describe("Button", function() {
+  var button;
+  var buttonAction;
+  var buttonWrapper;
+
+  var createButton = function() {
+    button = document.createElement("button");
+    button.setAttribute("id", "split");
+    document.body.appendChild(button);
+  };
+
+  var removeButton = function() {
+    document.body.removeChild(button);
+  };
+
+  beforeEach(function() {
+    createButton();
+    buttonAction  = { act: function(inputId, outputId) {} };
+    buttonWrapper = new Button("split", buttonAction);
+  });
+
+  afterEach(function() {
+    removeButton();
+  });
+
+// etc. ...
+}
+</code></pre>
+
+<p>Again, I'm not sure if this is how people do it. But it seemed faster to figure out things my way than to Google for hours. As I said, <strong>tips are welcome</strong>!</p>
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today I went to Codebar after a long time, and I had a student from Poland and another one from the Canary Islands. This is one of the things I love of Codebar, you can meet people from anywhere in the world!</p>
+
+<p>They were very cool students, they kept asking more and more questions, sometimes even before I was finished explaining the previous question. To the point that we ended up talking about compilers and binary numbers. That put some sparkles in my eyes.</p>
+
+<p>After the class, we went on talking about the Canary Islands Carnival, and how Rio is "<em>the SECOND best</em>" Carnival in the world LOL. I wasn't in Rio's, but I was in Tenerife's, and it was a blast. We were partying non-stop for 4 days in a row! I would love to go back. Probably even finish what me and my German friend started in Teide. We have a score to settle with the old guy!</p>

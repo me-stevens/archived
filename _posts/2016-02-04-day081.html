@@ -1,0 +1,65 @@
+---
+layout:   post
+title:    "81: Emacs"
+date:     2016-02-04 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Makis replied to <a href="{% post_url 2016-02-01-day078 %}">Rabea's suggestion</a> of making a <em>Zagaku</em> about Emacs and showed us some nice plugins as well as things that come out of the box.</p>
+
+
+
+
+
+<h3>Dirmode</h3>
+
+<p>It's used to have an interactive command line. You can create and open files or delete them, and mark several to delete them at once. For CJ this is better than the way Nerd Tree works, which is what everybody uses to navigate files. With dirmode you can type command line comands and it opens a terminal for you. When you are running tests, the buffer of the error is navigable and you can move the cursor there and jump to the line where the error is. You can also go to a line of a test and run only that test.</p>
+
+
+
+
+
+<h3>Magit</h3>
+
+<p>It's a tool that allows you to open the files staged and see the parts that changed. It even opens the file and marks the changes in green and red. You can search for lines of code in the current directory, and it will let you open the file where the lines are, although they are not really "opened", if you exit the search you go back to the file you were editing, or you can press enter if you want to enter the file.</p>
+
+
+
+
+
+<h3>Configuration files</h3>
+
+<p>They are Lisp functions, with orders in Lisp syntax, in between parentheses and all that, and they are executed when you open Emacs. If you know Lisp, reading an Emacs config file is easier to understand than a Vim config file.</p>
+
+
+
+
+
+<h3>Macros</h3>
+
+<p>You can define keyboard macros recording what you want, for example, the extraction of a let variable in a test (you have to end with the cursor in the line where you started).</p>
+
+
+
+
+<h3>Other things</h3>
+
+<ul>
+	<li>You have a common interface for every mode, you can memorize global commands and use them across all screens.</li>
+	<li>You can open a pry session and copy the file on one panel into pry, and you get autocompletion.</li>
+	<li>Dirmode is out of the box, and also the Ruby mode, and evaluating buffers.</li>
+	<li>There are other modes that Emacs provide you, like updating gists automagically.</li>
+	<li>The basic commands are like Vima, so you can pair.</li>
+</ul>
+
+<p>Finally, Makis showed us how he plays Tetris inside Emacs. I was almost convinced about switching to Emacs, until he said that <strong>in Emacs you also have to be changing from normal mode to insert mode</strong> all the time.</p>
+
+<p>ARGH!</p>
+
+
+
+
+
+

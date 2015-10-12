@@ -1,0 +1,64 @@
+---
+layout:   post
+title:    "99: ADP and requires sorting"
+date:     2016-03-01 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Christoph told us about another package principle, the <strong>Acyclic Dependencies Principle</strong>. It's related with circular dependencies and it can be spotted easily in a package-dependency graph.</p>
+
+<figure>
+	<a href="{{ baseurl }}/img/day099.png"><img src="{{ baseurl }}/img/day099.png" alt="Circular dependency" width="265" height="256"></a>
+	<figcaption>Circular dependency in packages.</figcaption>
+</figure>
+
+<p>The "cycles" refer to when there are dependencies that need to be compiled before something else and a circular dependency is in place. What people normally do is, they compile with an older version of one of the packages of the cycle. But of course, you should avoid even having to do that.</p>
+
+<p>Another thing you can do is to extract a common package with the dependencies. </p>
+
+<p>The moral is, check out your dependencies. Not only the circular dependencies, be careful with the dependencies you include in your classes to avoid this from happening. Using interfaces may help because they break these dependencies through DIP.</p>
+
+
+
+
+
+
+
+
+<h2>Other things</h2>
+
+<p>As I was creating new classes today, the little control freak inside me wondered about how Ruby people organize their "imports" (requires, in this case). So I asked in the Slack channel:</p>
+
+<blockquote>Do you order your requires? and if so, do you do it:
+<ul>
+	<li>by alphabetical order</li>
+	<li>by order of appearance</li>
+	<li>by relevance</li>
+ 	<li>something else</li>
+ 	<li>all of the previous ones</li>
+ 	<li>none of the previous ones</li>
+</ul>
+</blockquote>
+
+<p>Christoph answered:</p>
+
+<blockquote>I usually follow the rule that I require all core classes first (e.g. date, etc.), then the ones from dependencies (e.g. other gems), then the ones from my project. I try to order them alphabetically then. But I’m also not that strict with the alphabetical order myself. But I do keep the groupings between core, external, internal.</blockquote>
+
+<p>That sounds good for now, although I don't have so many requires, all of them are internal for now, so I guess I'll just sort them alphabetically.</p>
+
+<p>Georgina added that if you want to sort them alphabetically you can highlight them in vim and do <code class="language-">:sort</code>, and Skim added <code class="language-">:!sort</code>, which I imagine calls the terminal's sort.</p>
+
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today Makis told me that <strong>I'm going to one of our client's sites tomorrow, to participate in an IPM</strong>. I am so happy that I'm finally going, although I'm surprised that Christoph didn't tell me anything!</p>

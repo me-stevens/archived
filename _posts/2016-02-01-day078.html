@@ -1,0 +1,445 @@
+---
+layout:   post
+title:    "78: Pry and Vim"
+date:     2016-02-01 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<h3>Pry</h3>
+
+<p>Skim gave <strong>an introduction to</strong> <code class="language-ruby">pry</code>, the debugger I discovered last Friday that Jim and Christoph recommended not to use because I should write a test or perform "<code class="language-ruby">puts</code> <em>driven development</em>", LOL. I also discovered <code class="language-ruby">irb</code> last week, which Skim compared to <code class="language-ruby">pry</code> saying that it is "<em>the cool verion of irb</em>".</p>
+
+<p>To install pry, you type:</p>
+
+
+<pre><code class="language-bash">$ sudo gem install pry pry-doc</code></pre>
+
+<p>This will also install <code class="language-ruby">pry-doc</code>, which will allow you to look at ruby gem's code.</p>
+
+<p>To run it, just type:</p>
+
+<pre><code class="language-bash">$ pry</code></pre>
+
+<p>Which will bring the prompt:</p>
+
+<pre><code class="language-ruby">[1] pry(main)></code></pre>
+
+<p>You can exit with:</p>
+
+<pre><code class="language-ruby">[1] pry(main)>quit</code></pre>
+
+<p>Pry <strong>keeps a history</strong> of the commands you typed, just as irb or the terminal. It also has a <code class="language-bash">help</code> command that lists everything you can do with it.</p>
+it keeps history
+
+<pre><code class="language-ruby">[1] pry(main)> help</code></pre>
+
+<p>With <code class="language-bash">ls</code>, we can show the list of variables and methods in the current scope. You can do <code class="language-bash">ls command</code> and it will show information according to the command, for example:</p>
+
+<ul>
+  <li><code class="language-bash">ls -l</code>: </li>
+  <li><code class="language-bash">ls -m</code>: </li>
+  <li><code class="language-bash">ls -M</code>: </li>
+</ul>
+
+<p>We can provide it with a class just as with irb and it will indent it properly. for example (Skim's example):</p>
+
+<pre><code class="language-ruby">[5] pry(main)> class Priya
+[5] pry(main)*   def speak
+[5] pry(main)*   end
+[5] pry(main)* end
+=> nil
+</code></pre>
+
+<p>Once a class is loaded, we can access information about it:</p>
+
+<pre><code class="language-ruby">[6] pry(main)> cd Priya
+[7] pry(Priya):1> ls
+Priya#methods: speak
+locals: _  __  _dir_  _ex_  _file_  _in_  _out_  _pry_
+</code></pre>
+
+<p>Once you are "inside" a class with <code class="language-ruby">cd</code> , you have access to many other commands. The following example turned out a bit wrong LOL, but funny nevertheless, and very informative:</p>
+
+<pre><code class="language-ruby">[8] pry(Priya):1> whereami
+Inside Priya.
+</code></pre>
+
+<p>Which made me feel a bit guilty because I was the one who said that <code class="language-bash">pry</code> was Priya's gem.</p>
+
+<p>My favorite command is <code class="language-bash">wtf?</code>, which you can use to debug exceptions:</p>
+
+<pre><code class="language-ruby">[9] pry(Priya):1> raise 'something happened'
+RuntimeError: something happened
+from (pry):5:in `__binding__'
+[10] pry(Priya):1> wtf?
+Exception: RuntimeError: something happened
+--
+0: (pry):5:in `__binding__'
+1: /Library/Ruby/Gems/2.0.0/gems/pry-0.10.3/lib/pry/pry_instance.rb:355:in `eval'
+2: /Library/Ruby/Gems/2.0.0/gems/pry-0.10.3/lib/pry/pry_instance.rb:355:in `evaluate_ruby'
+3: /Library/Ruby/Gems/2.0.0/gems/pry-0.10.3/lib/pry/pry_instance.rb:323:in `handle_line'
+4: /Library/Ruby/Gems/2.0.0/gems/pry-0.10.3/lib/pry/pry_instance.rb:243:in `block (2 levels) in eval'
+5: /Library/Ruby/Gems/2.0.0/gems/pry-0.10.3/lib/pry/pry_instance.rb:242:in `catch'
+6: /Library/Ruby/Gems/2.0.0/gems/pry-0.10.3/lib/pry/pry_instance.rb:242:in `block in eval'
+7: /Library/Ruby/Gems/2.0.0/gems/pry-0.10.3/lib/pry/pry_instance.rb:241:in `catch'
+8: /Library/Ruby/Gems/2.0.0/gems/pry-0.10.3/lib/pry/pry_instance.rb:241:in `eval'
+9: /Library/Ruby/Gems/2.0.0/gems/pry-0.10.3/lib/pry/repl.rb:77:in `block in repl'
+</code></pre>
+
+<p>Although this command is also priceless (supposedly clears the buffer):</p>
+
+<pre><code class="language-ruby">[11] pry(Priya):1> /^\s*!\s*$/
+=> /^\s*!\s*$/
+</code></pre>
+
+<p>Now try to type it.</p>
+
+<p>DON'T SNEAK.</p>
+
+<p>You can execute CLI commands appending a dot at the beginning, like:</p>
+
+<pre><code class="language-ruby">[12] pry(Priya):1> .say HEY HUMANS</code></pre>
+
+<p>You can list the commands in history typing:</p>
+
+<pre><code class="language-ruby">[13] pry(Priya):1> hist
+ 1: help
+ 2: ls -l
+ 3: ls -m
+ 4: ls -M
+ 5: class Priya
+ 5:   def speak
+ 5:   end
+ 5: end
+ 6: cd Priya
+ 7: ls
+ 8: whereami
+ 9: raise 'something happened'
+10: wtf?
+11: /^\s*!\s*$/
+12: .say HEY HUMANS</code></pre>
+
+<p>You can correct typos on the fly:</p>
+
+<pre><code class="language-ruby">[1] pry(main)> def helo(name)
+[1] pry(main)*   amend-line 1 def hello(name)
+1: def hello(name)
+[1] pry(main)*     puts "hiya #{name}"
+[1] pry(main)*   end
+=> nil
+[2] pry(main)> hello('priya')
+hiya priya
+=> nil
+</code></pre>
+
+<p>Now to the really useful stuff. To see a list of the gems installed in our system:</p>
+
+<pre><code class="language-ruby">[3] pry(main)> gem-list
+CFPropertyList (2.2.8)
+bigdecimal (1.2.0)
+bundler (1.11.2)
+...
+</code></pre>
+
+<p>We can find-out where a gem is installed:</p>
+
+<pre><code class="language-ruby">[4] pry(main)> gem-cd bundler
+/Library/Ruby/Gems/2.0.0/gems/bundler-1.11.2
+[5] pry(main)> .pwd
+/Library/Ruby/Gems/2.0.0/gems/bundler-1.11.2
+</code></pre>
+
+<p>To list Ruby core constants:</p>
+
+<pre><code class="language-ruby">[6] pry(main)> ls -c
+constants:
+  APPLE_GEM_HOME     FALSE             MethodSource         Readline                STDIN
+  ARGF               FalseClass        Module               Regexp                  STDOUT
+</code></pre>
+
+<p>To list the methods in a Ruby core gem:</p>
+
+<pre><code class="language-ruby">[7] pry(main)> ls Math
+constants: DomainError  E  PI
+Math.methods:
+  acos   asin   atan   atanh  cos   erf   exp    gamma  ldexp   log    log2  sinh  tan
+  acosh  asinh  atan2  cbrt   cosh  erfc  frexp  hypot  lgamma  log10  sin   sqrt  tanh
+</code></pre>
+
+<p>You can also use <code class="language-ruby">show-doc classname</code> to show documentation of a class, or methods. For instance methods:</p>
+
+<pre><code class="language-ruby">show-doc classname&num;method</code></pre>
+
+<p>For class methods (static methods)</p>
+
+<pre><code class="language-ruby">show-doc classname::method</code></pre>
+
+<p>You can also check the superclasses of a class with:</p>
+
+<pre><code class="language-ruby">class.ancestors</code></pre>
+
+<p>To debug, you would include it in your files:</p>
+
+<pre><code class="language-ruby">require 'pry'</code></pre>
+
+<p>And then you can place:</p>
+
+<pre><code class="language-ruby">binding.pry</code></pre>
+
+<p>wherever you want to start debugging. Pretty much like "<code class="language-ruby">puts</code> <em>driven development</em>", but with more information and control. You can do it from the prompt too:</p>
+
+<pre><code class="language-ruby">edit classname#methodname</code></pre>
+
+<p>This will open the nano editor (long time no see!), then you can type:</p>
+
+<pre><code class="language-ruby">binding.pry</code></pre>
+
+<p>and save the changes in the file. Then press <kbd>ctrl</kbd> + <kbd>D</kbd> to continue. You can require a file for your session doing:</p>
+
+<pre><code class="language-ruby">$ pry -r filename</code></pre>
+
+<p>or entering the prompt and typing:</p>
+
+<pre><code class="language-ruby">require 'file'</code></pre>
+
+<p>In summary, it's a cool tool, although Skim agreed that is <strong>more of a discovery tool than a development tool</strong>.</p>
+
+
+
+
+
+
+
+
+<h3>IPM</h3>
+
+<p>Today I had my IPM, and everything I did on the week (and weekend, which I spent ONLY coding), was "<em>not billable</em>". Why? Because I didn't do the part that writes the ConMan&trade; contacts to a file, so <strong>the client doesn't get any value from my code</strong>, since the contacts are lost when the program finishes.</p>
+
+<p>So we moved the stories to my next iteration and I now have 15 points to do this week. Most of these points are done already, I "just" have to implement the writing to a file and they will be moved. But <strong>I don't get paid this week by the client</strong>! Life is hard.</p>
+
+<p>Also, Crhistoph asked me which pattern I used for the menu, and I was so sleepy and tired that I couldn't reply "<em>the command pattern</em>"! that one I used in each and everyone of the 2348792304982347 files I have in the payroll application!</p>
+
+<p>I need a bed.</p>
+
+<p>To sleep for 30 months in a row.</p>
+
+
+
+
+
+
+<h3>Vim</h3>
+
+<p>One of my stories is to <strong>learn to use <a href="https://en.wikipedia.org/wiki/Vim_%28text_editor%29">Vim</a></strong>, since everybody in the team uses it.</p>
+
+<p>This editor (well, <a HREF="https://en.wikipedia.org/wiki/Vi">vi</a>, really), together with <a href="https://www.gnu.org/software/screen/">GNU Screen</a> (similar to <a href="https://tmux.github.io/">tmux</a>) and <a href="https://en.wikipedia.org/wiki/GNU_nano">nano</a>, are old foes. Something like 15 years ago, we only had Linux at uni, and we had to check our email and reply to our mails using nano. Or was it <a href="http://www.cs.virginia.edu/diochnos/tips/terminal/pico_tutorial.pdf">pico</a>?. I ended up not checking my email, LOL.</p>
+
+<p>Then I started working in research and we used GNU Screen to start and stop all the jobs related with the detectors and the DACQ (Data Acquisition System). The config files where of course, edited with Vim. It was stressing enough to make all those very delicate things and configurations work, under the pressure of a deadline, to have to deal with Vim on top of that. So it brings back bad memories!</p>
+
+<p>So... WHAT TIME IS IT</p>
+
+<p><strong>TIME FOR A RANT</strong></p>
+
+<p>Because that's what we old octopi do (you'll probably laugh at me and I will at myself in a couple of weeks, but I need to say this RITE NAO).</p>
+
+<p>The thing that always bothered me about Vim was <strong>having to change from insert mode to command mode</strong> to swap between moving through the document and typing. This is needed because you use the same keys to write code and to type commands. How is this considered to be faster or more efficient, is something I will never understand! (Rabea advised to be always in command mode and only change to insert mode to type something very fast and leave)</p>
+
+<p>On the other side, I can understand not using the mouse or the arrow keys in a desktop computer in the eighties, where the mouse was in Australia and the arrow keys were in the South Pole. But in 2016 everybody uses a laptop, so <strong>you don't have to travel from your keyboard to the mouse</strong> because it's not a mouse anymore, it's a pad!, and its like, one millimeter distance from the keyboard!</p>
+
+<p>Vim users usually disable the arrow keys to use <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd> and <kbd>l</kbd> as arrow keys. According to Skim, this is because "<em>you should never leave home</em>".</p>
+
+<p><strong>Definition of home:</strong></p>
+<ul>
+    <li>Left hand: <kbd>a</kbd>, <kbd>s</kbd>, <kbd>d</kbd> and <kbd>f</kbd></li>
+    <li>Right hand: <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd> and <kbd>l</kbd></li>
+</ul>
+
+<p>The reason why I find this inconvenient is because you have to find the <strong>exact</strong> position of your fingers on those keys, and they are surrounded by other keys. What is supposed to make you faster because you don't have to "<em>move too far away</em>" is prone to typing error. The arrow keys, though, are isolated. You can't mistype them! If your life depended on you placing your fingers precisely on the <kbd>a</kbd>, <kbd>s</kbd>, <kbd>d</kbd>, <kbd>f</kbd> and <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd>, <kbd>l</kbd> keys, you will die several times per day. Why do developers do this to themselves?</p>
+
+<p>Don't worry, Rabea already told me "<em>give it one week</em>". I CAN DO IT. I guess I will get totally used to it, but I have to question everything. IT'S IN MY NATURE. </p>
+
+<p>So, here are some commands:</p>
+
+<ul>
+  <li><code class="language-bash">:!ls</code> Runs a terminal command from Vim.</li>
+  <li><code class="language-bash">:w</code> Saves file.</li>
+  <li><code class="language-bash">:x</code> Saves and exits.</li>
+  <li><code class="language-bash">:linenumber</code> Goes to the line.</li>
+  <li><code class="language-bash">:e path/to/file</code> Opens file.</li>
+  <li><code class="language-bash">:sp</code> Horizontal split (to the top).</li>
+  <li><code class="language-bash">:vs</code> Vertical split (to the left).</li>
+  <li><code class="language-bash">:vsp path/to/file</code> Splits and opens in the left pane.</li>
+  <li><code class="language-bash">:q</code> Closes file and/or pane.</li>
+  <li><code class="language-bash">o</code> New line under current line.</li>
+  <li><code class="language-bash">O</code> New line on current line.</li>
+  <li><code class="language-bash">pp</code> Paste from Vim the line under current line.</li>
+  <li><code class="language-bash">P</code> Paste from Vim on current line.</li>
+  <li><code class="language-bash">yy</code> Copy line from Vim (yank).</li>
+  <li><code class="language-bash">dd</code> Delete line.</li>
+  <li><code class="language-bash">u</code> Undo.</li>
+  <li><kbd>ctrl</kbd> + <kbd>r</kbd>: Redo.</li>
+  <li><code class="language-bash">w</code> Jump to the next beginning of word.</li>
+  <li><code class="language-bash">e</code> Jump to the next end of word.</li>
+  <li><code class="language-bash">b</code> Jump to the previous beginning of word (backwards).</li>
+  <li>You can type a number before and it will do the command that number of times.</li>
+  <li><code class="language-bash">x</code> Delete characters under and after the cursor in the current line.</li>
+  <li><code class="language-bash">X</code> Delete the character before the cursor (Backspace).</li>
+  <li><code class="language-bash">G</code> Goes all the way to the bottom.</li>
+  <li><code class="language-bash">f</code> Followed by a character, finds that character.</li>
+  <li><code class="language-bash">gg</code> Goes all the way to the top.</li>
+  <li><code class="language-bash">a</code> Places the cursor 1 character after and enters insert mode, since when you move to the end of a line, the cursor is placed 1 character before.</li>
+</ul>
+
+<p>You can access some of these when in insert mode:</p>
+
+<ul>
+  <li><kbd>Ctrl</kbd> + <kbd>u</kbd>: Undo.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>t</kbd>: Indents document (tabs).</li>
+  <li><kbd>Ctrl</kbd> + <kbd>w</kbd>: Deletes from cursor to the beginning of the word.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>j</kbd>: Inserts new line where the cursor is.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>c</kbd>: Exit insert mode (also <kbd>Ctrl</kbd> + <kbd>{</kbd>).</li>
+</ul>
+
+<p>Some keyboard shortcuts:</p>
+
+<ul>
+  <li><kbd>Shift</kbd> + <kbd>a</kbd> Moves the cursor to the end of the line and enters insert mode.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>w</kbd> and then <kbd>s</kbd> Horizontal split to the top.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>w</kbd> and then <kbd>v</kbd> Vertical split to the left.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>w</kbd> and <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd>, <kbd>l</kbd> to move through Vim panes.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>w</kbd><kbd>w</kbd>: Moves forward through panels.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>w</kbd> and then <kbd>r</kbd>: Swap panes (rotate).</li>
+  <li><kbd>Ctrl</kbd> + <kbd>w</kbd> and then <kbd>&lt;</kbd> Decreases the size of the pane in 1 unit.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>w</kbd> and then <kbd>&gt;</kbd> Increases the size of the pane in 1 unit.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>w</kbd> and then <kbd>=</kbd> Pulls the previous back.</li>
+  <li>If you want it to increase in a longer number of units, type the number first.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>j</kbd>: Inserts new line where the cursor is.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>c</kbd>: Exit insert mode (also <kbd>Ctrl</kbd> + <kbd>{</kbd>).</li>
+  <li><kbd>Ctrl</kbd> + <kbd>d</kbd>: Goes all the way down the document.</li>
+  <li><kbd>Ctrl</kbd> + <kbd>u</kbd>: Goes all the way up.</li>
+  <li><kbd>Cmd</kbd> + <kbd>/</kbd>: TRIPPY.</li>
+</ul>
+
+<p>Also, you can put commands in your vim configuration file (.vimrc). For example, to map <kbd>Ctrl</kbd> + <kbd>w</kbd> and <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd>, <kbd>l</kbd> to just <kbd>Ctrl</kbd> and <kbd>h</kbd>, <kbd>j</kbd>, <kbd>k</kbd>, <kbd>l</kbd>, you can add these lines:</p>
+
+<pre><code class="language-bash">" easier movement between splits with Ctrl + h j k l "
+map &lt;C-h> &lt;C-W>h
+map &lt;C-j> &lt;C-W>j
+map &lt;C-k> &lt;C-W>k
+map &lt;C-l> &lt;C-W>l
+</code></pre>
+
+<p>And to run the tests from inside vim with <kbd>,</kbd> + <kbd>t</kbd>:</p>
+
+<pre><code class="language-bash">" leader is usually \ but , is easier to reach"
+let mapleader = ","
+
+" shell out (:!), clear and run tests with &lt;leader>t ""
+map &lt;leader>t :!clear;bundle exec rspec --color&lt;CR>
+</code></pre>
+
+<p>When I have time I plan to sit through other people's .vimrc files and try to understand every line. Meanwhile, here is <a href="https://github.com/christophgockel/dotfiles/blob/master/vim/vimrc">Christoph's</a>, <a href="https://github.com/sl4m/vim_dotfiles/blob/master/vimrc">Skim's</a> and <a href="https://github.com/gemcfadyen/dotfiles/blob/master/.vimrc">Georgina's</a>.</p>
+
+<p>My first step was to do the Vim adventures, but I got stuck after going to "<em>the islands of deletion</em>" and collecting the <kbd>x</kbd> key. I SUCK AT LIFE, THE UNIVERSE AND EVERYTHING ELSE.</p>
+
+<p>In view of my frustration, Skim told me of other commands that would make me feel better, like:</p>
+
+<pre><code class="language-bash">:help 42</code></pre>
+
+<p>or</p>
+
+<pre><code class="language-bash">:Ni!</code></pre>
+
+<p>In case the last one didn't ring any bells, try:</p>
+
+<pre><code class="language-bash">:help holy-grail</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3>Dot files</h3>
+
+<p>Rabea pointed me to <a href="http://blog.sanctum.geek.nz/managing-dot-files-with-git/">a nice blog post</a> that explains how to handle your dotfiles in one place, something I never had the need to do, but now I will, since I work with three different laptops. It basically recommends to make a dotfiles folder, move your files there, and make symlinks to the places where those files need to live.</p>
+
+<p>In my case it was easy, because all of them live in my home directory. And I only have four files (for now). I want to be conservative and have only what I need!</p>
+
+<p>This is what I did:</p>
+
+<pre><code class="language-bash">mv .bash_profile Dropbox/.dotfiles/.bash_profile
+ln -s Dropbox/.dotfiles/.bash_profile .bash_profile
+
+mv .gitconfig Dropbox/.dotfiles/.gitconfig
+ln -s Dropbox/.dotfiles/.gitconfig .gitconfig
+
+mv .tmux.conf Dropbox/.dotfiles/.tmux.conf
+ln -s Dropbox/.dotfiles/.tmux.conf .tmux.conf
+
+mv .vimrc Dropbox/.dotfiles/.vimrc
+ln -s Dropbox/.dotfiles/.vimrc .vimrc
+</code></pre>
+
+
+
+<h2>Nice things</h2>
+
+<p>Today I learnt that in order to install Vim plugins, you could use either <a href="https://github.com/VundleVim/Vundle.vim">Vundle</a> or <a href="http://www.vim.org/scripts/script.php?script_id=2332">Pathogen</a>. So I innocently asked in the Slack channel:</p>
+
+<blockquote>Hellow dear team members with which I will have to pair,<br>
+what do you use for vim: vundle or pathogen?</blockquote>
+
+<p>It took Felipe 40 microseconds to reply:</p>
+
+<blockquote>You could maybe write a post on the differences and their strengthens?</blockquote>
+
+<p>Rabea and me were laughing so hard we were crying. That's Felipe's answer for almost everything.</p>
+
+<p>Then, people started trolling with Emacs being better than Vim. Then Rabea said, also innocently:</p>
+
+<blockquote>Would be cool to have a Zagaku on what Emacs is and how it’s different from Vim.<br>
+Just an idea : )
+</blockquote>
+
+<p>It was too good to let the opportunity go, so I replied:</p>
+
+<blockquote>Why don't you write a blog post?<br>
+Just an idea</blockquote>
+
+<p>We were ROTFL again. Then more people joined the trolling:</p>
+
+<blockquote>
+    <strong>Skim:</strong> I used to Vim, but now I use Emacs inside Vim inside Emacs inside Vim.<br>
+    <strong>Octopus:</strong> Do you use vagrant for that.
+</blockquote>
+
+<p>Rabea and me were DYING.</p>
+
+<p>Anyway, these are the votes:</p>
+
+<ul>
+    <li><strong>Vundle:</strong> Georgina, Priya, CJ</li>
+    <li><strong>Pathogen:</strong> Rabea, Felipe, Christoph, Jim, Makis (before he switched to emacs)</li>
+    <li><strong>Emacs:</strong> Vincent Storme, Makis.</li>
+    <li><strong>Vim:</strong> Apparently, the rest of the team.</li>
+</ul>
+
+<figure>
+    <a href="{{ baseurl }}/img/day078.png"><img src="{{ baseurl }}/img/day078.png" alt="Tetris in Emacs" width="599" height="720"></a>
+    <figcaption>Apparently, you can play Tetris in Emacs, lol.</figcaption>
+</figure>
+

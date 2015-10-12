@@ -1,0 +1,73 @@
+---
+layout:   post
+title:    "108: Apprenticeship redesign?"
+date:     2016-03-14 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>That in order to run only a set of shared-examples tests in Ruby, you have to use the <code class="language-ruby">-e</code> flag followed by some words of the name of your test combo. So if you have something like this:</p>
+
+<pre><code class="language-ruby">RSpec.shared_examples_for 'a video assets repository' do
+  #...etc
+</code></pre>
+
+<p>You can run something like this:</p>
+
+<pre><code class="language-bash">$ bundle exec rspec -e "video assets repo" [--color]</code></pre>
+
+<p>and it would run only that file. The caveat is that you can not run single tests by appending a colon and the line number. You would have to comment the tests you don't want to run.</p>
+
+<p>Apart from this, I keep learning more and more details of the client project we are working on, and <strong>Christoph and Skim are being a huge help on that, and have a lot of patience for my noobie questions</strong>. I can't wait to have my own apprentices and turn the little worms into butterflies, like these two are doing with me.</p>
+
+<p>Also, after <em>Zagaku</em>, Christoph turned to me and said: "<em>IPM!</em>", and I was like "<em>A wild IPM appears! Squid is confused! Squid hurt himself in the confusion!</em>"... but he only asked me how my past week had been. Pretty great I must say!</p>
+
+<p>I've been thinking about it, and I really think the apprenticeship would be even better if it was <strong>split in two</strong>: a first part were we all learn the basic principles of clean code and good design, as we are already doing, and a second part where all we do is to <strong>slowly</strong> get into client projects and go to client IPMs.</p>
+
+<p>At the beginning of that second part, we would work with a craftsperson and receive small one-point stories, as I did this week. Then, as time goes by, the number of points would be increased slowly, up until at the very end of the apprenticeship, when we would be working elbow to elbow with a craftsman, sharing the stories evenly.</p>
+
+<p>I had this conversation with Christoph last week. The reason <strong>is mainly didactic</strong>, and may not be obvious for an experienced developer, but its very cristaline from the point of view of an apprentice. First off, that would expose us to working with the kind of clients the company works with. Second, it would expose us to huge codebases so that we can learn how to navigate them efficiently to find what we need. It would also teach us how to deal with clients, and how to deal with problems when they appear, like it happened last week, when we couldn't deliver all the points we had promised. And the list goes on.</p>
+
+<p>After all, it's not only about the code: we are a consultancy.</p>
+
+<p>I think I've been one of the apprentices that has asked the most for this client interaction, since the very beginning of my apprenticeship. Even if it wasn't possible to work with real client projects, <strong>we could still use a repo</strong>. Something like the videostore repo: we are asked to fork it and refactor it, since it is meant to be used as a refactoring practice. Why not have a huge repo that is meant to be used as a client project practice? We would have to fork it, and could be assigned tiny stories on it, preferably with another apprentice, since we will have to work in pairs in the future anyway. <strong>We are not pairing enough in the apprenticeship</strong>. Two birds in one shot!</p>
+
+<p>Otherwise, I feel like the jump is too sharp from finishing the apprenticeship to taking client projects immediately. I know, I know what the first batch of apprentices would think: "<em>we had to hunt bears by ourselves! with our own hands!</em>". And it's true. But my point is that we don't want our educational efforts to be like those of universities, which are disconnected from reality, living in another dimension. Their gap with the real world is huge. We can do better.</p>
+
+<p>I probably have a lot to learn yet about clean code and good design, but I wouldn't mind if the rest of my apprenticeship was like my last week!</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>I just learnt that <a href="https://www.youtube.com/watch?v=HvG45d0etOc">Moonsorrow</a> is playing here with <a href="https://www.youtube.com/watch?v=xoLmeOBn4ck">Korpiklaani</a> (what a weird combo!).</p>
+
+<p>I<br>
+CAN'T<br>
+BELIEVE IT.<br>
+(to be read again with Lumpy Space Princess voice)</p>
+
+
+<p>I told Mateu and I asked for partners in crime in the Slack channel, but I could only hear the crickets. Christoph told me the name rang a bell, and I had to contain myself to not start talking for HOURS about my all time top of the top-notch favorite band EVAH (together with Finntroll). A band of <strong>musicians</strong> that can go from <a href="https://www.youtube.com/watch?v=CRpdakf-k9o">this</a> or <a href="https://www.youtube.com/watch?v=52u-taAOGKc">this delicate beauties</a>, to <a href="https://www.youtube.com/watch?v=NgZA5J00aeU">this cathartic masterpiece</a>. My metalhead friends are spread through several American countries and Mateu's friends don't fancy coming to London for a concert, so I guess I'll go alone. IT'S MOONSORROW TIME.</p>
+
+<figure>
+	<a href="{{ baseurl }}/img/day108.png"><img src="{{ baseurl }}/img/day108.png" alt="Me talking about music or science" width="1760" height="657"></a>
+	<figcaption>This is the weirdo-squid talking about music (or gravitational waves), and people's reaction... lol.<br>
+		P.S.: Image from <a href="https://imagecomics.com/comics/series/saga">Saga {% include link.svg %}</a>, a Sci-Fi comic by artist Fiona Staples and Brian K. Vaughan that I recommend everybody (over 18) to read.</figcaption>
+</figure> 
+
+

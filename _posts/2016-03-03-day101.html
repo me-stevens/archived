@@ -1,0 +1,48 @@
+---
+layout:   post
+title:    "101: My board is not immutable!"
+date:     2016-03-03 20:00:00
+category: journal
+---
+
+<p>Today I had a bit of a battle, because the way I placed the mark in the board was ok when I was using a Matrix and I was getting a different board object, but when I changed from a Matrix to an array, this immutability was lost and I forgot to revisit the method.</p>
+
+<p>So I tried several things, but nothing was working. Desperated, I went to the Slack channel, and as usual, Skim saved the day. </p>
+
+<p>From the Matrix times, I had:</p>
+
+<pre><code class="language-ruby">def place_mark(cell, mark)
+  rows = board.to_a
+  rows[row_from(cell)][column_from(cell)] = mark
+  Board.new(rows)
+end
+</code></pre>
+
+<p>To make it immutable now, I have:</p>
+
+<pre><code class="language-ruby">def place_mark(cell, mark)
+  rows = board.reduce([]) { |memo, row| memo &lt;&lt; row.dup }
+  rows[row_from(cell)][column_from(cell)] = mark
+  Board.new(rows)
+end
+</code></pre>
+
+<p>Now it works.</p>
+
+<p><strong>I also managed to write the MiniMax algorithm</strong>, but it is returning an array at some point when it should return an index, so I have to check that out. Now I'm going to start splitting it slowly as much as I can, even if I have to keep those methods as public for now, which I don't like much. Christoph told me something like that was a lot already, but that is only like, 1&percnt; of it! lol.</p>
+
+<p>Apart from that, <strong>today I had to give a Zagaku</strong>. I wanted to give one since last year but I never had the time to sit and do it. Last week it was in my stories, so I had to do it!. I realized the topic was a bit huge, and I didn't think of that at the time, so it took much more than half an hour, even though I only scratched the surface... well, next time.</p>
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p><strong>Today I went to a client site again!</strong> It's a very different project that Christoph is working on, and I didn't know he was alone in it. So we had only like three or four stories, and we finished in like half an hour. There were also some stories on the backlog that were already estimated, so we didn't even have to do that. Also, I noticed they are not using Artisan, but something different. I think I saw the logo of the client on it.</p>
+
+<p>The nice thing is that <strong>I will probably be pairing on some of the stories for that project</strong>, this or next week.</p>

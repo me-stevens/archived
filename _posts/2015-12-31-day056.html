@@ -1,0 +1,145 @@
+---
+layout:   post
+title:    "56: The Payroll case study"
+date:     2015-12-31 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>In the book, they mention that they are not going to start with the database design, because that would be "<em>Implementation details!</em>".</p>
+
+<p>One of the things I always wanted to know when I was learning SQL and databases stuff was, <strong>how to make a good database design</strong>. We were always told that it was important to have a good design from the beginning, because changing the structure later would be difficult in a relational database. Imagine you wanted to add a new field to a table one year after the database was running. You could be in a situation where you would have to go record by record adding something to the new field.</p>
+
+<p>However we weren't taught how to make a good design at any point, in any of the database-related classes I took along my life. How could you predict all the things that could happen? How to know what tables you would need? Where to put which fields? etc etc.</p>
+
+<p>Uncle Bob tells you it doesn't matter... at least at this point of the development, because we are at the first iteration, and, as he says <a href="https://cleancoders.com/episode/clean-code-episode-7/show">in one of his videos</a>, <strong>you should keep decisions open as long as you can</strong>, maybe you find a simplest solution that doesn't even require a database! Also, Sandi Metz says <strong>you can measure good design with the amount of decisions NOT made</strong>.</p>
+
+<p>I remember from <a href="https://vimeo.com/37595051">one talk by J. B. Rainsberger</a> that <strong>you should always start building your system from the point of view of the client</strong>, and the design will be much simpler and behave much similarly to what you expect. The book starts by taking a look at the use cases and acceptance tests to consider the behavior of the system first.</p>
+
+<p>So this is what the client wants to do:</p>
+
+
+
+
+
+<h3>Add an employee</h3>
+
+<p>As I said <a href="{% post_url 2015-12-30-day055 %}">in a previous post</a>, the acceptance tests look a lot like an SQL query, so the book is going to use one application of the COMMAND pattern, the <strong>Transaction</strong>.</p>
+
+<p>There are three types of payment that I had abstracted into three classes and only one <code class="language-java">Employee</code> class that could take any of the three. But here the book does something different. The book turns my <code class="language-java">Employee</code>  class into an interface and adds three subclasses of <code class="language-java">Employee</code>, one for each payment type. It also creates the transactions that create those employees.</p>
+
+<figure>
+	<a href="{{ baseurl }}/img/day056-1.png"><img src="{{ baseurl }}/img/day056-1.png" alt="UML of the employees and transactions according to the book" width="2533" height="819"></a>
+	<figcaption>Do we really need subclasses for the employees or is it enough for the payment types only?.</figcaption>
+</figure>
+
+
+
+
+
+
+<h3>Posting time cards and sales receipts</h3>
+
+<p>In a way, looking at the use cases, ie, how the system is going to be used, could solve my problem with time management in the app, if there is going to be a human activating these things, making things happen, I don't have to think about measuring time. I just have to worry about how to implement that "<em>a human submits a card</em>", or better, "<em>How and when do I read the cards?</em>".</p>
+
+<p>These two use cases point out <strong>the association between hourly employees and time cards</strong>. and <strong>the association between commissioned employees and sales receipts</strong>. In <a href="{% post_url 2015-12-30-day055 %}">my initial UML</a>, the <code class="language-java">Employee</code> class took a <code class="language-java">Card</code> object as a field. I had abstracted the time and sales cards into a <code class="language-java">Card</code> interface. In the book, they make the relevant subclasses of employee take their associated card.</p>
+
+<figure>
+	<a href="{{ baseurl }}/img/day056-2.png"><img src="{{ baseurl }}/img/day056-2.png" alt="The employees and their associated cards" width="1167" height="1074"></a>
+	<figcaption>I also had the employees take a set of cards (but there was only one employee class).</figcaption>
+</figure>
+
+
+
+
+
+
+<h3>Posting a Union Service Charge</h3>
+
+<p>This is where things get a bit different from my design. The Union has their own id for members that is different to the Employees' ids, and we have to associate them. The book delays that association and instead goes with the association between a member and the charge, which, for me, is similar to the relationship between an employee and their card.</p>
+
+<figure>
+	<a href="{{ baseurl }}/img/day056-3.png"><img src="{{ baseurl }}/img/day056-3.png" alt="Union members are associated with a charge" width="250" height="350"></a>
+	<figcaption>Union members are associated with a charge.</figcaption>
+</figure>
+
+<p>Because of this, I had made the Union be another subclass of employee record, and its <code class="language-java">calculatePay()</code> method was going to subtract the charges from the employee pay.</p>
+
+
+
+
+
+
+<h3>Changing employee details</h3>
+
+<p>Here is where the use case tells us that there are not <code class="language-java">Employee</code> subclasses, but rather an abstraction of the payment type that would be passed to the <code class="language-java">Employee</code> class in some way (maybe as a member field, as I had it?).</p>
+
+<p>At the same time, this introduces a change with respect to my design, since now <strong>the ones holding the <code class="language-java">Card</code> objects are the payment types, not the employees.</strong> Which probably makes more sense. If we can change an employee from hourly to salaried, in my design we would have to change the payment type AND the card, but if the payment type is the one that holds the card, we can just change ONE object.</p>
+
+<p>Another difference is that, for the payment method, I had just used an enum. But the book abstracts them into classes. Now that I see it, it makes sense, since <strong>they are storing things like the bank account (deposit method) or the address (post method)</strong>, etc.</p>
+
+<p>So, in the book, they make the <code class="language-java">Employee</code> class have <strong>three collaborators: the payment method, the type of payment and the affiliation</strong> (for the Union stuff). Since an employee can be a member of the Union or not, the affiliation can be a <a href="{% post_url 2015-12-30-day055 %}">NULL OBJECT</a> or a real object. I like that structure.</p>
+
+<figure>
+	<a href="{{ baseurl }}/img/day056-4.png"><img src="{{ baseurl }}/img/day056-4.png" alt="The book's UML" width="2427" height="1878"></a>
+	<figcaption>The UML according to the book. The employees class has three collaborators, and the cards are collaborators of the payment types.</figcaption>
+</figure>
+
+
+
+
+
+
+<h3>Payday</h3>
+
+<p>Here is when time considerations might have to be addressed? As I had in <a href="{% post_url 2015-12-30-day055 %}">my first UML</a>, the book implements the pay calculation in the payment-type subclasses. To calculate the pay, each payment type knows how to get the dates and hours / amount that have to be summed up.</p>
+
+<p>The use cases and the client requirements allowed us to check out the details and think about the behavior and design of the app. Now we need to step out and see the general picture. Which abstractions do we need? The abstractions are:</p>
+
+<ul>
+	<li>"<em>All employees are paid</em>" (although in different ways).</li>
+	<li>"<em>All employees are paid at some specific day</em>" (Fridays, end of the month, etc.). This smells like my boolean <code class="language-java">isPayDay()</code> method,	 I wasn't sure about how to handle it, since it is related with the time-management stuff that I also didn't know how to handle.</li>
+	<li>"<em>Some employees may have affiliations</em>".</li>
+</ul>
+
+
+<p>The book mentions something I would have never think of: <strong>payday could change independently of the payment type</strong>, so I shouldn't handle it in the payment type classes, to respect OCP and SRP. Our tools didn't see this coming, so we should not rely on them ONLY. We should use our brain! Hehe, HeheHEHEHEhehHEhE.</p>
+
+<p>So now, <strong>the employee has another collaborator, the payment schedule</strong>, which is an interface with subclasses such as weekly, biweekly and monthly. And I think this is the ultimate abstraction that solves my problem with the time management in the app. Who takes care of that? the payment schedule!</p>
+
+<p>Another tweak is the affiliations, <strong>if the employee has more than just the Union, then we will need to provide the collaborator as a list of affiliations, and then there is no need for the NULL OBJECT pattern</strong>. If the employee is not affiliated with something, no element is added to the list. If the employee has no affiliations at all, the list would be empty. Tada!</p>
+
+<p>At the end of this chapter, the book says that <strong>a design session shouldn't last more than an hour</strong>. This is <a href="{% post_url 2015-11-04-day018 %}">what Jim told me that time when I spent a whole afternoon designing my TDD TTT</a>.</p>
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>When I was working as a comic artist, I had to do a lot of research for a Science-Fiction story I was working on, about <strong>a woman who dies and her brain is connected to a robot to create some kind of human-like cyborg</strong>, and all the "<em>what's the meaning of life even</em>" kind of consequences of it.</p>
+
+<p>That research led me into two academic papers that went in opposite directions, biology controlling robots and biology controlled by robots:</p>
+
+<ul>
+	<li>The first paper was about an experiment where a group of researchers create a culture of human brain cells and have them control a mobile robot. The robot (or the brain culture, more accurately) could learn, but the cells died after three months.</li>
+
+	<li>The other paper was about a robot sending electrical signals to parts of a human body, to produce movements, like for example, keep a heart beating, or make legs move on quadriplegic patients (in other words, MATRIX. Mwehehehe).</li>
+</ul>
+
+<p>I remember enjoying reading those papers a lot, but I had totally forgotten about them. Today, Mateu, Priya and me where the only ones at the office, so we went out to have a pizza and for some reason, ended up talking about this. I couldn't find the second paper, but the first one can be found here: "<a href="http://centaur.reading.ac.uk/8181/1/60_1_5.pdf">Controlling a Mobile Robot with a Biological Brain</a>. I think this is super cool.</p>
+
+<p>As a bonus, here are some sketches of the protagonist and a sketch of the cover. There is no finished version of them, because <strong>the comic was never published</strong>. You know what they say, "<em>life happens</em>".</p>
+
+
+<figure>
+	<a href="{{ baseurl }}/img/day056-5.png"><img src="{{ baseurl }}/img/day056-5.png" alt="Sketches showing the design of the woman turned into cyborg" width="3500" height="2500"></a>
+	<figcaption>Unfinished sketches showing the design of the woman turned into cyborg.</figcaption>
+</figure>
+
+
+<figure>
+	<a href="{{ baseurl }}/img/day056-6.png"><img src="{{ baseurl }}/img/day056-6.png" alt="Sketch of the comic cover" width="700" height="1041"></a>
+	<figcaption>Unfinished sketch of the comic cover.</figcaption>
+</figure>

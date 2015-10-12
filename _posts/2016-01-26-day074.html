@@ -1,0 +1,95 @@
+---
+layout:   post
+title:  "74: Adding contacts to Conman&trade;"
+date:   2016-01-26 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Today Christoph talked about the <a href="https://en.wikipedia.org/wiki/Package_principles">Reuse / Release Equivalence Principle</a>, which is a principle related to packages. It is at a higher level than the SOLID principles, i.e., at the software level.</p>
+
+<p>Basically, your packages should be written as <strong>a cohesive unit of reusable code</strong>. This means that if there is a class A and a class B in your package, both should be the same version, and the same version as the package.  Also, if we depend on a package, we depend on everything inside it. It's like a black box. So, if something changes inside the package, you release it as a different thing.</p>
+
+<p>The author of the package compromises to maintain it and you don't have to read the code to know what it does. Also, the author shouldn't impose an update on you, the developer decides if they use it / pull it or not.</p>
+
+<p>To release a new version of a package, you number the version according to <a href="http://semver.org/">semantic versioning</a> conventions.</p>
+
+<p>Finally, Christoph told us that package principles are old and abstract, and because they have been used for so long, they have already become best practices in the community, so everybody is using them already.</p>
+
+
+
+
+
+
+<h3>The Conman&trade; thing</h3>
+
+<p>Apart from that, today I worked on the part of the Conman app that adds a contact to the "database". I ended up extracting a class for the user interface, where I put the methods that ask questions to the user. I have something like this:</p>
+
+<pre><code class="language-ruby"># UI class
+NAME = "Contact name: "
+
+def ask_for_name
+  console.print(NAME)
+  console.read.chomp
+end
+</code></pre>
+
+<p>And so I have a method like that for every contact field:</p>
+
+<pre><code class="language-ruby"># Conman class
+def add_contact
+  name    = ui.ask_for_name
+  address = ui.ask_for_address
+  phone   = ui.ask_for_phone
+
+  #... etc
+end
+</code></pre>
+
+<p>The methods and the tests for them are quite repetitive, so I asked myself if I could have just a generic method like:</p>
+
+<pre><code class="language-ruby"># UI class
+def ask_for_field(field)
+  console.print(field)
+  console.read.chomp
+end
+</code></pre>
+
+<p>And then call them in Conman like this:</p>
+
+<pre><code class="language-ruby"># Conman class
+def add_contact
+  name    = ui.ask_for_field(UI::NAME)
+  address = ui.ask_for_field(UI::ADDRESS)
+  phone   = ui.ask_for_field(UI::PHONE)
+
+  #... etc
+end
+</code></pre>
+
+<p>Later on, I discarded this because I think <strong>it exposes too much of the details of the UI</strong> that Conman doesn't need to know about, even if the constants are public anyway. So I decided to bear with repetition to have independence. Trade-offs!</p>
+
+<p>Also, I discovered that I can just run <code class="language-bash">$ rspec</code> and that will run all the tests inside the spec folder.</p>
+
+<p>So at this moment my app does all these things:</p>
+
+<ul>
+	<li>Asks the user for a contact's fields in the command line.</li>
+	<li>Saves contacts as hashes in an array.</li>
+	<li>Prints the contact and a list of all at the end.</li>
+	<li>Asks if the user wants to add another contact.</li>
+	<li>I did small but relevant commits, and worked in small steps.</li>
+</ul>
+
+<p>And it doesn't do any of these:</p>
+
+<ul>
+	<li>Save contacts in a file (yet).</li>
+	<li>Check user inputs.</li>
+	<li>Use any Ruby version manager.</li>
+	<li>Is not clean yet.</li>
+	<li>Still no design, everything in the main class, Conman. The ui was asking to be extracted, though.</li>
+</ul>
+
+<p>Tomorrow more, and better.</p>

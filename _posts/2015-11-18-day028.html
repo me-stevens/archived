@@ -1,0 +1,75 @@
+---
+layout:   post
+title:    "28: Polymorphism and refactoring the menu"
+date:     2015-11-18 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Christoph and Felipe asked us if we were using the <a href="https://en.wikipedia.org/wiki/SOLID_%28object-oriented_design%29">SOLID principles</a> in our daily coding and which of them was more difficult to apply or to even understand. We all agreed that the single responsibility principle and Interface segregation principle are straight forward, but the other three are a bit more difficult to spot.</p>
+
+<p>My problem is that I don't know where to put things, where do they belong. I asked them for <strong>real life projects living in the jungle. Codebases like fitnesse, that they where familiar with, and that they considered good quality code</strong>. Because reading other people's code really helps me to learn, as I see how other people solved the same problems. Christoph told me that it's better if I stick with my breakable toy for now and try to apply the SOLID principles to it. Other residents recommended a bunch of Uncle Bob's books with academic code examples. Finally, Georgina pointed out that <strong>we are not sharing any pull requests lately (I had shared one yesterday), so we are going to start doing it again</strong>.</p>
+
+<p>Mateu helped me with the extraction of the menu from my Game. I like how <strong>he doesn't give you the answer but guides you to it by asking the right questions</strong>. These days I'm a bit tired and lacking sleep, i.e. slower than usual for such an easy task, but it's always cool to pair with his brain.</p>
+
+<p>For example, I was playing the monkey extracting my Player interface and then having the turn method ignorant of all that wisdom.</p>
+
+<pre data-line="4,5,6"><code class="language-java">public boolean nextTurn() {
+    gameUI.printBoard(board);
+     
+    int index = (currentMark.equals("X")) ? 
+        player1.getCellIndex(board) : 
+        player2.getCellIndex(board);
+    board.setCell(index, currentMark);
+
+    return updateGameStatus();
+}
+</code></pre>
+
+<p>So, why did I extract the interface for, if I am not going to use it? The right way to do it would be to apply the Liskov principle:</p>
+
+<pre data-line="4,5"><code class="language-java">public boolean nextTurn() {
+    gameUI.printBoard(board);
+
+    Player currentPlayer = (currentMark.equals("X")) ? player1 : player2;
+    int index = currentPlayer.getCellIndex(board);
+    board.setCell(index, currentMark);
+
+    return updateGameStatus();
+}
+</code></pre>
+
+<p>Since all the Player implementors know about the <code class="language-java">getCellIndex(board)</code> method! I smell I'll be moving line 4 to some initialization place in the near future. Maybe in <code class="language-java">updateGameStatus()</code>?</p>
+
+<p>Regarding the menu class, I followed the Refactoring book that I'm reading now, although that's not exactly a chapter that I have to read this week, but It helped me do it properly. I have two methods that I want to put in there, <strong>one returns the option without changing the system, the other doesn't return any variable, but changes the state of the system</strong>. My objective was to make them both return, as I learnt from <a href="http://martinfowler.com/bliki/CommandQuerySeparation.html">Martin Fowler's post about query and command methods last week</a>, but because the second one's responsibility is to create the two players of the right type depending on the menu option, it would have to return two Player objects.</p>
+
+<p>Mateu recommended to make it first return a simple array with the two players, just to have the first step of the refactoring finished (moving the menu from the game to another class). Then I could think of a better structure. As Jim told me in the IPM, it's ok to pass an array inside the class, but it's a bit ugly to do it interclasswise (I just made that word up).</p>
+
+<p>This is what the menu is supposed to do:</p>
+
+<ul>
+    <li>Print menu</li>
+    <li>Get option</li>
+    <li>Check option</li>
+    <li>Create players</li>
+    <li>Send players</li>
+</ul>
+
+<p>For me, the "create players" part should be in the game class, but that means the game would need to know about the menu options. At the moment, if I change anything in the menu I have to update the game class AND the user interface. Still don't know how I'm going to refactor that.</p>
+
+<p>In other topics, I finally understand why people using Mac have the need for so many keyboard shortcuts and combinations. Mac's keyboard lacks a lot of keys that make your life easier! Like, how can a proper keyboard lack the <kbd>ñ</kbd> key? WATS DAT SACRILEGE - (Just kidding) -. The keys I'm missing the most are <kbd>Page Up</kbd> and <kbd>Page Down</kbd>, and the <kbd>Start</kbd> / <kbd>End</kbd> keys. I ended up making a table of equivalences between my keyboard keys and the Mac keys and pasting it in front of my desk. Everybody loved it!</p>
+
+<p>&lt; / RANT &gt;<sup><a href="#clarify">1</a></sup>.</p>
+
+<p id="clarify" class="footnote"><sup>1</sup>I know it doesn't look like, but I'm really enjoying this Mac. It's just that I need to rant a bit to get it all out in a funny way and then I'm fine.</p>
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>My Codebar student is already super assured writing code all by herself and making accurate estimations of the values of the properties, "<em>Oh, this should be around X</em>"... BOOM. She nailed it. I'm so happy and so proud.</p>

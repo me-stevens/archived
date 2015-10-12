@@ -1,0 +1,84 @@
+---
+layout:   post
+title:    "84: Vim plugins and tips"
+date:     2016-02-09 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Maybe as a counter-attack to <a href="{% post_url 2016-02-04-day081 %}">Makis' <em>Zagaku</em> about Emacs</a>, maybe not, we had a <em>Zagaku</em> about Vim plugins today, by CJ:</p>
+
+
+
+
+
+<h3>Vimux</h3>
+
+<p>It's just a separate tmux pane, nothing else. So it's a bit limited if you compare it with tmux. It's used to run tests asynchronously:</p>
+
+<pre><code class="language-bash">:VimuxRunCommand("rspec " . expand("%")) # runs in a separate tmux window)
+:VimuxRunCommand("rspec " . expand("%") . ";" . line("."))&lt;cr>
+:VimuxRunCommand("clear; rspec " . expand("%") . ";" . line("."))&lt;cr>
+</code></pre>
+
+<p>There is a nice article on vimux <a href="https://www.braintreepayments.com/blog/vimux-simple-vim-and-tmux-integration/">here</a>.</p>
+
+
+<h3>Compiler</h3>
+
+<p>Compiler lets you compile without leaving the editor.</p>
+
+<pre><code class="language-bash">:compiler rspec
+:make %
+:copen # to see where something fails
+</code></pre>
+
+
+
+
+<h3>Vim dispatch</h3>
+
+<p>Vim dispatch allows you to run tests asynchronously:</p>
+<pre><code class="language-bash">:Dispatch rspec %</code></pre>
+
+<p>It's very similar to what Makis had shown us in Emacs.</p>
+
+<p>If the tests pass, the window is not shown, if there are tests not passing, a window will open showing the error messages.</p>
+
+<pre><code class="language-bash">:execute "Dispatch rspec %:"
+:execute "Dispatch rspec %:" . line(".")
+</code></pre>
+
+<p>It's of general application, to run tests no matter the language. Here is <a href="http://tilvim.com/2014/03/13/dispatch.html">a nice blog post about it</a>.</p>
+
+
+
+
+
+<h3>Ftplugin</h3>
+
+<p>To configure different commands for each language. That way you can keep the same shortcuts. There is <a href="http://vim.wikia.com/wiki/Keep_your_vimrc_file_clean">an article on the Vim wikia</a> about this plugin.</p>
+
+<p>It gets loaded automatically, there is no need to reference it in .vimrc. Just set up the files in the ftplugin directory and use the right names.</p>
+
+<p>Some plugins allow you to have the tests running everytime you save. I think I heard Christoph some comment against that workflow, because there was "<em>too much magic going on</em>", but I don't remember the details. I'll have to do my research.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Yesterday I went with Rabea to a conference organized by the Ruby community. There were a lot of nice lightning talks and it was a nice way of finishing a work day. Especially a day like yesterday, where I was a bit worried of having dissapointed Jim at my IPM, because I didn't manage to test the file IO thing properly.</p>
+
+<p>Hopefully, Rabea was so nice to offer her shoulder for me to cry over. Sometimes you only need someone to listen to you! Also she gave me an OSOM Vim tip: <strong>you should always be in normal mode</strong>, and only very fastly change to insert mode to type something very quickly and leave again. That won't change my hate for having to change from normal to insert mode, but will make it a bit easier to deal with.</p>
+
+<p>She also <strong>shouted at me for calling myself stupid</strong>, and told me I have to stop doing that. That is gonna be a bit harder.</p>

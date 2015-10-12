@@ -1,0 +1,46 @@
+		<footer class="site__footer wrapper">
+
+			<div class="footer__col">
+
+{% include search.html %}
+
+				<!-- Categories -->
+				<div class="footer__col-1">
+					<p class="center">{{ site.description }}</p>
+				</div>
+
+				<div class="footer__col-2">
+
+					<ul class="social">{% if site.git_user %}
+						<li>
+							<a href="https://github.com/{{ site.git_user }}">
+								<span class="social__icon">
+{% include github.svg %}
+								</span>
+								<span class="social__username">{{ site.git_user }}</span>
+							</a>
+						</li>{% endif %}{% if site.twitter_user %}
+
+						<li>
+							<a href="https://twitter.com/{{ site.twitter_user }}">
+								<span class="social__icon">
+{% include twitter.svg %}
+								</span>
+								<span class="social__username">{{ site.twitter_user }}</span>
+							</a>
+						</li>{% endif %}
+
+						<li>
+							<a href="{{ '/feed.xml' | prepend: site.baseurl }}">
+								<span class="social__icon">
+{% include rss.svg %}
+								</span>
+								<span class="social__username">RSS</span>
+							</a>
+						</li>
+					</ul>
+
+				</div>
+
+			</div>
+		</footer>

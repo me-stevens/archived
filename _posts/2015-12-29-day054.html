@@ -1,0 +1,93 @@
+---
+layout:   post
+title:    "54: Planning, testing, refactoring"
+date:     2015-12-29 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>More reading of <a href="{% post_url 2015-12-28-day053 %}">Uncle Bob's book</a>. This is what I learnt today:</p>
+
+
+
+
+<h3>Planning</h3>
+
+<p>Developers tend to underestimate big stories and overestimate small stories. Split big stories into smaller ones, and if one story is too small, merge it with other small stories. Get stories to a size where estimation is accurate.</p>
+
+<p>A <strong>spike</strong> is a prototype of a story, to help developers make a guess of how much time it's going to take.</p>
+
+<p>Once you know the velocity, the customers can get an idea of cost and business value of each story, and they can sort them in importance, based on these two things. This is a business decision. The order of the stories in an iteration is a technical decision.</p>
+
+<p> A <strong>task</strong> is a story that a developer can implement in 4-16 hours. A list of the tasks is presented to the team and they sign up to any tasks they want. GUI devs can sign up in database tasks. The knowledge of the codebase is then spread.</p>
+
+<p>The <strong>halfway point</strong> happens halfway through an iteration. Half of the stories should be completed, as opposed of half of the tasks. Every two weeks, an iteration should be finished and presented to the customer for feedback.</p>
+
+
+
+
+<h3>Testing</h3>
+
+<p>As Jarkyn put it: "<em>Tests made me do it!</em>".</p>
+
+<p>In order to be callable and testable, the code has to be decoupled from its surroundings.</p>
+
+<p><strong>Intentional programming</strong> is when you state your intent in a test before you implement the code. The tests are compileable and executable documents that describe the details of a program.</p>
+
+<p><strong>Test isolation</strong> is when you test a class behaviour without worrying about its collaborators. When we have to work with concepts like databases or printers (things that we can not test directly), we use <strong>mocks</strong>. For that, we insert interfaces in between the tested class and its collaborators and create stubs that implement those interfaces. Now the tested class uses the interfaces to communicate with the collaborators.</p>
+
+<p>Using mocks allows you to test that the classes behave as expected, in isolation, without having to check if a database was updated or anything was printed. Your tests expose areas in your code that should be decoupled.</p>
+
+<p><strong>Acceptance tests</strong> are like <em>black boxes</em> that verify that the whole system behaves as the client wants. <strong>Unit tests</strong> are like <em>white boxes</em> that verify individual details of the system. Acceptance tests are the ultimate documentation of a feature.</p>
+
+<p>Acceptance tests can be written in a test file. Some lines will be "<em>transactions</em>", while others will be "<em>directives</em>".</p>
+
+<p>Having to accept inputs from the user and from the acceptance tests, puts architectural pressure on the codebase. We will need a transaction processor that accepts inputs from different sources.</p>
+
+
+
+
+<h3>Refactoring</h3>
+
+<p>Every software module has three functions:</p>
+
+<ul>
+	<li>The function for which it was designed.</li>
+	<li>Being easy to change in the course of its life.</li>
+	<li>Communicate to its readers.</li>
+</ul>
+
+<p>Easy to read and easy to change: flexible and adaptable.</p>
+
+
+
+
+<h3>Agile design</h3>
+
+<p>Symptoms of poor design:</p>
+      
+<ul>
+	<li><strong>Rigidity:</strong> The design is hard to change.</li>
+	<li><strong>Fragility:</strong> The design is easy to break.</li>
+	<li><strong>Immobility:</strong> The design is hard to reuse.</li>
+	<li><strong>Viscosity:</strong> It is hard to do the right thing.</li>
+	<li><strong>Needless Complexity:</strong> Overdesign.</li>
+	<li><strong>Needless Repetition:</strong> Mouse abuse.</li>
+	<li><strong>Opacity:</strong> Disorganized Expression, difficult to understand.</li>
+</ul>
+
+<p>These are like code smells, only not in a small section of code, but in the whole codebase.</p>
+
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>I would never get tired of saying this: THE SILENCE. And getting shit done.</p>

@@ -1,0 +1,92 @@
+---
+layout:   post
+title:    "96: Priya hash and immutable board"
+date:     2016-02-25 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Priya gave a <em>Zagaku</em> about her <strong><em>PriyaHash</em></strong>. Her mentor Dany told her to implement hashes manually. The reason you would do that is because <strong>you may want a more efficient way to calculate the hash for your objects</strong> than what the language provides you.</p>
+
+<p>Java allows you to generate your own implementation of HashMaps. HashMaps are made by a key and a value. So Priya made an object whose field members were a key, a value and a <code class="language-java">LinkedList&lt;></code> with the next nodes.</p>
+
+<p>The list is needed because when you calculate the hash, <strong>several objects can be associated with the same hash</strong>. So the idea is that you place those objects in "buckets" with the same hash, and <strong>every entry keeps track of the next entry</strong>, forming a linked list data structure.</p>
+
+<p>Data buckets have a hash, and several objects can be associated with the same buckets. When this happens, that's called a <em>collision</em>, and makes finding objects more difficult.</p>
+
+<p>To find an object by hash, Priya implemented a search as a loop on the entries inside a "bucket", which checked the key using <code class="language-java">equals()</code>. She implemented her own hash but didn't overwrite <code class="language-java">equals()</code> (there is a contract in Java, that forces you to overwrite the hashcode if you overwrite the equals). If I remember well, I think she was taking multiples of three to assign the hashcode. I'll check it out when she pushes it to her repo.</p>
+
+
+
+
+
+
+
+
+
+
+<h3>TTT UI</h3>
+
+<p>Since I finished the board, the next step was to implement the UI. A very simple one. Since I only have the board, I only have board-related methods for now, like printing the board or reading a cell index introduced by the user. I also added an input validation class.</p>
+
+<p>The next step would be the game. For this I realized that <strong>I need to implement how a mark is placed in the board</strong>. My board is immutable, so this kept me thinking a bit. How do I want to do this call? Should I do:</p>
+
+<pre><code class="language-ruby">board = Board.new(rows, cell, mark)</code></pre>
+
+<p>Later on I realized that I don't need the rows, I could take them from the board itself:</p>
+
+<pre><code class="language-ruby">def initialize(rows)
+  @rows  = rows
+  @board = Matrix.rows(rows)
+end
+</code></pre>
+
+<p>or</p>
+
+<pre><code class="language-ruby">rows = board.to_a</code></pre>
+
+<p>But then I will be passing a reference to the array and the new boards created this way won't be immutable (if I update the rows array with a cell, all the boards would be updated).</p>
+
+<p>What about a method that returns a new board?</p>
+
+<pre><code class="language-ruby">def place_mark(cell, mark)
+  rows[row_from(cell)][col_from(cell)] = mark
+  Board.new(rows)
+end
+</code></pre>
+
+<p>Again this implementation is mutating the rows and passing them to a new board. So this might be better:</p>
+
+<pre><code class="language-ruby">def place_mark(cell, mark)
+  new_rows = board.to_a.map { |row| row }
+  new_rows[row_from(cell)][col_from(cell)] = mark
+  Board.new(new_rows)
+end
+</code></pre>
+
+<p>I checked with a test that this doesn't keep a reference to the old rows but creates a new array.</p>
+
+<p>I have another problem though: If I do this:</p>
+
+<pre><code class="language-ruby">board = board.place_mark(cell, mark)</code></pre>
+
+<p>My test complain that the board is nil:</p>
+
+<pre><code class="language-bash">1) Board places a mark in the board
+   Failure/Error: board = board.place_mark(0, o)
+
+   NoMethodError:
+     undefined method `place_mark' for nil:NilClass
+</code></pre>
+
+<p>I smell that this is probably due to the fact that my board is immutable. Although I had thought that the immutability was at cell level only. But if I do:</p>
+
+<pre><code class="language-ruby">new_board = board.place_mark(cell, mark)</code></pre>
+
+<p>it works. So I'm gonna leave it like this for now, and maybe come back to it later if I have time.</p>
+
+<p>Also, the apprenticeship is now going to use <strong>a new tool for teaching: spreadsheets!</strong> (insert Christoph's seal of approval here).</p>
+
+<p>In this read-only spreadsheets, your mentors are going to keep a list of the things you need to improve. <strong>I have to improve naming and I still carry the cross of being "the overcomplicator"</strong>, so those two are on my list.</p>
+

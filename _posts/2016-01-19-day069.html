@@ -1,0 +1,160 @@
+---
+layout:   post
+title:    "69: Gravitational payroll waves"
+date:     2016-01-19 20:00:00
+category: journal
+---
+
+
+<p>Nice number we have here today! :-P</p>
+
+
+
+
+
+
+
+
+<h2>Today I learnt</h2>
+
+
+<p>There was something that was bugging me in the payroll application. There was a hardcoded number in the payment types, regarding the length of the period where cards must be taken into account for the pay calculation. What's more, that method felt that it didn't belong there, but in the payment schedules:</p>
+
+<pre><code class="language-java">private boolean isInPeriod(LocalDate payDay, TimeCard timeCard) {
+	return timeCard.getDate().isAfter(payDay.minusDays(5));
+}</code></pre>
+
+<pre><code class="language-java">private boolean isInPeriod(LocalDate payDay, SalesCard salesCard) {
+	return salesCard.getDate().isAfter(payDay.minusDays(15));
+}</code></pre>
+
+
+<p>This method handles only dates and nothing else. I was wondering if I could move it directly to the payment schedules. But then I would have to pass a payment schedule in the <code class="language-java">calculatePay()</code> method, which looked like this:</p>
+
+<pre><code class="language-java">@Override
+public double calculatePay(LocalDate payDay) {
+	double pay = 0.0;
+	for (TimeCard timeCard : timeCards) {
+		if (isInPeriod(payDay, timeCard)) {
+			pay += calculatePayFor(timeCard);
+		}
+	}
+	return pay;
+}</code></pre>
+
+<p>IntelliJ didn't allow me to move the method to the payment schedules automatically, so I moved it first to the cards. But in a way, it makes sense that this check was in the cards, since you don't have to check this if there are no cards.</p>
+
+<p>I decided to pass a payment schedule to the <code class="language-java">calculatePay()</code> method, and then to the <code class="language-java">isInPeriod()</code> method. Finally, I added an upper limit to the <code class="language-java">isInPeriod()</code> method, since it was checking lower boundaries only. I separated both checks into the two helper methods <code class="language-java">isAfter()</code> and <code class="language-java">isBefore()</code>:</p>
+
+
+<pre><code class="language-java">@Override
+public double calculatePay(LocalDate payDay, PaymentSchedule paySched) {
+	double pay = 0.0;
+	for (SalesCard salesCard : salesCards) {
+		if (salesCard.isInPeriod(payDay, paySched)) {
+			pay += calculatePayFor(salesCard);
+		}
+	}
+	return pay;
+}</code></pre>
+
+<pre><code class="language-java">public boolean isInPeriod(LocalDate payDay, PaymentSchedule paySched) {
+	return isAfter(payDay, paySched) &amp;&amp; isBefore(payDay);
+}
+
+private boolean isAfter(LocalDate payDay, PaymentSchedule paySched) {
+	return date.isAfter(payDay.minusDays(paySched.getDaysInPeriod()));
+}
+
+private boolean isBefore(LocalDate payDay) {
+	return date.isBefore(payDay.plusDays(1));
+}</code></pre>
+
+<p>I then added a <code class="language-java">getDaysInPeriod()</code> method in the payment schedules to get the days in the period, since the schedule is the one who knows that, and added a constant to hold the number:</p>
+
+<pre><code class="language-java">private final int DAYS_IN_PERIOD = 15;
+
+@Override
+public int getDaysInPeriod() {
+	return DAYS_IN_PERIOD;
+}</code></pre>
+
+<p>The problem I have with this is that the code that checks if a date is inside the period is the same in both the time and the sales card. I don't have an abstraction for the cards yet, maybe I could put that code in an abstract class? At the same time, I still think that code should probably go in the schedules. But again, I don't want to repeat the same code in all the schedule subclasses, and they are using an interface at the moment, which comes in very handy. So I think this is the time to create that abstract Card class.</p>
+
+<h3>Another idea</h3>
+
+<p>Another thing that crossed my mind was to pass the initial date, i.e. <code class="language-java">payDay.minusDays(paySched.getDaysInPeriod())</code> directly instead of passing the whole paymentSchedule object. I could make some method like:</p>
+
+<pre><code class="language-java">public LocalDate initialDate(LocalDate payDay) {
+	return payDay.minusDays(DAYS_IN_PERIOD);
+}</code></pre>
+
+<p>That way I could pass two dates. For example, for the sales card:</p>
+
+<pre><code class="language-java">@Override
+public double calculatePay(LocalDate payDay, LocalDate initalDate) {
+	double pay = 0.0;
+	for (SalesCard salesCard : salesCards) {
+		if (salesCard.isInPeriod(payDay, initalDate)) {
+			pay += calculatePayFor(salesCard);
+		}
+	}
+	return pay;
+}</code></pre>
+
+<pre><code class="language-java">public boolean isInPeriod(LocalDate payDay, LocalDate initalDate) {
+	return isAfter(initalDate) &amp;&amp; isBefore(payDay);
+}
+
+private boolean isAfter(LocalDate initalDate) {
+	return date.isAfter(initalDate);
+}
+
+private boolean isBefore(LocalDate payDay) {
+	return date.isBefore(payDay.plusDays(1));
+}</code></pre>
+
+<p>And then, in the employee class, which is where I call the <code class="language-java">calculatePay()</code> method, I could do:</p>
+
+<pre><code class="language-java">public double grossPayFor(LocalDate date) {
+    return paymentType.calculatePay(date, paymentSchedule.initialDate(payDay));
+}</code></pre>
+
+<p>But I'm not sure about it yet, because it looks like I am leaking details in the employee class on the fact that the schedules have an <code class="language-java">initialDate()</code> method. I'll have to think about it.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today I learnt that <a href="https://ligo.caltech.edu/">the LIGO experiment</a> had <strong>measured a hint of gravitational waves</strong>. They are still analyzing the data. I know how hard and long data analysis can get, and how it can be the source of all kinds of sexual jokes, which would be perfect for today's post (today is the 69th day after all!) but this is not that kind of blog. So they can't say anything final. But it is exciting nevertheless.</p>
+
+<p>Everybody is comparing these rumours to that time, years ago, when physicists at CERN said that <a href="http://nautil.us/issue/24/error/the-data-that-threatened-to-break-physics">they had measured faster-than-light neutrinos</a>. But this time the researchers are more conservative with what they say to the press. We all know <a href="http://www.phdcomics.com/comics/archive.php?comicid=1174">how the press is sometimes</a>!<sup><a href="#spanish">[1]</a></sup></p>
+
+<p>The LIGO experiment uses an <a href="http://www.renishaw.com/en/interferometry-explained--7854">interferometer</a>, that consist of two vacuum pipes separated by 4km, with special mirrors in each end, so that a laser can bounce back and forth. If a gravitational wave appears, it will distort spacetime, and so <strong>the pipes would shrink in that direction and expand in the perpendicular direction</strong>. Then, the time the lasers take to reach the mirrors will change, so you would measure a different distance. That's how you would "detect" gravitational waves. ISN'T IT BIUTIFUL.</p>
+
+<p class="center">INSERT SPARKLES HERE.</p>
+
+<p>Now, why is this so exciting that when I heard the news this morning, it made me forget my backpack at home, with my laptop charger, my lunch for today prepared during one long hour the day before, and basically, my whole life in it?</p>
+
+<p>The importance of this measurements is similar to that <a href="https://en.wikipedia.org/wiki/Michelson%E2%80%93Morley_experiment">Michelson-Morley experiment</a> to measure the speed of ether a century ago. It proved that <strong>there was no such a frame of reference in the universe, and it helped build the base for the theory of relativity</strong>.</p>
+
+<p>Einstein (and his <a href="https://en.wikipedia.org/wiki/Mileva_Mari%C4%87#Role_in_physics">never quoted wife</a>) proposed that a mass in accelerated movement would produce gravitational waves in spacetime. Gravitational waves are changes in the gravity field that propagate through space at the speed of light. This waves, like gravity, deform spacetime. Some consequences of this are that the speed of light would decrease as gravity increases, or that its trajectory would appear curved (in reality, is the spacetime who is curved). Black holes are the perfect scenario to study these things, because there, gravity is huge.</p>
+
+<p>So this research can help understand <strong>if relativity has got a good description of gravity</strong>, and <strong>how to track objects that don't emit light or other kinds of radiation</strong> (for example black holes and neutron stars). Also, if we could find gravitational waves coming from the origin of the universe, we could understand <strong>how the universe became what it is today</strong>.</p>
+
+<p>Finally, the Standard Model tries to unify all the known interactions: gravity, electro-magnetism, weak nuclear force and strong nuclear force. So far it has been successful in integrating the last three, but there were several problems with gravity, which Einstein was trying to address at the end of his career, but couldn't make any contributions (probably due to the fact that Mileva was not his wife anymore, and hence, not helping him with the calculations). Having an actual proof of the existence of gravitational waves could help with this unification.</p>
+
+<p>In summary, great news. Will be checking the news again in February.</p>
+
+<p class="footnote" id="spanish"><sup>[1]</sup> The Spanish press translated "God-damm particle" as "the God particle", referring to the Higgs boson. And so, they turned what was an annoyingly difficult to find particle into a particle coming from heaven to save us (or something).</p>
+

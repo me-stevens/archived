@@ -1,0 +1,120 @@
+---
+layout:   post
+title:    "82: Interview with the vampire and tiny steps"
+date:     2016-02-05 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Today Felipe showed me what he did with Christoph for his photoblog, how <strong>he mocked the entire filesystem</strong>, something I might try but I don't think it is the solution I'm going for. But it was interesting nevertheless, and I learnt about <a href="http://modocache.io/shared-examples-in-rspec">shared examples in Rspec</a>.</p>
+
+<p>Basically my fear when mocking a class of my own was that <strong>the mock gets out of sync with the class it mocks, and if you add a new method you have to remember to go to the mock and change it</strong>. With shared examples, you have one test file for both, and if you add a new test it forces you to implement the method in both classes.</p>
+
+<p>Then I showed him and Mateu the UML of ConMan&trade;, and how I was not sure about the Menu class having a dependency on both the actions and the user interface. Felipe told us that he always imagines <strong>how the whole thing would hang</strong> if he took the upper class in the diagram. If it hangs nicely, the design is ok. It was so funny and illustrative.</p>
+
+<p>Felipe had to go, so Mateu showed me how to decouple the Menu class using <code class="language-ruby">map</code> to split my array, and pointed to that <code class="language-ruby">nil</code> for the exit option which has been bothering me as well. So when I finish ConMan&trade; I'm gonna try those changes he showed me.</p>
+
+<p>Then I shed manly tears over his shoulders because <strong>I want to impress Jim and make him be proud of me, but I feel my code is still shit after almost four months</strong>, and that couple of months when I was not learning anything. So he connected to <a href="{% post_url 2015-12-02-day038 %}">his server</a> and <strong>showed me code he wrote like seven years ago</strong>, which had a lot of chained if, else, for, switch and what not, methods that were like a thousand lines long, and so on. And I felt better, because I really admire the way he writes code now, and he was the team member that impressed me the most when I visited the office and paired with everyone. He told me I have to stop being so perfectionist and take "<em>tiny steps</em>", and I will get there.</p>
+
+<p>BUT WHEN</p>
+
+<p>We also had a good laugh at some of his very old files with embarrasing names, which I spotted while he was exploring his remote disk files to search the ugly code he wanted to show me. But I'll keep that a secret because...</p>
+
+<p>...I HAVE FILES LIKE THOSE TOO.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+
+<p>Today <strong>I had my interview with James</strong>. He has been interviewing the team during this week and I have been spying the interviews, because I wanted to know what my dear team members had to say to James questions. I asked him for the questions on Monday, so that I could think about them, since they are going to be used among other things to pair us with the right clients. I think that is quite important!</p>
+
+<p>Priya stayed on my interview for a bit, and it was super funny. Then she had to go before we finished the interview. My replies where more or less these:</p>
+
+<dl>
+	<dt>How long have you been here?</dt>
+	<dd>12 Oct. 2015.</dd>
+​	<dt>Previous work experience:</dt>
+	<dd>Experimental nuclear physics research (8yr), freelance illustrator/comic artist and web developer (3yr).</dd>
+
+​	<dt>Most interesting parts of the apprenticeship:</dt>
+	<dd>Diverse tasks, learning to write clean and maintainable code, time estimating, reading, pairing, being paid for learning. Yeah, I know, everything.</dd>
+
+	<dt>What projects would you like to see more of and what industries?</dt>
+	<dd>YES: Videogames, robots, science, art, small companies.<br>
+NO: finances, business, corporate, big companies.</dd>
+
+	<dt>What is the company's secret sauce?</dt>
+	<dd>The team.<br>
+Diversity in gender, age, origin, etc.<br>
+Transparency.<br>
+Horizontality.</dd>
+
+	<dt>What meetups do you attend?</dt>
+	<dd>I'm a coach at Codebar and assistant/helper at the company's events/conferences/code retreats, etc. Other than that I usually don't go to meetups or conferences. Specially if they have the word lady, girl or woman in the title.</dd>
+
+	<dt>What meetups do you suggest I attend?</dt>
+	<dd>I have honestly no idea, plus, I just arrived to the UK.</dd>
+
+​	<dt>What's your favourite Colour?</dt>
+	<dd>RAINBOW.</dd>
+
+	<dt>What is your favourite cuisine?</dt>
+	<dd>I'm happy eating a cheap kebab sitting with friends on a public place, plaza, stairs, etc., and talking about parallel universes.</dd>
+
+	<dt>What is your go to drink at the bar?</dt>​
+	<dd>Beer. Black beer. If you want brands, I'm a fan of Guiness, Grimbergen Optimo Bruno, Black Leffe, Negra Modelo, and Mezquita.</dd>
+
+	<dt>What is your motivation and drivers to succeed</dt>
+	<dd>Motivation: To get better at anything I do, to learn constantly, to build stuff that I am proud of.<br>
+Drivers: Perseverance and hard work.</dd>
+</dl>
+
+<p>At the end, because I told James that I was persistent and hard working, he said "<em>You are a trooper!</em> I think I agree.</p>
+
+<p>Corinne, the young woman that we met at the Christmas party we had in January, <strong>is starting a studentship today</strong>. When she told me that she was going to learn Elixir and she had to install Emacs, I was like: "<em>So, you mentor is Makis, non?</em>". BINGO. Ha ha.</p>
+
+<p>At lunch, Georgina told us <strong>she is starting with JavaScript and Jasmine</strong>. That's so cool! I told her that it's like the bastard son of Java and Ruby, like a weird mix of the two and some own stuff.</p>
+
+<p>Then I went on to spy the interview with Felipe and learnt about the frustrations he is going through with the client they are working with now. And I also learnt a bit more about James through the questions that we can ask at the end of the interview. In my interview, I asked him about what he learnt from all the interviews he has been doing, and Feipe asked something about his past life anecdotes as a sales man.</p>
+
+<p>Finally, Priya worked on a waza project that Daniel proposed her to do: an anagram program in Ruby. She called it "agraman", so the laughs were assured:</p>
+
+<blockquote>From the creator of ConMan&trade;...<br>
+announcing, AgraMan&trade;!!</blockquote>
+
+<p>You can not say we don't have fun at the office.</p>
+
+<p>So everybody started asking for the anagram for their names. Georgina is Georgian, Rabea is a bear, Daniel is denial, and I...<br>
+I am...</p>
+
+
+<p>I AM LAME.</p>
+
+<p>I am also a meal. Who would have thought that this octopus was actually eatable.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

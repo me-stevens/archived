@@ -1,0 +1,67 @@
+---
+layout:   post
+title:    "23: Better the devil you know..."
+date:     2015-11-11 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+
+<p>In today's Zagaku, Daniel talked about the tree created by conditionals, and how that is used by languages like SQL to build the query expressions, for example, the conditions coming after the <code class="language-sql">WHERE</code> clause.</p>
+
+<p>Also, he explained how in functional languages, you are closer to the way this tree is generated in the computer, since the operator comes before the operands, just as it happens in the generated tree.</p>
+
+<p>Finally, I was having some problems when returning things from an array in my <code class="language-java">BoardTest</code> class, and that lead me to learn something new from Felipe. I had this test:</p>
+
+
+<pre><code class="language-java">@Test
+public void getsTheEmptyCellIndexes() {
+	board.setCell(1, "hi");
+
+	ArrayList<Integer> expected = new ArrayList();
+	for (int index = 2; index &lt;= 9; index++) {
+		expected.add(index);
+	}
+
+	assertEquals(expected, board.getEmptyCellIndexes());
+}
+</code></pre>
+
+<p>I wanted to test the functionality of the <code class="language-java">getEmptyCellIndexes()</code> method in my <code class="language-java">Board</code> class, so I placed a mark on the first cell of the board and then asserted that the array returned from that method was equal to the expected that I was building manually. Since my method returns the indexes of the cells of the board that are empty, my expected array was storing all indexes from 2 to 9 (only cell of index 1 was busy with a mark).</p>
+
+<p>For some weird reason, the expected array was returning a <code class="language-java">6</code>, and my method was returning the right indexes, so I had an assertion fail. If I changed the condition to end in any other number that was not 9, I got a proper array list that looked like this: <code class="language-java">[2, 3, 4, 5, 6, 7, 8]</code> (for a loop condition ending in 8). But if I put back the 9, I got a 6 again. Where was that 6 coming from? Neither Felipe or Christoph nor I were able to grasp the origin of that 6. However, Felipe showed me a way to initialize an <code class="language-java">ArrayList</code> that doesn't require a for loop and can be done in one line:</p>
+
+<pre data-line="5"><code class="language-java">@Test
+public void getsTheEmptyCellIndexes() {
+	board.setCell(1, "hi");
+
+	List<Integer> expected = Arrays.asList(2,3,4,5,6,7,8,9);
+
+	assertEquals(expected, board.getEmptyCellIndexes());
+}
+</code></pre>
+
+<p>And suddenly, my test was green. It's cool to learn new things! The 6 though, <a href="https://www.youtube.com/watch?v=HQoRXhS7vlU">will forever remain a mistery</a>.</p>
+
+
+
+
+
+
+
+
+
+<h2>Challenges</h2>
+
+<p>Communication in English. Again. Today I had a chat with Daniel and I felt it was a bit like talking to a wall. I was not able to express myself accurately enough or find good examples to explain what I was trying to say, and he didn't get it. I found myself repeating the same stuff and he was repeating the same examples. I think I will never master this language. At the end I decided to leave the conversation, because I was feeling tired and frustrated with myself again.</p>
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today, at Codebar, I had <strong>a student that has been coming for three weeks in a row because she doesn't want any other mentor</strong>... she wants <em>me</em>! That was so cute from her. I had another second student that left the room with sparkles in her eyes too. She asked me if I had teached before, and what I was working in before coming to this city, etc. She was so surprised that I was accepting emails from the students if they had doubts after the Codebar session.</p>

@@ -1,0 +1,62 @@
+---
+layout:   post
+title:    "91: To share or not to share (examples)"
+date:     2016-02-18 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+
+<p>Today I've been looking at shared examples. I found <a href="http://modocache.io/shared-examples-in-rspec">these</a> <a href="http://modocache.svbtle.com/code-reading-shared-examples-in-rspec">two</a> resources.</p>
+
+<p>I think what I would have to do is something like this:</p>
+
+<pre><code class="language-ruby">shared_examples 'a database' do
+
+  let(:db) { described_class.new }
+
+  it 'should have an add method' do
+    db.responds_to?('add')
+  end
+
+  it 'should have an update method' do
+    db.responds_to?('update')
+  end
+
+  # same for other methods
+  ...
+
+end
+</code></pre>
+
+<p>And then have the two databases behave like the db:</p>
+
+<pre><code class="language-ruby">describe DBFile do
+  it_behaves_like 'a database'
+
+  it "other tests here..."
+  ...
+
+end
+</code></pre>
+
+<pre><code class="language-ruby">describe DBSQLite do
+  it_behaves_like 'a database'
+
+  it "other tests here..."
+  ...
+end
+</code></pre>
+
+<p>The thing is that <strong>I think that the only thing I have to test is if the methods exist</strong>, but then I think again that <strong>I am probably trying to force Java into Ruby</strong>, by assuring those methods exist, just as an interface would do. The idea was to apply this to the two databases and a possible fake database that I would use for the tests, and so, I will not forget to add any new method to the three classes.</p>
+
+<p>Right now I have an empty database class, made of empty methods, and the two database classes are subclassing it. I also use this empty database to generate the tests doubles I use in the actions tests.</p>
+
+<p>But what Jim told me is that <strong>shared examples are used when you have "<em>the same tests</em>" in two or more classes</strong>, which is not what I have right now. That's what Felipe did when he mocked the filesystem. It's also what Jarkyn reminded me about testing a database. You would have the same tests for the mock and the real database, and only run the tests with the real database once in a while.</p>
+
+<p>Also, Christoph told me to <strong>use one of my databases instead of the empty database to create the test doubles</strong>. I think it would be confusing for a developer coming to my code. How would they know that the thing works with any database, if I have one of them hardcoded there.</p>
+
+<p>I will think a bit more about it and decide what to do.</p>
+
+

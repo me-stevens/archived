@@ -1,0 +1,58 @@
+---
+layout: post
+title:  "20: Don't test the main()"
+date:   2015-11-06 20:00:00
+category: journal
+---
+
+
+<h2>Today I learnt</h2>
+
+<p>If you want to test a function that doesn't return... USE YOUR SPY. The one that you just coded, remember? XD. The thing is that the way I used my spy is a little weird and I don't know if my method is really "tested". This is the method:</p>
+
+<pre><code class="language-java">public void start() {
+        boolean play = true;
+
+        while (play) {
+            play = nextTurn();
+        }
+    }
+</code></pre>
+
+<p>where <code class="language-java">nextTurn()</code> is tested. What I did is to test it in an integrated fashion, verifying the state on my spy after calling <code class="language-java">start()</code>. For that I added a <code class="language-java">lastPrintedMessage()</code> to my spy, so that it will return the last thing that was printed, and I assert that it was the Game Over message. Weird, isn't it? Let's see what will happen this Monday in my IPM :-P.</p>
+
+<p>The <code class="language-java">main()</code> method though, is different:</p>
+
+<pre><code class="language-java">public class GameRunner {
+
+    public static void main(String[] args) {
+        Game game = new Game(new Board(3), new UserInterface(new GameConsole(System.in, System.out)));
+        game.start();
+    }
+}
+</code></pre>
+
+<p>In Jim's words:</p>
+
+<blockquote>Main is difficult / impossible to unit test. So long as its only responsibility is instantiating object, wiring up dependencies, and starting the application, I would not try to test it (your code above only does those things). I would personally just put main in your Game class, but having a separate class is fine too. Then by just running the program, you verify that it "works".</blockquote>
+
+<p>And in Christoph's words:</p>
+
+<blockquote>Game is considered an application class - that should be tested completely. It will help your coverage to not put <code class="language-java">main()</code> in there. Having the <code class="language-java">GameRunner</code> as a “main” leaves that as the untested part.</blockquote>
+
+<p>I see the point, and I think that's why I made the <code class="language-java">GameRunner</code> class, it felt like the right thing to do. In my echo server I had the main method inside the class. But as Christoph said, my app classes should be 100% tested!</p>
+
+
+
+
+<h2>Nice things</h2>
+
+<p>This week is the first one since I am here that I finished all my stories on a Friday, which is cool, because now I have the weekend free. Free is a way of speaking, what it means is that I finally have time to do the things I been waiting to have the time to sit and do, like:</p>
+
+<ul>
+	<li>Finishing the design of this blog.</li>
+	<li>Getting up to date with all the online courses I started before coming here, which keep sending me mails to check if I'm alive.</li>
+	<li>Working on my (coding) projects.</li>
+	<li>If there is time left after all that, take a look at <a href="https://github.com/felipesere/faros">the code of faros</a> and see if I can contribute something to it.</li>
+	<li>Finish the logo for faros and for the reactive podcast.</li>
+</ul>

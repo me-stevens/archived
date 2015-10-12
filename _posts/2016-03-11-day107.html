@@ -1,0 +1,24 @@
+---
+layout:   post
+title:    "107: The codebase"
+date:     2016-03-11 20:00:00
+category: journal
+---
+
+<p>Today I worked on the one point story I got from yesterday's IPM. First I got everything installed and running. Then, I started digging into the code.</p>
+
+<p>The problem at hand has to do with loop videos not showing up in the page that shows the list of articles. In the admin page, I saw there were two options for videos: loop videos and normal videos. So I tried normal videos and it worked. Looking at the template, I discovered that images and normal videos are covered in the code through if statements, but there is nothing for loop videos.</p>
+
+<p>The first thing I did was to check out what was done for the normal videos. I thought I had found it and I started making a template for loop videos following what was done for normal videos. But while in this case the video can be accessed, there was no way to access the loop video.</p>
+
+<p>Apparently, the id of the video was accessible. Why this difference? Why videos for videos but just ids for loop videos? After the 8LU and pairing with a visitor, I sat again to swim through the code, and couldn't find a way to retrieve said video. Christoph was very busy, so I asked Skim.</p>
+
+<p>Skim explained the whole codebase structure to me on the white-board, and then showed me what he does to find files when he works with a huge codebase for the first time. He told me to find the call to the page I want to modify, and then follow the request.</p>
+
+<p>So we went file by file following the calls of the methods. This method calls this other method in this class. Open the class, that method calls another method in another class. And so on. After something like six or seven files, we arrived to the file I was modifying, the template.</p>
+
+<p>Then I told him about the loop video having only the id accessible, and asked him how to retrieve the video. Looking at the image, it seemed to have to be retrieved with an id as well, and that call was wrapped in a method. So I asked Skim if maybe we would have to do something like that?</p>
+
+<p>And then Skim remembered that there were an image helper and a video helper.</p>
+
+<p>So that is the next thing I'll work on. <strong>I'm Jon Snow. I know nothing</strong>.</p>

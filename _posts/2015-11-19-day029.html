@@ -1,0 +1,47 @@
+---
+layout:   post
+title:    "29: Uncle Bob's videos"
+date:     2015-11-19 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>I missed the <em>Zagaku</em> on time estimation because I was signing my flat's contract. Finally! But I realized something: <strong>I still have to read more and learn more before I continue refactoring, because I'm doing it wrong, or either I don't know which step to take next</strong>. So I'm going to stop for a while and learn.</p>
+
+<p>I took some pop-corn bags from the snacks we have in the office and sat through the first two <a href="https://cleancoders.com/category/clean-code">Uncle Bob's Clean Code videos</a>. <strong>They are the cheesiest thing in the known universe</strong>, which almost made me fall from my chair laughing, but the concepts are pretty straight forward and precisely presented. I honestly learnt a lot, and refreshed concepts I already knew.</p>
+
+<p>This packed-like wisdom shown in a direct way is a format that really works for me.
+
+<p>This is what I took from the first video:</p>
+
+<ul>
+    <li>Name your variables properly, so that they communicate their intent and don't misinform.</li>
+    <li>The cost of software is <strong>its maintenance</strong>.</li>
+    <li><strong>Use nouns to name classes and variables</strong>, but don't use too general names like "info" that mean nothing.</li>
+    <li><strong>Use predicates to name booleans</strong>, like <code class="language-java">isSet</code> or <code class="language-java">hasWinner</code>. Same for functions that return a boolean.</li>
+    <li><strong>Use the verb get to name accessors</strong>.</li>
+    <li>Properties, like those in C&#35;, are methods pretending to be variables, so use <strong>nouns</strong> (or predicates if they are boolean).</li>
+    <li><strong>Enums represent state, so use and adjective</strong>.</li>
+    <li>Regarding scope: for variables, the shorter the scope, the shorter the name (for example, the iteration variable in a for loop can be just one letter long). Longer scope variables need a more descriptive name so that you don't have to go 20 lines up to see what it is.</li>
+    <li>The opposite is true for functions and classes, the bigger the scope the more places you will be using them, so use short names like <code class="language-java">open()</code> in the <code class="language-java">File</code> class.</li>
+</ul>
+
+
+<p>And from the second video:</p>
+
+<ul>
+    <li><strong>A function should do one thing, well and only</strong>. Or as he said, first, should be small, second, should be smaller than that. Four or five lines is ok, ten is too long.</li>
+    <li>If you have a long condition in an if statement, it's a good idea to extract it into a method.</li>
+    <li>"<em>A long method is where all the classes were to hide</em>". If you see one, it can probably be extracted into a class. The local variables used everywhere would be fields that we'll pass in the constructor. You can even move some of those fields to local variables inside certain methods.</li>
+    <li>The bedroom metaphor: a 12 year old would have everything scattered. Keep your room clean! Put your code in nicely named small places so that other people can find them.</li>
+</ul>
+
+<p>It really comes down to "<em>use common sense</em>", but its always cool to have these tips present in the back of your head while you are coding.</p>
+
+
+<h2>Nice things</h2>
+
+<p>It was raining and I signed my flat's contract. The only way to top this would be to win the lottery for the exact amount of the six months of rent I had to pay in advance.</p>
+
+<p>Also, Skim was back and he showed me the pictures he took on his trip with his mom, who is visiting London for a couple of weeks. The landscapes and the castles were so OSOM... I've been here for a bit more than a month and haven't moved from the office or the hostel yet. Time to take some time off! But something tells me I'll have to wait till Christmas.</p>

@@ -1,0 +1,36 @@
+---
+layout: default
+---
+{% assign sorted    = site.posts     | sort: 'date' %}
+{% assign firstdate = sorted[0].date | date: '%s' %}
+{% assign onemonth  = 30 | times: 24 | times: 60 | times: 60 %}
+{% assign pdate     = page.date | date: '%s' %}
+{% assign month     = pdate     | minus: firstdate | divided_by: onemonth | plus: 1 %}
+{% if month == 1 %}{% assign separator = 'month1.svg' %}{% endif %}
+{% if month == 2 %}{% assign separator = 'month2.svg' %}{% endif %}
+{% if month == 3 %}{% assign separator = 'month3.svg' %}{% endif %}
+{% if month == 4 %}{% assign separator = 'month4.svg' %}{% endif %}
+{% if month == 5 %}{% assign separator = 'month5.svg' %}{% endif %}
+{% if month == 6 %}{% assign separator = 'month6.svg' %}{% endif %}
+		<article>
+
+			<header class="post__header">
+				<h1 class="post__title wrapper">{{ page.title }}</h1>
+				<p class="post__meta"><span>{{ page.date | date: "%b %-d, %Y" }}{% if page.author %} • {{ page.author }}{% endif %}{% if page.category %} <span class="separator">{% include {{ separator }} %}</span> {{ page.category }}{% endif %}</span></p>
+			</header>
+
+			<section class="post__content wrapper">
+{{ content }}
+			</section>
+
+			<section>
+				<h1 class="visuallyhidden">Posts navigation</h1>
+{% include navigation.html %}
+			</section>
+
+			<section class="post__comments wrapper">
+				<h1 class="post__title">Comments</h1>
+{% include disqus.html %}
+			</section>
+
+		</article>

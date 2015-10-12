@@ -1,0 +1,70 @@
+.status {
+	font-size:      1.5em;
+	border-bottom: .2em solid $text-color;
+
+	span {
+		line-height: .9;
+	}
+}
+
+.status__month {
+	position:       relative;
+	top:            .5em;
+	display:        block;
+	font-family:   'Exo 2', sans-serif;
+	font-size:      $small-font-size*.9;
+	text-transform: uppercase;
+}
+
+.status__number {
+	font-family: 'Exo 2', sans-serif;
+	font-size:   3em;
+	font-weight: bold;
+}
+
+.status__state {
+	font-family:    'Alegreya', serif;
+	font-style:     italic;
+}
+
+.state {
+	display: none;
+}
+
+.posts__list {
+	margin:  0;
+	padding: 0;
+	list-style: none;
+}
+
+.post {
+	margin:   0;
+	padding: .2em;
+
+	&:hover {
+		background-color: $grey-color-light;
+	}
+}
+
+
+.post__date, 
+.post__link {
+	vertical-align: middle;
+}
+
+.post__link {
+	padding: .5em;
+
+	&:hover {
+		text-decoration: none;
+	}
+}
+
+.post__date {
+	display:     inline-block;
+	margin-left: 1em;
+	width:       6em;
+	font-family: 'Exo 2', sans-serif;
+	font-size:   $small-font-size / 1.3;
+	border-right: .2em solid $brand-color;
+}

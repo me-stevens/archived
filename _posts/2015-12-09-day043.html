@@ -1,0 +1,117 @@
+---
+layout:   post
+title:    "43: Build your git apocalypse shield (with a pair)"
+date:     2015-12-09 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Enrique gave us some tips regarding pairing in the <em>Zagaku</em>, which was so convenient because <strong>I had just said in the stand-up that we need to pair more</strong>. This realization came to me yesterday, when Georgina asked me to pair because she had a story in her backlog where she had to pair with me, because we are working on similar projects, and that kept me thinking... is this how it should be?</p>
+
+<p>Long ago we all had a discussion where we decided that we would pair at least once every day, and we chose to do it after lunch. We did it for some time and then we stopped again. If we have to wait to have a story in our backlog in order to pair with someone, there's something wrong going on. I see Felipe and Christoph pairing everyday on the Groupon project, and I understand that <strong>we all will have to pair in the future on client projects as well</strong>, so we better get used to it!</p>
+
+<p>So I expressed exactly that in the stand-up, and added that <strong>even though Priya has been doing Java for months and I've been doing it for years, she still teaches me things from time to time when we pair</strong>, so if that is what is stopping people from pairing, it's a really silly reason. I also mentioned that <strong>explaining your code to somebody else helps you understand your code better, and probably find your bug, apart from strengthening your communication skills</strong>. Looks like my words resonated, people recovered the motivation to pair, and with a little push from Enrique's <em>Zagaku</em>, I happily saw everybody pairing along the day.</p>
+
+<p>I also happily discovered that I had comments in my pull requests FOR THE FIRST TIME. They were from Felipe and Georgina, and they were very useful and to the point. They really helped me understand some things that I've been doing wrongly, or simple refactorings that I was not aware of because I've been looking at my code for so long.</p>
+
+<p>So I started adding their corrections, but I found a problem: because I'm following Felipe's advice of working in tiny branches, every time I want to work on a little feature, I add a tiny branch and do a pull request. <strong>Since I have to continue working while I wait for feedback, the next tiny branch is branched from the first one</strong>. When I finish I do another pull request and I branch from there another tiny branch. So my branches are not independent.</p>
+
+<p>The problem with this is that now I want to add the corrections I got from the first pull request on top of my first branch. But my second branch was branched from the first one, and is not going to have those commits, so I'm screwing it up, and if I do a merge, merge conflicts will arise. This is because <strong>two commits in both branches are now pointing to the same father</strong>.</p>
+
+<p>I asked for HALP in the apprentices channel and Felipe + Christoph came to the rescue. <strong>I should checkout my second branch and rebase the first into the second one</strong>. In other words:</p>
+
+<pre><code class="language-git">$ git checkout second-branch
+$ git rebase first-branch
+</code></pre>
+
+
+<p>However, I can still have merge conflicts if I do that. GitHub has <a href="https://help.github.com/articles/resolving-a-merge-conflict-from-the-command-line/">a very nice explanation</a> regarding merge conflicts. But I would like to avoid having to do that. I wanted to add the corrections to each pull request, so that they appear in the GitHub page of the pull request. But if I do that, I'll have merge conflicts. For example:</p>
+
+
+<pre><code class="language-git">$ git rebase unhardcode-marks
+First, rewinding head to replay your work on top of it...
+Applying: "Create a GameSetup class to setup the game."
+Using index info to reconstruct a base tree...
+    M	Game.java
+    M	GameTest.java
+Falling back to patching base and 3-way merge...
+    Auto-merging GameTest.java
+CONFLICT (content): Merge conflict in GameTest.java
+    Auto-merging Game.java
+CONFLICT (content): Merge conflict in Game.java
+    Failed to merge in the changes.
+Patch failed at 0001 "Create a GameSetup class to setup the game."
+The copy of the patch that failed is found in:
+   TicTacToe/.git/rebase-apply/patch
+
+When you have resolved this problem, run "git rebase --continue".
+If you prefer to skip this patch, run "git rebase --skip" instead.
+To check out the original branch and stop rebasing, run "git rebase --abort".
+</code></pre>
+
+<p>So I followed what git told me, and opened the files that had merge conflicts. For example, the game class looked like this:</p>
+
+<pre><code class="language-java">public Game(Board board, UserInterface gameUI, List<Player> players) {
+        this.board   = board;
+        this.gameUI  = gameUI;
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; 2408d570e4781d9e35c515bfb09287b9b511a3f9
+        playerMark   = PLAYER.getMark();
+        opponentMark = OPPONENT.getMark();
+=======
+        player1      = players.get(0);
+        player2      = players.get(1);
+
+        playerMark   = Marks.PLAYER.toString();
+        opponentMark = Marks.OPPONENT.toString();
+>>>>>>> Create a GameSetup class to setup the game.
+        resetGame();
+    }
+</code></pre>
+
+<p>Because I had changed the marks. So I had to go there and delete the old code:</p>
+
+<pre><code class="language-java">public Game(Board board, UserInterface gameUI, List<Player> players) {
+    this.board   = board;
+    this.gameUI  = gameUI;
+    player1      = players.get(0);
+    player2      = players.get(1);
+    playerMark   = PLAYER.getMark();
+    opponentMark = OPPONENT.getMark();
+    resetGame();
+}
+</code></pre>
+
+<p>When I finished deleting the old code in the classes where there were merge conflicts, I went back to the terminal, and told git so:</p>
+
+<pre><code class="language-java">$ git rebase --continue</code></pre>
+
+<p>Git told me to add the files and commit:</p>
+
+<pre><code class="language-java">$ git add Game.java GameTest.java</code></pre>
+
+<p>And then I had to tell git again that I was done:</p>
+
+<pre><code class="language-java">$ git rebase --continue</code></pre>
+
+<p>Honestly, f*ck the corrections appearing after the comments in GitHub's pull request page. I don't have time for this... I'm going to add the corrections in the last branch from now on.</p>
+
+
+
+
+
+
+
+
+<h2>Challenges</h2>
+
+<p>Today at codebar I coached two women that were working on their own projects, and I realized that it doesn't work. I mean, two students working on the same tutorial or even on different but close tutorials is ok. Two people with totally different projects and one coach, doesn't work. There's not enough time to go through each project, explain the problems they may have, and help them solve them. So they go home with half the project finished. I told that to Kriszta on the lift, but I think it didn't resonate.</p>
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today I saw Jarkyn be super brave, giving some feedback to the craftspeople in the stand-up, and I felt so proud of her. I wanna see her succeed and be strong, become a craftsperson, sit at the decisions table and cut the pie, and have people follow her and respect her for her wisdom and achievements.</p>

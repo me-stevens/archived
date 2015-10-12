@@ -1,0 +1,309 @@
+---
+layout:   post
+title:    "103: Single Responsibility Principle"
+date:     2016-03-07 20:00:00
+category: journal
+---
+
+<p>The <strong>Single Responsibility Principle</strong> is part of the SOLID principles, and it tells us that every piece of your code, be it a module, a class or a method, should have only one reason to change.</p>
+
+<h2>SRP applied to classes</h2>
+
+<p>When classes get too big and start doing too much, they become difficult to maintain. For example:</p>
+
+<pre><code class="language-ruby">require 'console'
+
+class Conman
+
+  def initialize(console)
+    @console = console
+    @contact_list = []
+  end
+
+  def run
+    answer = "y"
+    while answer == "y"
+      name    = ask_for_name
+      address = ask_for_address
+
+      contact = {}
+      contact[:name]    = name
+      contact[:address] = address
+
+      contact_list &lt;&lt; contact
+
+      answer = ui.ask_for_another
+    end
+  end
+
+  private
+
+  attr_reader :console, :contact_list
+
+  def ask_for_another
+    console.print("Add another contact? (y/n): ")
+    console.read.chomp
+  end
+
+  def ask_for_name
+    console.print("Contact name: ")
+    console.read.chomp
+  end
+
+  def ask_for_address
+    console.print("Contact address: ")
+    console.read.chomp
+  end
+
+end
+</code></pre>
+
+<p>This class has at least two responsibilities, one is to save the contacts in an array, the other is to print and read from the console and send the read data to the main method.</p>
+
+<p>Imagine more requirements appear: to print the contact after adding it and to display all the contacts before exit:</p>
+
+<pre><code class="language-ruby">require 'console'
+
+class Conman
+
+  def initialize(console)
+    @console = console
+    @contact_list = []
+  end
+
+  def run
+    answer = "y"
+    while answer == "y"
+      add_contact
+      display(contact_list.last)
+      answer = ui.ask_for_another
+    end
+    display_all(contact_list)
+  end
+
+  private
+
+  attr_reader :console, :contact_list
+
+  def add_contact
+    name    = ask_for_name
+    address = ask_for_address
+
+    contact = {}
+    contact[:name]    = name
+    contact[:address] = address
+
+    contact_list &lt;&lt; contact
+  end
+
+  def ask_for_another
+    console.print("Add another contact? (y/n): ")
+    console.read.chomp
+  end
+
+  def ask_for_name
+    console.print("Contact name: ")
+    console.read.chomp
+  end
+
+  def ask_for_address
+    console.print("Contact address: ")
+    console.read.chomp
+  end
+
+  def display(contact)
+    console.print(contact[:name] + "\t" + contact[:address] + "\n"
+  end
+
+  def display_all(contacts)
+    contacts.each do |contact|
+      display(contact)
+    end
+  end
+
+end
+</code></pre>
+
+<p>What if more requirements came to add more fields to the contact or to read or display other things?</p>
+
+<p>We need to extract all this behaviours into separate classes, and those classes will be in charge of knowing how to perform those behaviours. Also, each of those clases would have just one reason to change.</p>
+
+<p>We could add all the reading and printing methods to a user interface class:</p>
+
+<pre><code class="language-ruby">require 'console'
+
+class UI
+
+  ADD_ANOTHER = "Add another contact? (y/n): "
+  NAME        = "Contact name: "
+  ADDRESS     = "Contact address: "
+
+  def initialize(console)
+    @console = console
+  end
+
+  def ask_for_another
+    console.print(ADD_ANOTHER)
+    console.read.chomp
+  end
+
+  def ask_for_name
+    console.print(NAME)
+    console.read.chomp
+  end
+
+  def ask_for_address
+    console.print(ADDRESS)
+    console.read.chomp
+  end
+
+  def display(contact)
+    console.print(contact[:name] + "\t" + contact[:address] + "\n"
+  end
+
+  def display_all(contacts)
+    contacts.each do |contact|
+      display(contact)
+    end
+  end
+
+  private
+
+  attr_reader :console
+
+end
+</code></pre>
+
+<p>Anything having to deal with the console would be in this class, and everything related to adding contacts would be in the main class:</p>
+
+<pre><code class="language-ruby">class Conman
+
+  def initialize(ui)
+    @ui           = ui
+    @contact_list = []
+  end
+
+  def run
+    answer = "y"
+
+    while answer == "y"
+      add_contact
+      ui.display(contact_list.last)
+      answer = ui.ask_for_another
+    end
+    ui.display_all(contact_list)
+  end
+
+  def add_contact
+    name    = ui.ask_for_name
+    address = ui.ask_for_address
+
+    contact = {}
+    contact[:name]    = name
+    contact[:address] = address
+
+    contact_list &lt;&lt; contact
+  end
+
+  private
+
+  attr_reader :ui, :contact_list
+
+end
+</code></pre>
+
+
+<h2>SRP applied to methods</h2>
+
+<p>The Single Responsibility Principle also applies to methods. <strong>A method should do one thing and do it well</strong>. Methods should ideally be small, with no more that four or five lines. This can be a challenge in verbose languages like Java, but trying to keep them below ten lines should be enough.</p>
+
+<p>Two indications of a method that is getting too long (apart from the number of lines it has), is that it has different responsibilities, and local variables that are used all over the place. If that's the case, that method could be "<em>the place where all your classes went to hide</em>", and you should aim to extract them. Those local variables are probably asking to be fields.</p>
+
+<p>Consider for example this method:</p>
+
+<pre><code class="language-ruby">  def add_contact
+    name    = ui.ask_for_name
+    address = ui.ask_for_address
+    phone   = ui.ask_for_phone
+    email   = ui.ask_for_email
+    notes   = ui.ask_for_notes
+
+    contact = {}
+    contact[:name]    = name
+    contact[:address] = address
+    contact[:phone]   = phone
+    contact[:email]   = email
+    contact[:notes]   = notes
+    contact_list &lt;&lt; contact
+  end
+</code></pre>
+
+<p>It's asking the user interface for the fields, and adding them to the contact list. Maybe we can split these two behaviours. We could have a database class that handles the list of contacts:</p>
+
+<pre><code class="language-ruby">class DBFile
+
+  def initialize(file)
+    @file = file
+  end
+
+  def all
+    file.read_contacts
+  end
+
+  def add(contact)
+    file.write_contacts(all &lt;&lt; contact)
+  end
+
+  private
+
+  attr_reader :file
+end
+</code></pre>
+
+<p>And ask the user interface for the contact data:</p>
+
+<pre><code class="language-ruby">  def ask_for_fields
+    contact = {}
+    FIELDS_TO_QUESTIONS.each { |field, question| contact[field] = ask_for(question) }
+    contact
+  end
+
+  FIELDS_TO_QUESTIONS = {
+    "name"    => NAME,
+    "address" => ADDRESS,
+    "phone"   => PHONE,
+    "email"   => EMAIL,
+    "notes"   => NOTES
+  }
+
+  def ask_for(question)
+    console.write(question)
+    console.read.chomp
+  end
+</code></pre>
+
+<p>So that the base class can just delegate to the database method and send the contact information read from the user interface:</p>
+
+<pre><code class="language-ruby">  def add_contact(contact)
+    db.add(contact)
+  end
+</code></pre>
+
+<p>We have identified the parts that could change in the future and separated them into small methods with informative names that are in charge of one thing. As a result, we have a method that is easy to understand and maintain.</p>
+
+<p>What's more, if our codebase got more complex, it would be easy to move these methods around to other classes. Since they only do one thing, they are easily pluggable where they are needed.</p>
+
+
+
+
+
+
+
+
+<h2>In summary</h2>
+
+<p>SRP helps you keep your code as <strong>a healthy group of individual pieces of reusable code</strong>. Since each piece does just one thing, you can plug them in and out at your convenience to build something more complex without making your life unnecessarily harder.</p>
+
+<p>A way of thinking about it is: "<em>gather together the things that change for the same reasons. Separate those things that change for different reasons</em>".</p>
+
+<p>Applying this principle and keeping it in mind when you code will allow you to have a system that is flexible and easy to maintain, and will simplify updating and development in the future.</p>

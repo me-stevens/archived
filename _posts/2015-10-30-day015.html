@@ -1,0 +1,226 @@
+---
+layout: post
+title:  "15: Third week and testing tips"
+date:   2015-10-30 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>I finished reading Test-Driven Development by Example. This week I had to read the third and last part of it, and I found it easier than the previous two. In this part, the author goes through all the little concepts that we covered in the previous two parts, so, some of those I already recognized from using them daily when I do katas or when doing the book examples. This part seems more like a "look, this is the wisdom that we were applying, chopped into tiny wisdom tips."</p>
+
+<p>I decided to sum up the little tiny tips in the last part of the book, so that I can come to this list in the future. So here comes my summary:</p>
+
+<h3>TDD Patterns:</h3>
+
+<dl>
+	<dt>Isolated Test</dt>
+	<dd>The smallest possible test that doesn't contain dependencies to other tests and can be run in any order.</dd>
+
+	<dt>Test list</dt>
+	<dd>A to-do list of the tests that need to be performed. As the conditions change, you can add more tests to the list and strike the ones that are ready.</dd>
+
+	<dt>Test first</dt>
+	<dd>Always write the test first before the production code. The test will tell you the production code you have to write.</dd>
+
+	<dt>Assert first</dt>
+	<dd>Start writing your test with the <code class="language-java">assert</code> method. Then write back anything you need, create the objects you need, etc.</dd>
+
+	<dt>Test data</dt>
+	<dd>Use realistic data that makes sense to the test and that contributes some information to it.</dd>
+
+	<dt>Evident data</dt>
+	<dd>Use the data in an informative way, instead of calling a method, write the operation you are doing explicitly. The test will then be like a documentation of your code.</dd>
+</dl>
+
+<h3>Red bar Patterns:</h3>
+
+
+<dl>
+	<dt>One Step Test</dt>
+	<dd>What test to run next? The easier to implement, the one that you are sure that you can make it work.</dd>
+
+	<dt>Starter Test</dt>
+	<dd>Start with a variant of an operation that doesn't do anything. If your test is too realistic, you will spend too much time in the dark with no feedback.</dd>
+
+	<dt>Explanation test</dt>
+	<dd>A test that exists to explain what happens when the the objects or variables have certain values.</dd>
+
+	<dt>Learning test</dt>
+	<dd>A test you do to learn about the API or external resource you have to use in your production code.</dd>
+
+	<dt>Another test</dt>
+	<dd>In order to keep focused, if new ideas arrive that will make you get out of track, add another test to the list for your new idea, to visit it later, and get back to what you where working on.</dd>
+
+	<dt>Regression test</dt>
+	<dd>Regression testing is the process of testing changes to computer programs to make sure that the older programming still works with the new changes.</dd>
+
+	<dt>Break</dt>
+	<dd>When you are stuck, take a break, go for a walk, take some fresh air. Then, when you are relaxing under the shower, the solution to that problem will come to you.</dd>
+
+	<dt>Do over</dt>
+	<dd>Don't get attached to your code: if it doesn't work and you don't see the light at the end of the tunnel, throw it away and start over again.</dd>
+
+	<dt>Cheap desk, nice chair</dt>
+	<dd>You're gonna spend hours sitting on that chair. Make sure it's <a href="http://www.spine-health.com/wellness/ergonomics/office-chair-how-reduce-back-pain">a good one, ergonomic or otherwise</a>. Your desk can be a piece of wood over four legs. The bigger, the better.</dd>
+	
+</dl>
+
+
+<h3>Testing Patterns:</h3>
+
+
+<dl>
+	<dt>Child Test</dt>
+	<dd>When your test becomes too big, extract a small part, make it work, then add it again to papa test.</dd>
+
+	<dt>Mock object</dt>
+	<dd>Create a fake version of an expensive resource (a login, a database connection, an API implementation) and have control over it by making it return hardcoded answers.</dd>
+
+	<dt>Self shunt</dt>
+	<dd>To test that an object communicates with another, make it communicate with your test.</dd>
+
+	<dt>Log String</dt>
+	<dd>When you make your tests record progress or notifications in a string, so that every time a message is called, you append the message to the string.</dd>
+
+	<dt>Crash Test Dummy</dt>
+	<dd>It's some sort of mock. When you have a method that is supposed to return an exception, pass the exception as a parameter and see how the method reacts.</dd>
+
+	<dt>Broken test</dt>
+	<dd>When the day is over, leave the last test broken, so that when you come back the next day, you know where you were and you can put yourself in context in a short time.</dd>
+
+	<dt>Clean check-in</dt>
+	<dd>The opposite to the previous one. When you are not working alone but in a team, it's as if you were releasing a new version of your code to the public: don't do it until all tests are green.</dd>
+</dl>
+
+
+<h3>Green bar Patterns:</h3>
+
+<dl>
+	<dt>Fake it ('til you make it')</dt>
+	<dd>Use hardcoded values first to make your test pass, then, on a green bar, refactor to generalize those values into variables.</dd>
+
+	<dt>Triangulate</dt>
+	<dd>Don't abstract behaviour until you have at least two or three examples (Christoph told me he likes to wait until he has at least three).</dd>
+
+	<dt>Obvious implementation</dt>
+	<dd>If the operation is simple, use it instead of something more complicated.</dd>
+
+	<dt>One to many</dt>
+	<dd>When the method you want to test uses a collection (array, list, etc.), implement the test with a single parameter first, then make it work for the collection.</dd>
+</dl>
+
+
+<h3>xUnix Patterns:</h3>
+
+<dl>
+	<dt>Assertion</dt>
+	<dd>Check your tests using booleans, and be specific on the values that must be returned.</dd>
+
+	<dt>Fixture</dt>
+	<dd>Remove duplication in your tests by moving the variables and objects you create in every test to the <code class="language-java">setUp()</code>method.</dd>
+
+	<dt>External Fixture</dt>
+	<dd>The same, but overriding the <code class="language-java">tearDown()</code>method to release your resources.</dd>
+
+	<dt>Test method</dt>
+	<dd>Should be easy to read, should do things in tiny steps, should be marked as test (for example, add a <code class="language-java">@Test</code> modifier in Java with Junit 4).</dd>
+
+	<dt>Exception test</dt>
+	<dd>Checks that the method throws an exception, catching it, and failing if the exception is not thrown.</dd>
+
+	<dt>All tests</dt>
+	<dd>Have one test set for each package, and then a papa set that aggregates the package tests of the whole application you're building.</dd>
+</dl>
+
+
+<h3>Design Patterns:</h3>
+
+
+<dl>
+	<dt>Command</dt>
+	<dd>When you need an invocation of a computation to be more complicated than a simple method call, it's better to make an object for the computation and invoke it.</dd>
+
+	<dt>Value Object</dt>
+	<dd>Create an object whose state never changes, so that you can share it widely without suffering from aliasing problems.</dd>
+
+	<dt>Null Object</dt>
+	<dd>Represent the base case of a computation by an object. For example, if you have to return a value that could potentially be null valued, check for null and return a non-null object instead.</dd>
+
+	<dt>Template method</dt>
+	<dd>You first start with similar methods in different subclasses, then you refactor more and more until you have the same method in both and you can move it to the superclass.</dd>
+
+	<dt>Pluggable object</dt>
+	<dd>Represent variations avoiding explicit conditionals, because they spread. Instead, use an object with as many implementations as conditionals you need.</dd>
+
+	<dt>Pluggable selector</dt>
+	<dd>Instead of creating a lot of subclasses for the different implementations of a method, invoke different behaviour for different instances of a class with several methods.</dd>
+
+	<dt>Factory method</dt>
+	<dd>It's a method that makes objects. It's more flexible than a constructor. Don't use the constructor to create an object, create it in a factory method.</dd>
+
+	<dt>Imposter</dt>
+	<dd>Introduce variations by creating a new object with the same protocol as an existing one but different implementation. Null objects and composites are imposters.</dd>
+
+
+	<dt>Composite</dt>
+	<dd>It's a way of fighting duplication by making an object that is a collection of objects, like a folder containing folders.</dd>
+
+	<dt>Collecting parameter</dt>
+	<dd>Collect the results of different objects in a parameter. For example, the <code class="language-java">java.io.Externalizable</code> Java class, collects the results in an <code class="language-java">ObjectOutput</code> object.</dd>
+
+	<dt>Singleton</dt>
+	<dd>Instead of using global variables, think about the design of your programs.</dd>
+
+</dl>
+
+
+<h3>Refactoring:</h3>
+
+
+<dl>
+	<dt>Reconcile differences</dt>
+	<dd>When you have to pieces of code that look similar, gradually make them closer until you can unify them when they are identical.</dd>
+
+	<dt>Isolate change</dt>
+	<dd>Isolate the part of a long method that has to change, and work with it first.</dd>
+
+	<dt>Migrate data</dt>
+	<dd>First change the representation internally, then change the externally visible interface.</dd>
+
+	<dt>Extract method</dt>
+	<dd>When you have a long method, chop it into smaller methods and call them inside the big method.</dd>
+
+	<dt>Inline method</dt>
+	<dd>The opposite to the previous one, when you have too many invocations and the method behaviour is difficult to follow, inline some of the invoked methods.</dd>
+
+	<dt>Extract interface</dt>
+	<dd>Create an interface every time you want to define shared operations.</dd>
+
+	<dt>Move method</dt>
+	<dd>Identify where a method <em>really</em> belongs, and move it there.</dd>
+
+	<dt>Method object</dt>
+	<dd>When a method is too complicated, make an object out of the method. Simplifies code that is not simplified enough by "Extract method".</dd>
+
+	<dt>Add parameter</dt>
+	<dd>Add it first, and let the compiler errors tell you where you have to update your code.</dd>
+
+	<dt>Method parameter to constructor parameter</dt>
+	<dd>When you pass the same parameter to several methods in the same object, avoid duplication by turning it into a field instead.</dd>
+</dl>
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today was the Halloween party at HeadSpace, that ended up at Bounce, a bar that is like a pool bar, but with ping-pong tables instead. It was really fun. Then we went to have dinner at a korean restaurant near the office.</p>
+
+<p>Mateu came to present his Spanish BRO FIST to me, and we shared how sometimes at the end of the day <strong>we are so tired just because of having to speak in another language and understand people talking to us in another language</strong>. He had agreed so much with my previous Slack alias "<em>I swear I'm smart in Spanish!</em>". Jarkyn told us she had the same issues at the beginning, but now she's got used to it, to the point that now it's difficult for her to speak in her native language, as Russian has much more complex grammar and rules.</p>
+
+<p>Finally, we had a lot of visitors today, to the point that the office became a bit unhandleable (does that word even exist?). <strong>Emily was specially funny today</strong>, first she told us she would love to visit a prison, and she's going to, in her very special way of saying things. Then she praised the good taste on hairstyling of one of the visitors, who had two braids with coloured balls, counting their colours and comparing them to the vim console's syntax-highlighting colours. Skim and me were rolling on the floor laughing. Then she pulled out a Halloween dress out of nowhere to go to Bounce. She's AMAZING.</p>
+
+

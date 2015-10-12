@@ -1,0 +1,160 @@
+---
+layout:   post
+title:    "97: Including Ruby modules"
+date:     2016-02-26 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Today I battled again with the best and more idiomatic way of handling the marks. I asked in the apprentices channel and CJ came to the rescue. Basically, <strong>he told me to use symbols for the tests. Then Christoph told me to include my Marks module in the classes</strong>.</p>
+
+<p>Regarding the modules, I didn't know it, but you can include or extend a module, and have the methods available as well. However, they behave differently:</p>
+
+<ul>
+  <li>If you <strong>include</strong> the module, the method becomes an instance method. But,</li>
+  <li>if you <strong>extend</strong> the module then it becomes a class method.</li>
+</ul>
+
+<p>For example:</p>
+
+<pre><code class="language-ruby">module Const
+  def format
+    puts 'Done!'
+  end
+end
+</code></pre>
+
+<p>Including:</p>
+
+<pre><code class="language-ruby">class Car
+  include Const
+end
+
+Car.new.format # Done!
+Car.format # NoMethodError: undefined method format for Car:Class
+</code></pre>
+
+<p>Extending:</p>
+
+<pre><code class="language-ruby">class Bus
+  extend Const
+end
+
+Bus.format # Done!
+Bus.new.format # NoMethodError: undefined method format
+</code></pre>
+
+<p>So if I wanted to use the module's methods in the tests, I maybe could extend them instead of including them in the class, and then call the method on the class as if it was a "static" method (as in the first call of the second example). I tried this but it felt weird, so I sticked with the symbols and <code class="language-ruby">Marks.method</code> for the tests.</p>
+
+<p>Now, if I add methods to my module, I will have to test them. So there I wouldn't be able to just use symbols. I was wondering if there was a more natural way to test a module's behaviour in the simplest way, but still in the most similar conditions to reality, as in, inside of a class (that's how I'm gonna use it after all).</p>
+
+<p>I found a nice example <a href="http://stackoverflow.com/a/1546493">in Stack Overflow</a>, where they create a dummy class and inject the module:</p>
+
+<pre><code class="language-ruby">module Say
+  def hello
+    "hello"
+  end
+end
+</code></pre>
+
+<p>Test:</p>
+
+<pre><code class="language-ruby">class DummyClass
+end
+
+before(:each) do
+  @dummy_class = DummyClass.new
+  @dummy_class.extend(Say)
+end
+
+it "get hello string" do
+  @dummy_class.hello.should == "hello"
+end
+</code></pre>
+
+<p>But in my case it turned out to not be that simple, since I also have constants and all that, so at the end I did this:</p>
+
+<pre><code class="language-ruby">module Marks
+  X = :X
+  O = :O
+  E = :E
+
+  def self.opponent(mark)
+    mark == X ? O : X
+  end
+
+end
+</code></pre>
+
+<pre><code class="language-ruby">require 'marks'
+
+describe Marks do
+
+  it "swaps X to O" do
+    mark = Marks::X
+    expect(Marks.opponent(mark)).to eq(Marks::O)
+  end
+
+  it "swaps O to X" do
+    mark = Marks::O
+    expect(Marks.opponent(mark)).to eq(Marks::X)
+  end
+
+end
+</code></pre>
+
+<p>I also had a very stupid error using the shovel operator with the user interface constants. I was using it because of the performance, (it doesn't create a new string) and <strong>I totally forgot that the first string is mutated</strong>. So everytime I had to add dynamic information to the constant before printing it, I was actually appending it:</p>
+
+<pre><code class="language-ruby">def print_win_message(mark)
+  println(WIN &lt;&lt; mark.to_s)
+end
+
+#Diff:
+#       @@ -1,2 +1,4 @@
+#       -\nCongratulations, XX
+#       +
+#       +\nCongratulations, X
+</code></pre>
+
+<p>The solution is easy... concatenate! Because concatenating creates a new string (that's something I learnt back in the day, doing <a href="{% post_url 2016-01-25-day073 %}">the koans</a>):</p>
+
+<pre><code class="language-ruby">def print_win_message(mark)
+  println(WIN + mark.to_s)
+end
+</code></pre>
+
+<p>I'm definitely tired.</p>
+
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today we had our first "<em>MiniConf</em>, which is a mini conference were the craftspeople give talks that were previously added in a spreadsheet by anybody in the team and voted by everybody as well.</p>
+
+<p>The four most voted talks were:</p>
+
+<ul>
+  <li><strong>A talk about Elm (by Nathan)</strong>, a functional language I will take a look at when I finish the apprenticeship. It's like a preprocessor for JavaScript. It also has a "<a href="http://debug.elm-lang.org/">Time traveling Debugger</a>"" that reminds me of <a href="https://dribbble.com/LeaVerou/tags/dabblet">Dabblet on steroids</a>, since you can interact with the pop-ups (Sarah was reminded of <a href="https://vimeo.com/36579366">a video</a> where a similar UI is presented). The time travel is because you can do stuff and go back to any moment in time and check the states of your stuff, which is very helpful for debugging. Again, for some reason reminded me of Lea Verou using <code class="language-css">animation-play-state: paused;</code> and <code class="language-css">animation-delay: -1s</code> to debug CSS keyframe animations. What happens to my brain.</li>
+
+  <li><strong>Focusing on the marathon, by Christoph</strong>. Basically tips to avoid getting stuck: tiny steps, simple steps, focus on one thing at a time, etc.</li>
+  
+  <li><strong>Workshop on Bayes, by Uku</strong>. Bayes is an old foe, from when I had to calculate probabilities for the different feedings of the daughter of a decaying parent nucleus. This was a <a href="https://github.com/ukutaht/naive_bayes">much simpler</a> exercise though. It was about handling a data structure correctly in Ruby and using the right probability formula to tag words as spam or ham. I paired with Sarah but we couldn't finish on time.</li>
+  
+  <li><strong>Lessons from <a href="http://faros.io/">Faros</a>, by Felipe</strong>. He explained some deployment problems he had with how he was tagging the latest versions of his Docker packages. Although the explanation was very clear, I felt like I needed to have some experience working with Docker to get all the details. I also learnt that Faros was actually created to be used by design apprentices. As of today I thought it really was a compilation of CS resources, lol.</li>
+</ul>
+
+<p>The place was amazing. It was <strong>a photography studio</strong> with a living room, kitchen, bathroom, and the studio, where we had the talks. I have a friend who is a professional photographer, and <a href="https://www.facebook.com/photo.php?fbid=1419897531987">her studio was very similar</a>, although much bigger. But I recognized the infinite background, the ceiling window over it, for natural light, the black walls, the rolls of colored paper, etc. It was a dream place for me. At the end, some team members posed for the human company logo.</p>
+
+<p>There was also a bookshelf with a lot of cool photography books, and <strong>a bunch of old analog cameras</strong> (INSERT SPARKLES HERE). They even had a hanging human skeleton and a fireplace... old suitcases, and old circular home radiator from the fifties, and much more. I hope we can rent it again. Amelia said she got it through something like an AirBnb for offices.</p>
+
+<p>Skim came back from the US for the MiniConf, and so did Jim and Amelia. Mateu went back to Spain to celebrate <em>La Magdalena</em>.</p>
+
+<p>After the MiniConf, there were beers at the pub, but me and most of the apprentices didn't join. Jarkyn is working on her challenges, Georgina is working on her server, Sarah had a cast and crutches because she broke an ankle, and I was a bit in <em>cave-mode</em>, apart from VERY tired, so wouldn't be able to handle communication with other human beings.</p>

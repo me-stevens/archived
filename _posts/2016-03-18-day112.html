@@ -1,0 +1,28 @@
+---
+layout:   post
+title:    "112: Waza time!"
+date:     2016-03-18 20:00:00
+category: journal
+---
+
+<p>Today was a weird Friday. For the first time I didn't have to finish any of my stories, and I had the whole Friday to focus on my <em>waza</em>.</p>
+
+<p>There's something I've been trying to do since before starting the apprenticeship. <strong>I want to learn to use public APIs like those of GitHub, Twitter or Youtube, to fetch and send data</strong>. As usual, I never have the time to sit and work on that. So I tried to do that today.</p>
+
+<p>I worked with the <a href="https://developer.github.com/guides/getting-started/">GitHub API</a>. I want to build a webapp where users can log-in to GitHub, and fetch data. Then, they would do stuff with the data. Then the stuff they did would be persisted in a GitHub gist.</p>
+
+<p>This requires several things. The log-in I left for later, because <a href="https://developer.github.com/guides/basics-of-authentication/">I have to learn about OAuth</a>, but learning this will take me forever.</p>
+
+<p>I also want to authenticate in the client side, but the GitHub API only lets you do it server side. <strong>I guess I could deploy to Heroku and use PHP or whatever</strong>, as Lea Verou does in her webapp <a href="http://dabblet.com/">dabblet</a>, but I wanted something simple that I can use in GitHub pages. I suspect I will have to use PHP or similar and deploy to a proper server.</p>
+
+<p>The second part is to <strong>fetch the data and get what I want from the JSON object sent by GitHub</strong>. I managed to make a spike with HTML and vanilla JavaScript that is working, but the code makes your eyes bleed and there are no tests. Also, I'm hard-coding my user-name, lol. <em>L'horreur</em>.</p>
+
+<p>The third part is to <strong>send data to GitHub and save it in a gist</strong>. For this I guess <a href="https://developer.github.com/v3/gists/">I would need to have the log-in part finished first</a>.</p>
+
+<p>Finally, I tried to add tests, for which I used <a href ="https://github.com/jasmine/jasmine/">Jasmine</a>. But I had no idea how to test an HTTP connection like that. Then I saw Rabea learning about <a href="http://www.sinatrarb.com/">Sinatra</a> for her stories, and she was testing GET and POST requests to localhost, which is similar to what I want to do. However, I don't know if I want to use Sinatra for this particular thing or if it would even work.</p>
+
+<p>I've found that Jasmine comes with an AJAX library to mock AJAX responses called <a href="https://github.com/jasmine/jasmine-ajax">Jasmine-AJAX</a>, so I may try that.</p>
+
+<p>What I know for sure is that <strong>I don't want to use a trillion frameworks</strong>. Dabblet works with only <a href="https://github.com/LeaVerou/dabblet/tree/master/code">a bunch of vanilla JavaScript files</a>. Part of the reason why I'm doing this is <strong>to understand what's going on</strong>, as opposed to having a lot of magic doing things for me or different technologies fighting each other.</p>
+
+<p>So I idn't do much today... even though I have a working... "<em>something</em>". Working as in, it connects to GitHub, fetches user and repos data, and spits them in the html. Nothing, basically. A day might not be enough for me to finish this... I foresee the need of at least a month!</p>

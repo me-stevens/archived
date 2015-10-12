@@ -1,0 +1,135 @@
+---
+layout:   post
+title:    "75: Ruby mocks, rake and JSP"
+date:     2016-01-27 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Today I learnt a lot of things! OMG I hadn't had such a good week in ages.</p>
+
+<p>Skim gave his second <em>Zagaku</em> in ages. It was about <strong>double factor authentication</strong> and security, and it was cool and fun.</p>
+
+<p>Also, I was so happy pushing my pull request in the morning that I didn't realize that <strong>travis was RED</strong>. WAT. Some messages about rake. WAT. WAT IS RAKE EVEN. So I pressed all the panic buttons and alarms and asked Christoph for HALP.</p>
+
+<p>Turns out in order to use travis with your Ruby project you need to have something more that just a <code class="language-bash">.travis.yml</code> file with <code class="language-bash">language: ruby</code> in it. Georgina and Skim suddenly started speaking in Chinese, explaining the things I should do. So we went to one of Georgina's Ruby repos to see how she had it configured.</p>
+
+<p>Apparently <strong>I needed to have a <a href="http://tosbourn.com/what-is-the-gemfile/">Gemfile</a> in my project's root folder</strong>. We checked again my rspec version:</p>
+
+<pre><code class="language-bash">$ rspec -v
+3.4.1
+</code></pre>
+
+<p>And created a Gemfile with these contents:</p>
+
+<pre><code class="language-ruby">source 'https://rubygems.org'
+gem 'rspec',  '>=3.4.1'
+</code></pre>
+
+<p>We went back to the terminal and instaled <a href="bundler.io/">Bundler</a>, something that is to Ruby what Maven is to Java. But we got an error:</p>
+
+<pre><code class="language-bash">$ sudo gem install bundler
+$ bundle install
+
+Could not find gem 'rspec (>= 3.4.1)' in any of the gem sources listed in your Gemfile or available on this
+machine.
+</code></pre>
+
+<p>OH NOES! We went to <a href="https://rubygems.org">https://rubygems.org</a> and searched for rspec. The newest was 3.4.0, so we changed the Gemfile and ran <code class="language-bash">$ bundle install</code> again. It worked! And it created a <code class="language-bash">Gemfile.lock</code> file with a lot of dependencies. We pushed the files to GitHub and...</p>
+
+<p>Still red.</p>
+
+<p>OK.</p>
+
+<p>Looks like travis needs <a href="https://en.wikipedia.org/wiki/Rake_%28software%29">Rake</a> in order to work with Ruby projects (I think Rake works like Make files, the Node config file or like Grunt in web development). Skim was surprised about it, and there was also nothing about Rake in travis documentation regarding Ruby. We looked again at Georgina's files, and changed the Gemfile contents to:</p>
+
+<pre><code class="language-ruby">source 'https://rubygems.org'
+
+group :test do
+  gem 'rake'
+  gem 'rspec',  '>=3.4.0'
+end
+</code></pre>
+
+<p>The <code class="language-ruby">group :test do</code> part tells the system to use those dependencies only when running the tests. We also had to add a Rakefile:</p>
+
+<pre><code class="language-ruby">begin
+  require 'rspec/core/rake_task'
+  RSpec::Core::RakeTask.new(:spec)
+rescue LoadError
+end
+
+task :default => :spec
+</code></pre>
+
+<p>We ran <code class="language-bash">$ bundle install</code> again.</p>
+
+<pre><code class="language-bash">$ bundle install
+$ bundle exec rake
+</code></pre>
+
+<p>And travis was finally green.</p>
+
+<p>HOORAYYY!</p>
+
+<p>Now I have to run my tests using bundle, just like you would do it in Maven:</p>
+
+
+<pre><code class="language-bash">$ bundle install
+$ bundle exec rspec
+</code></pre>
+
+<p>That way, I will be using the local versions of the gems I need for the project, as if I had an isolated box, and I could share that box with other devs who could pull the dependencies and work smoothly with my project, no matter which versions of the gems they have installed globally in their system.</p>
+
+<p>When I ran the tests with bundle, I didn't have colors, so I added a <code class="language-bash">runtests</code> file with:</p>
+
+<pre><code class="language-bash">bundle exec rspec --color</code></pre>
+
+<p>and now I run it as:</p>
+
+<pre><code class="language-bash">$ . runtests</code></pre>
+
+<p>While doing all this today, I think I installed a bunch of garbage in my system. The next step was then to install a Ruby manager. I installed <a href="https://github.com/rbenv/rbenv">rbenv</a>, since that's what I remember installing in my Mountain. The tutorial I followed at the time was <a href="https://cbednarski.com/articles/installing-ruby/">"Installing Ruby the Correct Way"</a>, which I wish I had used earlier (it also instals rbenv FIRST and THEN bundle, I don't know if that would make any difference). Today I also found <a href="http://dan.carley.co/blog/2012/02/07/rbenv-and-bundler/">Rbenv and Bundler</a>. I hope I haven't destroyed my system too much with today's installations-in-a-rush-to-make-it-work-RITE-NAO.</p>
+
+
+
+
+
+<h3>Running a specific test with rspec</h3>
+
+<p>Today I needed to run specific tests to check something I was changing for them all, one at a time. Uku came to the rescue in the Slack channel. You do it like this:</p>
+
+<pre><code class="language-bash">rspec filename:linenumber</code></pre>
+
+<p>For example:</p>
+
+<pre><code class="language-bash">$ rspec spec/my_test.rb:13</code></pre>
+
+
+
+
+
+
+<h3>Mocks in Ruby</h3>
+
+<p>Today I ALSO learnt how to do mocks in Ruby. I followed <a href="http://rspec.info/documentation/3.4/rspec-mocks/">this documentation page</a>, and pushed to one of my conman branches, <a href="https://github.com/me-stevens/conman/commit/1b741afb44898ad8d007dfbcd99d63ecafda2908">here</a>.</p>
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today at Codebar I coached a woman who had her own web project she was doing for uni. <strong>She was doing it in NetBeans, and her files where all JSP</strong> (<a href="https://en.wikipedia.org/wiki/JavaServer_Pages">Java Server Pages</a>), an extension I had never seen before. Apparently, when you create a web project in NetBeans, it automatically saves your html files with that extension. So I supposed they where pretty much like PHP or ASP, both of which I had used in the past.</p>
+
+<p>The problem is that <strong>she was using XAMPP to load the page, and it doesn't understand JSP files right away</strong>. Also, she wasn't working in the default Apache's htdocs directory, so she had to manually edit some of the Apache configuration files to point somewhere else. Finally, there were some typos here and there that were preventing the server from starting. On top of that, she was working in Windows. ARGH! (of course I had to tell her to <strong>make another partition to dual boot Windows an Linux</strong>!)</p>
+
+<p>The first thing I did was to check the ports, everything was ok. Then we discovered that there were several instances of XAMPP running, so we killed them all. Then I got tired of the awful error messages in the XAMPP GUI, so I opened the terminal (as in, the Windows terminal, i.e., MS-DOS... ARGH!) and started the server there. BOOM. Beautiful and specific error messages. That's how we discovered all the hidden typos in the configuration files. <strong>The server was running again</strong>!</p>
+
+<p>Then the page was not loading. I checked the configuration files to see how she was running the project outside of htdocs, but Apache wasn't finding the page. So we moved it back to htdocs, not copy-pasting the files, but using NetBeans to create a web project from scratch instead, and moving just the JSP files from elsewhere to the project directory in htdocs. BOOM. <strong>The site was loaded!</strong>. But it was showing the directory listing, which is something that happens in Apache when you don't have an index page in your root directory.</p>
+
+<p>So we had to find the way to tell XAMPP to run JSP files. We did a quick search and discovered that <a href="http://1cap-onecap.blogspot.co.uk/2010/10/enable-tomcat-web-server-on-xampp.html">you need to have TomCat installed with XAMPP</a> and place your project files there. We couldn't finish because the two hours went away, but as usual, I gave her my email, in case she had any problems, to help her debug it.</p>
+
+<p>It was cool, like playing CSI, and I learnt new stuff!</p>

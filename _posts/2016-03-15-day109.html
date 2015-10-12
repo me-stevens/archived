@@ -1,0 +1,148 @@
+---
+layout:   post
+title:    "109: Mission accomplished and CraftsWAT"
+date:     2016-03-15 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>There was no <em>Zagaku</em> today, but to compensate, I learnt a lot from the client project I'm working on. This is my third day of intense work on a one-point story, to the point that <strong>I almost don't know my name anymore, lol</strong>.</p>
+
+<p>But <strong>I finished the point I was assigned</strong>, and that was cool! I was very scared when it was the time to push, my heart was about to grow legs and run away. ALL THOSE WHAT-IFS IN MY HEAD. My pull request is very tiny, and nobody would say that took me three days to do it (mostly swimming the huge codebase). But I gave my best and I'm very proud of it. And Skim told me "<em>Good job!</em>", which made me feel better.</p>
+
+<p>Anyway, today I was trying to test the method I made to get a video asset from its id, with no luck. Skim told me to look into the video assets helper, so that I could have the method available from the html templates. But Christoph thinks that it should go in the article presenter, so that we don't make one call to the database for every article if there are several articles pointing to the same asset. So I've been moving it back and forth from one class to the other. But my biggest concern is that I was not being able to find the way how to test it properly.</p>
+
+<p>At the end I put the code in the video asset helper. The test looks, more or less, let's say... like this:</p>
+
+<pre data-line="2"><code class="language-ruby">it "retrieves a video given an id" do
+  video_helper.config = config
+  video = create_video!
+  expect(video_helper.find_by_id(video.id)).to eq(video)
+end
+</code></pre>
+
+<p>My problem with this test in this particular file was... how do I create a video from here so that I can get the id? The only clear line for me was the last one (the expectation).</p>
+
+<p>Turns out line two is what I should have looked at. It is something I had seen all over the place in that file, but I didn't understand where it was coming from, or how to search for it.</p>
+
+<p>I almost wanted to slap myself when Skim told me: "<em>since it is Ruby, it can only be a variable or a method, right? so one thing you can try is:</em>"</p>
+
+<pre><code class="language-bash">$ git grep "def config"</code></pre>
+
+<p>BOOM.</p>
+
+<p>Why can't I think of these things, lol.</p>
+
+<p>I could have also looked at the requires. All spec files in a Ruby on Rails project import a helper by convention (I didn't know that):</p>
+
+<pre><code class="language-bash">require 'rails_spec_helper'</code></pre>
+
+<p>This file imports a custom spec helper, which imports a custom spec-helper methods, which is where this config method is defined, together with the methods to create things from tables, basically, like for example, a video asset.</p>
+
+<p>Another thing I learnt today is something about the controllers. The video asset is a module. A module can be included (or extended) in a class, and the methods of that module are then available for the class. What I didn't know is that what's in the class also becomes available for the module.</p>
+
+<p>You can test the module in several ways, one of them is to make a dummy class for the tests and include the module there. I talked about it in <a href="{% post_url 2016-02-26-day097 %}">a previous post</a>.</p>
+
+<pre><code class="language-ruby">class DummyForVideoHelper &lt; ApplicationController
+  include VideoHelper
+  attr_writer :config
+end
+</code></pre>
+
+<p>It was cool to parse this piece of the code after Skim's explanations and realize that it is exactly what I had written in my previous post. Applied concept in the wild!</p>
+
+<p>The test subclasses an application controller class for the dummy because that's where the module would be included. In the production code, though, if the class is a controller, it wouldn't use <code class="language-ruby">include</code> to mixin the module. Instead it would use <code class="language-ruby">helper</code>.</p>
+
+<pre><code class="language-ruby">class ApplicationController &lt; ActionController::Base
+  helper VideoHelper
+  ...
+</code></pre>
+
+<p>The reason for this is that then, the methods of the helper become available in the html templates. And so I can use my method <code class="language-ruby">find_by_id(id)</code> like this:</p>
+
+<pre><code class="language-markup">&lt;section>
+  &lt;%= render partial: 'some_partial', locals: {video: find_by_id(id) } %>
+&lt;/section>
+</code></pre>
+
+<p>Now I understand where the "helper" part of the name comes from in the video assets helper.</p>
+
+<p>I also learnt that if you want to run all the tests, in-memory and real database, you should type <code class="language-bash">bundle exec rake</code>, but if you want to only run the in-memory tests, you can type <code class="language-bash">bundle exec rake</code>.</p>
+
+<p>Finally, to commit the changes to the shared repo, we have to do it in <code class="language-bash">lib/assets</code>, and we should commit them first, because then the commit sha is updated automatically in the normal repo. If we go back to the master branch, it will see the change to the shared repo, so we should type <code class="language-bash">git submodule update</code>.</p>
+
+<p>Christoph also told me that <a href="https://www.relishapp.com/rspec/rspec-core/docs/configuration/read-command-line-configuration-options-from-files">you can do an rspec config file</a>, which is something I had no idea of.</p>
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<h2>Crafter or craftsperson?</h2>
+
+<p>This week we received an email form one of our team members in the US asking us to think about the word "craftsman":</p>
+<blockquote>
+We're considering alternatives to the term "Craftsman"; the impetus being that we'd like to convey our craft, and what we do, above all else - regardless of gender.
+</blockquote>
+
+<p>Certainly, our profession has nothing to do with gender! The form gives the options "crafter" and "craftsperson", and an option to suggest something else.</p>
+
+<p>Dany wanted us to think seriously about it, and recommended discussing it with others before making a decision. There has been a cross-location group working to make a decision about this, which is why a survey has been sent out. He told us he'd be happy to hold a London-wide discussion on it if people think that might be useful. So I thought that it would be better to share some thoughts here. Maybe I make you think a bit about it, imaginary reader!</p>
+
+<p>Since I am not a native English speaker, both sound fine to me, but apparently in the other side of the "pond", there is division of opinions. And here, in the old-fashioned Europe, the sole idea of changing the name was received with rolling eyes, to the point that I saw my dear craftsmen making fun of it with all sort of crazy names like "craftonomer" or "craftoffel", which made me feel a bit sad.</p>
+
+<p>So what would I have done in my native language? We have a whole institution to decide those things, but there's nothing like that in the English language. So <strong>my first suggestion was</strong>:</p>
+
+<blockquote>Why don't you ask a linguist?</blockquote>
+
+<p>Who better than a preson who studies the language to come up with something as RAD as "fireFIGHTER" instead of the boring "fireman"? Who knows what an amazing title they could find!</p>
+
+<p><strong>The second thing I did was to search the dictionary</strong>. This is what I found: both "craftsman" and "craftswoman" exist, together with "craftsperson" and "craftspeople".</p>
+
+<dl>
+	<dt><a href="http://www.merriam-webster.com/thesaurus/craftsman">Craftsman</a>:</dt>
+	<dd>A person whose occupation requires skill with the hands.</dd>
+
+	<dt><a href="http://www.merriam-webster.com/thesaurus/craftswoman">Craftswoman</a>:</dt>
+	<dd>A woman who makes beautiful objects by hand.</dd>
+
+	<dt><a href="http://www.merriam-webster.com/dictionary/craftsperson">Craftsperson</a>:</dt>
+	<dd>A person who makes beautiful objects by hand : a craftsman or craftswoman.</dd>
+
+	<dt><a href="http://www.merriam-webster.com/thesaurus/craftspeople">Craftspeople</a>:</dt>
+	<dd>Workers who practice a trade or craft.</dd>
+</dl>
+
+<p>I find it interesting that a "craftsman" is "a person", and that women just make "beautiful" things. Ah, language! :) </p>
+
+<p><strong>The third thing I did was to search in our team page</strong>. How do our people like to call themselves? We certainly have a diverse team for a tech company, and that is reflected in the titles they chose. There are Lisa, Patrick, and James C. who chose the title "craftsperson". There is Cristina who I saw with a "craftswoman" title but changed this week to "craftsperson" due to the discussion in place. There are Ginny, who visited us last year, and Jarkyn, who have both "craftsman". None of the men have "craftswoman" in their title.</p>
+
+<p>Maybe that's a way to think about it. What if only "craftswoman" existed? Would men be OK having a business card that says "John Doe, craftswoman"? Why does this sound weird, but "Jane Doe, craftsman" doesn't? That's part of the unconcious ideas that float around our head without we even noticing, but in my experience, swaping genders helps to make them more apparent. Also, if you think about it, the first programmers were all women, so maybe "craftswoman" makes more sense?</p>
+
+<p><strong>But this is about our gender not having to do anything with our job</strong>. Which made me think: Personally I am pretty gender neutral in my daily life. Because that's what feels natural to me. So I would vote for a neutral title all the way, and I've even been using "craftsperson" in my blog.</p>
+
+<p>But I don't impose that title to people. Maybe that's not as natural to others as it is to me. I know Jarkyn and Rabea are very proud of their gender, and I am proud of them. So maybe they don't want to be gender neutral like me. Maybe they want to be "craftswomen". Maybe some team members would like to be "craftsqueers"... I don't know!</p>
+
+<p>The important part of the word here is "<strong><em>craft</em></strong>" after all. Isn't it?</p>
+
+<p>So after thinking about it, I think we shouldn't impose a word but <strong>everybody should be free to choose whatever they feel comfortable with calling themselves</strong>. I vote for letting everybody decide what they want. After all, that's what diversity is about, isn't it?</p>
+
+<p>I'm proud to be part of a team that is diverse not only in gender, but also on age, race, dressing style, opinions, hobbies, and what-not. We should aim for this diversity. But I don't think we are yet <em>prepared</em> for what diversity means. If we learnt anything from moral relativism is that diversity is about accepting that the world is bigger than your little fishbowl, and that there are all kinds of cultures and ways to approach life. Yet from time to time we, from the best of the intentions, try to impose a "one thing works for all". Which may not work for all!</p>
+
+<figure>
+	<a href="{{ baseurl }}/img/day109.jpg"><img src="{{ baseurl }}/img/day109.jpg" alt="The genderbread person" width="1400" height="906"></a>
+	<figcaption>Gender is not a binary thing, it's actually pretty complex. Do we know how to deal with it?</figcaption>
+</figure> 

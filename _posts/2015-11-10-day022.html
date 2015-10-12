@@ -1,0 +1,61 @@
+---
+layout:   post
+title:    "22: Segregation, only in your code"
+date:     2015-11-10 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+
+<p>Christoph told us about the <strong>Interface Segregation Principle or ISP</strong>, which is about breaking interfaces down when they start to do too many things, like having more than about 20 methods that are unrelated.</p>
+
+<p>For example, simplifying a lot, if you had a <code class="language-java">Vehicle</code> interface with methods like <code class="language-java">turnRadioOn()</code>, <code class="language-java">turnLightsOn()</code> and <code class="language-java">turnEngineOn()</code>, you would probably be fine extracting those into their own interfaces <code class="language-java">Radio</code>, <code class="language-java">Lights</code> and <code class="language-java">Engine</code>. If something changed in the lights department, the radio department shouldn't have to care. Extrapolating this to Java, if these where in jar files, we wouldn't have to recompile and deploy the whole thing, but just the jar files that changed.</p>
+
+<p>I only have one interface at the moment, but my <code class="language-java">Game</code> class was getting too filled up with things, so I extracted the <code class="language-java">humanTurn()</code> and all the methods that it called to a separate class. Since I also have to add a computer turn, this sounded like a good idea. The computer turn can be in a similar class with similar functions. Maybe I could extract the similarities to an interface? as I learnt to do in the TDD by Example book.</p>
+
+
+
+
+<h2>Challenges</h2>
+
+<p>I was again in an self-destructive loop of not speaking out because of shame. I <a href="{% post_url 2015-11-02-day016 %}">never stop</a> reminding myself <a href="{% post_url 2015-10-26-day011 %}">from time to time</a> to speak out, and it's so hard. Why is it so hard? Because it's uncomfortable. And because my body reacts in a way that I can not control, and that only makes me more ashamed and childish. Imagine if your body decided to suddenly vomit. Nobody can stop your body from vomiting. Not even the unexpected Spanish inquisition. And on top of that, it generates drama and calls people's attention, which I hate. I just want to be in my cave! So, when that happens, I just avoid any contact with people, because I know my body will explode, and I don't want that to happen in the office.</p>
+
+<p>I really wish I could get rid of that. It makes me feel miserable. I don't want that to happen. I want to learn to control my body.</p>
+
+<figure>
+	<a href="https://imgflip.com/i/ty075"><img src="{{ baseurl }}/img/day022.jpg" alt="One does not simply stop vomiting" width="4032" height="3024"></a>
+	<figcaption>You just can't!</figcaption>
+</figure> 
+
+
+
+<p>This happens because I am so passionate about what I am doing, and my biggest fear is to disappoint Jim or the team. If Jim pays me to learn and I'm not learning, Jim (and the company) looses money. I told Jim about my frustration with my own brain and how slow it is, and he told me it is ok if it takes me more time to finish the apprenticeship. But I don't want that to happen! That would be like failing at life, the universe and everything else. So this is what I'm going to do:</p>
+
+<ul>
+	<li>Try not to be so negative.</li>
+	<li>Try not to be so harsh to myself.</li>
+	<li>Talk to Jim or Amelia whenever I am struggling with something.</li>
+	<li>I'm going to start doing breathing exercises or anything that helps me control my body.</li>		
+	<li>Prefer face to face than slack. The team Jim wants to build is based on communication, and body language is part of it. So, don't hide in the cave!</li>
+	<li>At the end of the day, it's about being professional.</li>
+	<li>We will practice interactions with clients<sup><a href="clientspy">1</a></sup>.</li>
+</ul>
+
+
+<p>Despite the shame I was feeling for being so stupid these days and having and uncontrollable body, my fear of dissapointing Jim is much bigger. So next time I find myself doing this again, I'm seriously going to tatoo this in a visible place!</p>
+
+
+
+
+<p id="clientspy" class="footnote"><sup>1</sup>I suppose we will use a client double. Would that be a mock client, a spy client or a fake client, I don't know (BA-DUM-TSSSS).</p>
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>I think the nicer thing of the day was my conversation with Jim. It took some sort of weight out of my chest and gave me my happiness back. He told me I am doing well and he knows I can do it. So now I believe I can do it!</p>

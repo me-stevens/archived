@@ -1,0 +1,32 @@
+---
+layout:   post
+title:    "32: Fighting the monster"
+date:     2015-11-24 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>So much! I sat with Mateu and we tried to fight together against the MENU MONSTER. BECAUSE ONLY ONE OF US SHOULD STAND AT THE END. <strong>Mateu discover other smells in my code</strong>, like the robot player, which was not playing as expected (at least not as when I tested it), and how I can still separate every round and turn from the game.</p>
+
+<p>Basically, my tests were doing too much because <strong>I have too much integration</strong>: so many little things were happening behind the scenes in my Game class, and I had to test them all, to the point that everything was so entangled that, if I wanted to change something small, many tests will break and it was not straight forward to make them pass again. That is not maintainable at all.</p>
+
+<p>We spend a good amount of time, but thanks to pairing with Mateu, and Enrique's comments in yesterday's IPM, I discovered that my code is very improvable, has a lot of bad design and code smells. But I am happy to know that, because now I have a lot of work to do to make it better, and I know more or less how.</p>
+
+<p>In today's <em>Zagaku</em>, <strong>Uku show us the difference between dynamic and static languages</strong>.</p>
+
+<p><strong>Dynamic languages</strong> are generally not compiled, they usually don't have types, and they are a bit slower than static ones. Also, because of all the things that are hidden from you, they are more prone to produce bugs or be less stable, so you need a whole lot more of tests to make sure your application is robust. However, they might seem easier to learn from a beginners perspective.</p>
+
+<p>I have my doubts on the last statement, though. <strong>But I may not be a good example, because the first programming language I learnt was C</strong>. However, I don't remember finding it so hard to learn, and it helped me understand what was really going on. Jarkyn started with Ruby and then went on to Java, and she says she regrets that, because Ruby hiding all the lower level stuff from her made it very difficult for her to understand, say, the SOLID principles.</p>
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today Emily, Priya, Rabea and me helped Felipe and Christoph with the first <a href="http://www.codefirstgirls.org.uk/">Codefirst:Girls</a> git workshop. The slides where cool in that they presented a couple of commands and then did some short exercise with them, then the next couple of commands and another exercise, and so on.</p>
+
+<p>The approach was fine, but our audience was not homogeneus. Also, most of them didn't even know how to use the command line. So they cloned the whole thing and they didn't know that the cloning generated a folder, or where that folder was. They didn't realize they had to enter that folder in order to perform all the git commands. So I guess <strong>next time it would be nice to at least show them the three basic commands</strong>; <code class="language-bash">ls</code>, <code class="language-bash">cd</code> and <code class="language-bash">pwd</code>, tell them that they have to enter the cloned directory, and maybe also tell them what is MarkDown and how to change the default git text editor from vi to Sublime, which what they all seemed to use.</p>
+
+<p>Some of the women there <strong>had gone to the Codefirst:Girls conference the day that Priya gave her talk, so she was a bit of a "rockstar" for them</strong> and they asked her a lot of questions about the apprenticeship and all that. That was quite cool.</p>

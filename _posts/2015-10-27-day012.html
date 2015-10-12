@@ -1,0 +1,50 @@
+---
+layout: post
+title:  "12: Mocking like a boss"
+date:   2015-10-27 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p><strong>To implement a fake / dummy class that is going to be used just for the tests</strong>. At the beginning of the day it was difficult for me to understand how everything worked out, and the middle of the day I couldn't see why we had the tests we had, and at the end of the day things started to make sense but I still will have to give it a couple of weeks to really get all the quirks. This week is going to be interesting.</p>
+
+<p>I think I haven't yet grasped the whole functionality, but basically, <strong>when you have something hard to test, like a database, an IO, an API, a library, etc. you would use a dummy class that implements the functionality of the thing you want to test</strong>, and helper methods that let you know things about the functionality you want to test ("the wiring", as Skim called it). You do this by implementing an interface, so that you can implement the same interface for "the real thing", and pass it as an argument to your app's class.</p>
+
+<p>For example, say the thing you want to test is the Console IO in Java. You have a Main class that reads a message from the console, and writes it back to the console again. To test the input/output of that, you create a class where you read and write a message too, let's say it's called Echo. But Echo gets passed an interface, and uses the methods of the interface to read and write. Why an interface? Because then you can pass it either your dummy interface implementor, or a class that simulates a "real" console.</p>
+
+<p>The dummy class is used to test that the reading and writing methods are called, or that their arguments are correct. For example, you pass Echo the dummy class and check that, if a string was read, the same string is printed to the output, because that's the functionality of your Echo. Once you have tested Echo with the dummy class, you know that it will work with any other implementation of the same interface. For example, the real console class, the one that gets passed the kind of objects a console would use, like an InputStream (like System.in) and a PrintStream (like System.out). You would use those in your read and write methods now. Then, in your Main, you would be able to pass Echo the actual System.in and System.out, with the security that everything will behave as expected. The idea is, that <strong>with a dummy, you are in control of what happens</strong>, you can control and manipulate yout test double. You are testing things at an upper level.</p>
+
+<p>Since I have just two days of experience with this, <strong>what I just wrote would probably make my eyes bleed in the future when I read this again</strong>. So I'll just link Uncle Bob's post "<a href="https://blog.8thlight.com/uncle-bob/2014/05/14/TheLittleMocker.html">the little mocker</a>" here, which explains it much better than me.</p>
+
+
+
+
+
+
+
+
+<h2 id="challenges">Challenges</h2>
+
+
+<p>Today I went to pick up the Mac that was on repair. Jim is planning to give me either that one or his own one. I think I'll take his Mac, because it has an SSD while the other has an HDD, and it's going to be painful to go from my current SSD to an HDD. Also, Jim's Mac is smaller, which my back is going to thank me for.</p>
+
+<p>Apart from upgrading myself to hipster (or maybe, hipster hippie-wannabe with a Mac), I will face the challenge of learning to use an SO that I had never ever used before. It was funny when after repeating to the person in the Apple store that the Mac was mine, he told me to open it to check that it was working, and I was like... WHERE IS THIS THING TURNED ON. And then, three accounts appeared, and none had my name (I happily remembered the password for one of them). And then I had to do as if I was using it. But I didn't knew what to click. And then... HOW DO I TURN THIS THING OFF. And so on.</p>
+
+<p>I think it will be better to deal with it on a weekend.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today we all went down to a bar that is close to the office and that Priya and Christoph had told me about before. I realized how much I needed a beer today (and how much I deserved it too!), and I was so happy that <strong>they had Guiness</strong> :D :D (smileys because why not). It's been a while since I had my last beer, so I really enjoyed that. And hanging out with part of the team, like we do in the office, but in a proper environment, was really cool. It felt like sharing time with friends.</p>

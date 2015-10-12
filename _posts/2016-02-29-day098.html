@@ -1,0 +1,95 @@
+---
+layout:   post
+title:    "98: Good bye Matrix"
+date:     2016-02-29 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Christoph talked about the <strong>Common Closuse Principle</strong>, which is like OCP for packages. If change were to happen in an application dependent on a number of packages, ideally we only want changes to occur in one package.</p>
+
+<p>Adding a new class shouldn't affect your core package. We talked about dependencies in our packages: if the classes are tightly coupled, put them in the same package. When you change something in the dependency you will have to recompile all. Interfaces help with this, because you interact with the public methods and then you can change the code inside the methods and nothing else changes.</p>
+
+<p>Another way of overcoming this is to slice things in a way that you don't have to wait for other people's changes and vice-versa.</p>
+
+<p>We also mentioned the order of compiling, which may affect how you think of your collaborators. Also, think as if you were one of those people who had to wait for things to compile back in the days. If every-time you made a change you had to wait that long for the thing to compile, you would do it more carefully.</p>
+
+
+
+
+
+
+
+
+<h3>IPM</h3>
+
+<p>As I expected, <strong>I have to replace the Matrix that I was so proud of with an array</strong>. Christoph told me that it didn't make sense to have the board class call methods on a dependency when it could just do its stuff inside the class. This is because the functionality that I really want is the checks for full and win and placing the mark. Jim told me that the Enumerable class is much more powerful, so if I use an array, I can benefit from that too.</p>
+
+<p>So <strong>I have to practice the methods in the Enumerable class</strong>, that class that was such a discovery for me <a href="{% post_url 2016-01-28-day076%}">weeks ago</a> coming from Java (apparently, you can now do similar shenanigans in Java 8 using Streams). I thought I could make the replacement in one afternoon, but introducing all the changes from the IPM took me an afternoon already.</p>
+
+<p>Anyway, I learnt some things: one of the corrections from the IPM was to use better options for the code where I was already using the Enumerable class. This was one of those places:</p>
+
+<pre><code class="language-ruby">def format_cells(board)
+  i = 0
+  Board.new(board.all.collect { |cell| i += 1; cell == E ? i : cell }.to_a)
+end
+</code></pre>
+
+<p>This method of the User Interface formats the board to print it, but it also returns a new board. Also, there are two statements separated by a semicolon, so it's better to use a <code class="language-ruby">do</code> / <code class="language-ruby">end</code> block. Since I also had to change <code class="language-ruby">board.all</code> to return an array instead of a Matrix, I also could not use <code class="language-ruby">collect</code> anymore.</p>
+
+<p>I searched for collect and the options with index for 2D arrays but I couldn't make it work. So my first attempt was this:</p>
+
+<pre><code class="language-ruby">i = 0
+board.all.map { |row| row.map do |cell| 
+  i += 1
+  cell == E ? i : cell
+end
+}
+</code></pre>
+
+<p>But there should be a better way to do it in Ruby, right? RIGHT? I asked in the Slack channel and Skim came to the rescue. After some time dabbling, we found this pearl:</p>
+
+<pre><code class="language-ruby">board.all.flatten.each_with_index.reduce([]) do |memo, (cell, i)|
+  memo &lt;&lt; (cell == Marks::E ? i+1 : cell)
+end.each_slice(board.size).to_a
+</code></pre>
+
+<p>The <code class="language-ruby">each_slice</code> was to recover the structure of the array. The next method I wanted to change was in the board:</p>
+
+<pre><code class="language-ruby">def indexes_of(content)
+  indexes = []
+  board.each_with_index { |cell, row, col| indexes &lt;&lt; index_from(row, col) if cell == content }
+  indexes
+end
+</code></pre>
+
+<p>Three lines! I'm sure that could be reduced to one. Again, dabbling in pry, I ended up with:</p>
+
+<pre><code class="language-ruby">array = [[:e, :x, :o], [:e, :e, :e], [:x, :o, :o]]
+array.flatten.each_with_index.map { |cell, index| index if cell == :e }
+</code></pre>
+
+<p>But this returns <code class="language-ruby">[0, nil, nil, 3, 4, 5, nil, nil, nil]</code>. How do I get rid of the nils? With <code class="language-ruby">compact</code>:</p>
+
+<pre><code class="language-ruby">array.flatten.each_with_index.map { |cell, index| index if cell == :e }.compact
+=> [0, 3, 4, 5]
+</code></pre>
+
+<p>Tomorrow I'll start replacing the Matrix for an array. Today I'm too tired.</p>
+
+
+
+
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>Today Skim told me that <strong>he had been reading about gravitational waves last week</strong>. That was so cool! But he also told me he has an Italian friend that stayed at his place when he was living in Chicago, <strong>who works at Fermilab. AT FERMILAB. Like, how cool is that</strong>. That's like the Cambridge/Harvard of particle physics.</p>
+
+<p>When he told me about it he didn't remember the name of the lab. So I thought about the <a href="http://www.nscl.msu.edu/">NSCL</a> in Michigan, near Chicago. But I also couldn't remember the name, only something like NSFL came to my mind, although I clearly remembered that the logo was like a synchrotron. So we searched for all sorts of things, including NSFL, and of course nothing came up, LOL. These two places in Chicago and Michigan are the two BIG places to go if you want to work in nuclear physics.</p>
+
+<p>Apart from that, I feel very proud of myself because <strong>this weekend I managed to finish all the bunch of things I had in my todo list</strong>. I finished the 3x3 human vs. human Ruby TTT, published my 10 pending blog posts, created the new octopus state, polished this week's <em>Zagaku</em>, finished a song that I am writing, and did some illustration sketches.</p>

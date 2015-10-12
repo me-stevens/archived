@@ -1,0 +1,45 @@
+# Site settings
+title:        Octopus on a light beam
+description:  > # this means to ignore newlines until "baseurl:"
+              My experience as a resident apprentice, thoughts, struggles, things I learn on the way, etc.
+baseurl:      "" # the subpath of your site, e.g. /blog/
+url:          "http://octopusonalightbeam.tk" # the base hostname & protocol for your site
+
+# User names
+twitter_user: octopusinvitro
+git_user:     me-stevens
+
+# Build settings
+exclude: [.gitignore, exclude]
+sass:
+  style: compressed
+future:  true
+
+# Categories
+#cats:
+#  "cat1":  "cat 1"
+#  "cat2":  "cat 2"
+
+# Months
+months:
+  1: "Egg"
+  2: "Baby"
+  3: "Kid"
+  4: "Teen"
+  5: "Young"
+  6: "Adult"
+  7: "Mature"
+  8: "Old"
+  9: "Dead"
+
+# State
+states:
+  1: "month1.svg"
+  2: "month2.svg"
+  3: "month3.svg"
+  4: "month4.svg"
+  5: "month5.svg"
+  6: "month6.svg"
+  7: "month7.svg"
+  8: "month8.svg"
+  9: "month9.svg"

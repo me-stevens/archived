@@ -1,0 +1,73 @@
+---
+layout:   post
+title:    "42: Noah's ark"
+date:     2015-12-08 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>Uku told us about nominal and structural typing, and how different languages approach it. I like how when he gives a talk, <strong>he always mentions all languages, and compares them</strong>, although I haven't worked with half the languages he mentions. He told us he was writing an algorithm to sort the type of the variables at run time, and I asked him for a <em>Zagaku</em> on that and how to write a compiler, but of course he told me it would take MONTHS.</p>
+
+<p>I asked again for pairs on the Slack channel and didn't get an answer, but Mateu offered to help me, and we had one of the best pairing sessions up to now. <strong>I always learn a ton from him, which is so COOL, because sometimes I feel stuck in my learning, as if I was not moving forward</strong>. He gave me two advices: to make more katas, in order to learn how to think and come up with the ideas he comes up with. And to go home early so that I could rest. So, for the first time in a lot of time, I went home early (well, at 20:30, hehe), and I'm going to try to do it more in the future.</p>
+
+<p>Regarding the pairing, I showed him the part of my code that makes your eyes bleed. I have four classes, each for one option, which only create two players. I have told my mentors that, long ago, when I had a switch statement, I considered turning each case statement into a class and using polymorphism to get rid of the switch, as they do in every book. But theory is not always mappable to reality, and that, in my case, would not work, and would be an overkill.</p>
+
+<p>I could see it so clearly that I didn't bother trying, but last week I had a story where I had to do exactly that. As a result, I had four ugly classes for each menu option, and an even uglier class called "MenuCreator", that used three lists to set the menu options, the pair of players to be created and the text to be printed to the screen for the user. If one of those lists had a different size than the others, my app would be screwed.</p>
+
+<p>He kept asking me questions about how to call the creation of the players that I need instead of calling them in pairs. I couldn't see how to call them separately when I need to return two. So he made an exercise from zero where we created animals and we used the menu to create all the possible combinations of each animal with another.</p>
+
+<iframe width="420" height="315" src="https://www.youtube.com/embed/H_VJwC7ZThM" frameborder="0" allowfullscreen></iframe>
+
+<p>Even though I wrote the code for that, it would have never crossed my mind to do it that way.</p>
+
+
+<pre><code class="language-java">public &lt;T> List&lt;List&lt;T>> getCombinations(List&lt;T> animals) {
+    List&lt;List&lt;T>> comb = new ArrayList&lt;>();
+    for (int i = 0; i &lt; animals.size(); i++) {
+        for (int j = 0; j &lt; animals.size(); j++) {
+            comb.add(Arrays.asList(animals.get(i), animals.get(j)));
+        }
+    }
+
+    return comb;
+}</code></pre>
+
+<p>This is building a list of lists, where for each animal we store a list of all the other animals (including itself).</p>
+
+<p>The other leg of the menu was a conversion table that told us which animal we had to create by checking a message that we sent as argument. That allows us to have the main public method of the API looking like this:</p>
+
+<pre><code class="language-java">public List<Animal> selectAnimals(String input) {
+    List<String> animals = Arrays.asList("cat", "dog");
+        return getAnimals(getCombinations(animals).get(Integer.parseInt(input) - 1));
+}</code></pre>
+
+<p>where we pass two messages (<code class="language-java">"cat"</code> and <code class="language-java">"dog"</code>) and we get the two players. But they are created separately. The input we pass as an argument is the option of the menu, if the menu showed all the possible combinations. The method <code class="language-java">getAnimals(List messages)</code> is the one who calls the conversion table.</p>
+
+<p>The problem I see is that, again, I need a conversion table, or in other words, a switch, or a set of conditionals:</p>
+
+<pre><code class="language-java">public Animal conversionTable(String message) {
+    if (message.equals("cat")) {
+        return new Cat();
+    }
+
+    else if (message.equals("dog")) {
+        return new Dog();
+    }
+
+    // More else-ifs here if there are more animals
+
+    throw new IllegalArgumentException();
+}</code></pre>
+
+<p>Which is what I was trying to get rid of. This is the thing that is not open-closed. If I add a new animal, I have to come here and modify the conversion table. But how can you check which player to create without using conditionals, and without creating a class for everything? Every thing I've tried so far, and I've tried a lot, converges always to a set of conditionals.</p>
+
+<p>This is probably not exactly what I need, but it was a conceptual jump and I have to give it a deeper thought, because I think I can recicle part of the filosophy of this approach.</p>
+
+
+
+
+
+<h2>Nice things</h2>
+
+<p>I feel today was a productive day, I worked super concentrated, focused and without distractions, I made two pull requests, and thanks to Mateu, I know where to start the definite battle against my menu.</p>

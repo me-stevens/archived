@@ -1,0 +1,177 @@
+---
+layout:   post
+title:    "88: SQLite"
+date:     2016-02-15 20:00:00
+category: journal
+---
+
+<h2>Today I learnt</h2>
+
+<p>I had my flat's annual gas check today in the morning so <strong>I missed the OSOM <em>Zagaku</em> about how to juggle</strong>, but I saw pictures that Georgina showed me on her phone, and it looked like a lot of fun.</p>
+
+<p>So my IPM was moved to the afternoon. Jim was caught in phone calls so it was Christoph and me again. I had a huge curiosity regarding which would be my tasks for this week, since, for me, ConMan&trade; was finished. But <strong>I got a sequel to it: I have to use SQL</strong> instead of file storage (see what I did there?).</p>
+
+<p>Christoph recommended to use something simple like SQLite. So the first thing I checked is if I had sqlite installed already:</p>
+
+<pre><code class="language-bash">$ sqlite3
+SQLite version 3.8.10.2 2015-05-20 18:17:19
+Enter ".help" for usage hints.
+Connected to a transient in-memory database.
+Use ".open FILENAME" to reopen on a persistent database.
+sqlite> .exit
+$
+</code></pre>
+
+<p>This is the SQLite command prompt where you can type commands or SQL statements. If you want to run sqlite against a database, you can also pass it as an argument:</p>
+
+<pre><code class="language-bash">$ sqlite3 test.db
+SQLite version 3.8.10.2 2015-05-20 18:17:19
+Enter ".help" for usage hints.
+sqlite> .exit
+$
+</code></pre>
+
+<p>I worked with SQLite last year, but we didn't build anything with it, just did exercises where we typed commands on the prompt against a test database, to see things happening. Also, we didn't use SQL, we used HQL.</p>
+
+<p>We used it only for a couple of weeks and never touched it again. So, to refresh my memory, I skimmed through this <a href="http://zetcode.com/db/sqlite/">SQLite tutorial</a> and the official docs for the <a href="https://www.sqlite.org/cli.html">Command Line Shell For SQLite</a>.</p>
+
+
+<p>What I have to learn now though, is <strong>to connect to an SQLite database through Ruby</strong>. So I followed this <a href="http://zetcode.com/db/sqliteruby/">SQLite Ruby tutorial</a>, and had SO MUCH FUN.</p>
+
+<p>Apparently, I also had the <a href="https://rubygems.org/gems/sqlite3/versions/1.3.11">sqlite3</a> gem installed:</p>
+
+<pre><code class="language-ruby">$ pry
+[1] pry(main)> gem-list
+...
+sqlite3 (1.3.7)
+...
+[2] pry(main)> quit
+$
+</code></pre>
+
+<p>Which is used in the following way:</p>
+
+<pre><code class="language-ruby">require 'sqlite3'
+
+db = SQLite3::Database.new "data.db" 
+
+db.execute "SELECT * FROM table" do |row|
+  p row
+end
+
+db.close
+</code></pre>
+
+<p>You first require the gem and then create a new SQLite object that takes the name of the file where you want the database to be stored (in this case, <code class="language-">data.db</code>). Then you can do a lot of stuff with it, like executing SQL statements by calling the <code class="language-ruby">execute</code> method. A resource I found pretty handy is the documentation of the <a href="http://sqlite-ruby.rubyforge.org/sqlite3/classes/SQLite3/Database.html#M000099">Database</a> class, it shows you everything you can do with it.</p>
+
+<p>The good thing is that, <strong>it comes with an in-memory implementation</strong>, that you can use very easily by passing <code class="language-ruby">":memory:"</code> instead of the file name:</p>
+
+<pre><code class="language-ruby">db = SQLite3::Database.new ":memory:"</code></pre>
+
+<p>So I can use it for tests, and then in the production code I pass a real file. Also, this is more like SQL stuff, but, I will need to create a contacts table at some point, but it should only be created once, so I will need:</p>
+
+<pre><code class="language-ruby">db.execute "CREATE TABLE IF NOT EXISTS tablename(Id INTEGER PRIMARY KEY, columnname TEXT)"</code></pre>
+
+<p>I will also need to insert and update rows, to add and update contacts.</p>
+
+<pre><code class="language-ruby">db.execute "INSERT INTO tablename(column1, column2) VALUES ('value1', 'value2')"
+</code></pre>
+
+<pre><code class="language-ruby">db.execute "UPDATE tablename SET column1='value1', column2='value2' WHERE id=1"
+</code></pre>
+
+<p><strong>The ids are incremented automatically</strong> but can also be inserted by hand. There is also <code class="language-sql">INTEGER PRIMARY KEY AUTOINCREMENT</code>, which uses a slightly different algorithm for id creation, but <a href="https://www.sqlite.org/autoinc.html">its use is not recommended</a>.</p>
+
+<p>You can prepare SQL statements to use later, and when you execute them, you get a cursor. Just as I remember doing it in Java:</p>
+<pre><code class="language-ruby">stm = db.prepare "SELECT * FROM Cars LIMIT 5" 
+rs = stm.execute 
+
+rs.each do |row|
+  puts row.join "\s"
+end
+</code></pre>
+
+<p>You can also do it in a one-liner:</p>
+<pre><code class="language-ruby">rows = db.execute "SELECT * FROM Cars LIMIT 5"</code></pre>
+
+<p>You can <strong>get the results as a hash</strong>, by specifying:</p>
+
+<pre><code class="language-ruby">db.results_as_hash = true</code></pre>
+
+<p>I thought this was so convenient for ConMan&trade;, but it is not, because what it does is, that it returns duplicated information: <strong>the first keys are the names of the columns, and the last keys are numbers from 0 to the number of columns, both pointing to the same values</strong>.</p>
+
+<p>For example:</p>
+
+<pre><code class="language-ruby">require 'sqlite3'
+
+  db = SQLite3::Database.open "test.db"
+  db.results_as_hash = true
+
+  ary = db.execute "SELECT * FROM Cars LIMIT 5"
+  puts ary
+
+  db.close
+
+end
+</code></pre>
+
+<p>would return:</p>
+
+<pre><code class="language-ruby">{
+	"Id"=>1, 
+	"Name"=>"Audi", 
+	"Price"=>52642, 
+	0=>1, 
+	1=>"Audi", 
+	2=>52642
+}</code></pre>
+
+<p>I'm not sure why they decided to implement it this way, but it means I can't use it.</p>
+
+<p>Another thing I remembered from Java is that you can pass parameters. <strong>Binding parameters guards the program against SQL injections, and automatically escapes some special characters</strong>, which allow them to be handled correctly:</p>
+
+
+<pre><code class="language-ruby">stm = db.prepare "SELECT * FROM Cars WHERE Id=?"
+stm.bind_param 1, id
+rs = stm.execute
+</code></pre>
+
+or 
+
+<pre><code class="language-ruby">stm = db.prepare "SELECT * FROM Cars WHERE Id = :id"
+rs = stm.execute id
+</code></pre>
+
+or the one liner
+
+<pre><code class="language-ruby">row = db.get_first_row "SELECT * FROM Cars WHERE Id = ?", id</code></pre>
+
+<p>You can also use <strong>transactions</strong>:</p>
+
+<pre><code class="language-ruby">require 'sqlite3'
+
+begin
+    
+    db = SQLite3::Database.open "test.db"
+
+    db.transaction
+    db.execute "DROP TABLE IF EXISTS Friends"
+    db.execute "CREATE TABLE Friends(Id INTEGER PRIMARY KEY, Name TEXT)"
+    db.execute "INSERT INTO Friends(Name) VALUES ('Tom')"
+    db.execute "INSERT INTO Friends(Name) VALUES ('Rebecca')"
+    db.commit
+    
+rescue SQLite3::Exception => e 
+    
+    puts "Exception occurred"
+    puts e
+    db.rollback
+    
+ensure
+    db.close if db
+end
+</code></pre>
+
+<p>Although I haven't looked into it much further.</p>
+
+<p>I think I have more or less an idea of what I have to do, what I can use and how can I add it to ConMan&trade;. What I don't know is how am I gonna screw it up this time.</p>
